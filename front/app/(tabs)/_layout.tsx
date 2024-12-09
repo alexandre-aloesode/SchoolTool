@@ -22,22 +22,40 @@ export default function TabLayout() {
           ios: {
             // Use a transparent background on iOS to show the blur effect
             position: 'absolute',
+            backgroundColor: '#0084FA',
           },
-          default: {},
+          default: {
+            paddingTop: 4,
+            backgroundColor: '#0084FA',
+          },
         }),
       }}>
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          title: '',
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color="white" />,
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="jobs"
         options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          title: '',
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="briefcase.fill" color="white" />,
+        }}
+      />
+      <Tabs.Screen
+        name="absences"
+        options={{
+          title: '',
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="person.crop.circle.badge.xmark" color="white" />,
+        }}
+      />
+      <Tabs.Screen
+        name="calendar"
+        options={{
+          title: '',
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="calendar.badge.clock" color="white" />,
         }}
       />
     </Tabs>
