@@ -2,21 +2,18 @@ import React, { useEffect } from "react";
 import { StyleSheet, View, Text, Button, Alert, Platform } from "react-native";
 import * as AuthSession from "expo-auth-session";
 import * as WebBrowser from "expo-web-browser";
-import config from "../../config";
+import config from "../../config.js";
 
 WebBrowser.maybeCompleteAuthSession();
-const googleSecret = config.GOOGLE_CLIENT_SECRET;
+
 const androidClientId = config.ANDROID_CLIENT_ID;
 const iosClientId = config.IOS_CLIENT_ID;
 const webClientId = config.LPTF_GOOGLE_CLIENT_ID;
-// const webClientId = config.WEB_CLIENT_ID;
+const googleSecret = config.GOOGLE_CLIENT_SECRET;
+
+console.log("androidClientId", androidClientId);
 
 export default function HomeScreen() {
-
-  console.log("androidClientId", androidClientId);
-  console.log("iosClientId", iosClientId);
-  console.log("webClientId", webClientId);
-  
   const [request, response, promptAsync] = AuthSession.useAuthRequest(
     {
       clientId: Platform.select({
