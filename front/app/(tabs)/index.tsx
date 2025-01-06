@@ -1,79 +1,116 @@
-import { Image, StyleSheet, Platform } from "react-native";
+import React, { useEffect } from "react";
+import { StyleSheet, View, Text, Button, Alert, Platform } from "react-native";
+import * as AuthSession from "expo-auth-session";
+import * as WebBrowser from "expo-web-browser";
+import config from "../../config";
 
-import { HelloWave } from "@/components/HelloWave";
-import ParallaxScrollView from "@/components/ParallaxScrollView";
-import { ThemedText } from "@/components/ThemedText";
-import { ThemedView } from "@/components/ThemedView";
-import Entypo from "@expo/vector-icons/Entypo";
+WebBrowser.maybeCompleteAuthSession();
+const googleSecret = config.GOOGLE_CLIENT_SECRET;
+const androidClientId = config.ANDROID_CLIENT_ID;
+const iosClientId = config.IOS_CLIENT_ID;
+const webClientId = config.LPTF_GOOGLE_CLIENT_ID;
+// const webClientId = config.WEB_CLIENT_ID;
 
 export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: "#0084FA", dark: "#1D3D47" }}
-      headerImage={
-        <ThemedView style={styles.headerContainer}>
-          <Image source={require("@/assets/images/school-logo.png")} style={styles.schoolLogo} />
-          <Entypo name="log-out" size={30} color="white" style={styles.logoutIcon} />
-        </ThemedView>
+
+  console.log("androidClientId", androidClientId);
+  console.log("iosClientId", iosClientId);
+  console.log("webClientId", webClientId);
+  
+  const [request, response, promptAsync] = AuthSession.useAuthRequest(
+    {
+      clientId: Platform.select({
+        ios: iosClientId,
+        android: androidClientId,
+        default: webClientId,
+      }),
+      redirectUri: AuthSession.makeRedirectUri({
+        scheme: "com.schooltool.authsessiongoogle",
+      }),
+      scopes: ["openid", "profile", "email"],
+    },
+    { authorizationEndpoint: "https://accounts.google.com/o/oauth2/v2/auth" }
+  );
+
+  const exchangeCodeForToken = async (code: string) => {
+    console.log("code", code);
+    
+    try {
+      console.log(
+        "redirect adress",
+        AuthSession.makeRedirectUri({
+          scheme: "com.schooltool.authsessiongoogle",
+        })
+      );
+
+      const response = await fetch("https://oauth2.googleapis.com/token", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: new URLSearchParams({
+          code,
+          client_id: Platform.select({ ios: iosClientId, android: androidClientId, default: webClientId }),
+          redirect_uri: AuthSession.makeRedirectUri({
+            scheme: "com.schooltool.authsessiongoogle",
+          }),
+          grant_type: "authorization_code",
+        }),
+      });
+
+      const tokenData = await response.json();
+
+      if (tokenData.access_token) {
+        fetchUserData(tokenData.access_token);
+      } else {
+        console.log("Erreur lors de la récupération du token Google :", tokenData);
+        Alert.alert("Erreur", "Impossible d'obtenir un jeton d'accès");
       }
-    >
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes. Press{" "}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: "cmd + d",
-              android: "cmd + m",
-              web: "F12",
-            })}
-          </ThemedText>{" "}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>Tap the Explore tab to learn more about what's included in this starter app.</ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{" "}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current <ThemedText type="defaultSemiBold">app</ThemedText> to{" "}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+    } catch (error) {
+      console.error("Erreur lors de l'échange du code contre un jeton :", error);
+      Alert.alert("Erreur", "Problème lors de l'échange du code d'autorisation");
+    }
+  };
+
+  const fetchUserData = async (accessToken: string) => {
+    try {
+      const userInfoResponse = await fetch("https://www.googleapis.com/oauth2/v2/userinfo", {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+      const userInfo = await userInfoResponse.json();
+      Alert.alert("Connecté", `Bienvenue ${userInfo.name}`);
+    } catch (error) {
+      Alert.alert("Erreur", "Impossible de récupérer les informations utilisateur");
+      console.error(error);
+    }
+  };
+  
+  useEffect(() => {
+    console.log("Réponse AuthSession :", response);
+    if (response?.type === "success" && response.params?.code) {
+      const { code } = response.params;
+      exchangeCodeForToken(code);
+    }
+  }, [response]);
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>Bienvenue sur l'application</Text>
+      <Button disabled={!request} title="Se connecter avec Google" onPress={() => promptAsync()} color="#4285F4" />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: "row",
+  container: {
+    flex: 1,
+    justifyContent: "center",
     alignItems: "center",
-    gap: 8,
+    backgroundColor: "#f7f7f7",
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  headerContainer: {
-    flexDirection: "row",
-    height: "100%",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 10,
-    paddingTop: 20,
-    backgroundColor: "#0084FA",
-  },
-  schoolLogo: {
-    height: "90%",
-    width: "20%",
-  },
-  logoutIcon: {
+  title: {
+    fontSize: 24,
+    marginBottom: 20,
+    color: "#333",
   },
 });
