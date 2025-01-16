@@ -8,7 +8,7 @@ WebBrowser.maybeCompleteAuthSession();
 
 const androidClientId = config.ANDROID_CLIENT_ID;
 const iosClientId = config.IOS_CLIENT_ID;
-const webClientId = config.LPTF_GOOGLE_CLIENT_ID;
+const webClientId = config.WEB_CLIENT_ID;
 const googleSecret = config.GOOGLE_CLIENT_SECRET;
 
 console.log("androidClientId", androidClientId);
@@ -47,6 +47,7 @@ export default function HomeScreen() {
         },
         body: new URLSearchParams({
           code,
+          client_secret: Platform.OS === "web" ? googleSecret : undefined,
           client_id: Platform.select({ ios: iosClientId, android: androidClientId, default: webClientId }),
           redirect_uri: AuthSession.makeRedirectUri({
             scheme: "com.schooltool.authsessiongoogle",
