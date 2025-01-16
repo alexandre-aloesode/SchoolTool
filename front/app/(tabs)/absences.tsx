@@ -1,109 +1,256 @@
-import { StyleSheet, Image, Platform } from 'react-native';
+import React, { useState, useRef } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  Button,
+  StyleSheet,
+  Alert,
+  TouchableOpacity,
+  ActivityIndicator,
+  Modal,
+  TouchableWithoutFeedback,
+} from "react-native";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import * as ImagePicker from "expo-image-picker";
+import { format } from "date-fns";
+import { ApiActions } from "../../services/ApiServices";
 
-import { Collapsible } from '@/components/Collapsible';
-import { ExternalLink } from '@/components/ExternalLink';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
-import { IconSymbol } from '@/components/ui/IconSymbol';
-
-export default function TabTwoScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
-      headerImage={
-        <IconSymbol
-          size={310}
-          color="#808080"
-          name="chevron.left.forwardslash.chevron.right"
-          style={styles.headerImage}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Explore</ThemedText>
-      </ThemedView>
-      <ThemedText>This app includes example code to help you get started.</ThemedText>
-      <Collapsible title="File-based routing">
-        <ThemedText>
-          This app has two screens:{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/explore.tsx</ThemedText>
-        </ThemedText>
-        <ThemedText>
-          The layout file in <ThemedText type="defaultSemiBold">app/(tabs)/_layout.tsx</ThemedText>{' '}
-          sets up the tab navigator.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/router/introduction">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Android, iOS, and web support">
-        <ThemedText>
-          You can open this project on Android, iOS, and the web. To open the web version, press{' '}
-          <ThemedText type="defaultSemiBold">w</ThemedText> in the terminal running this project.
-        </ThemedText>
-      </Collapsible>
-      <Collapsible title="Images">
-        <ThemedText>
-          For static images, you can use the <ThemedText type="defaultSemiBold">@2x</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">@3x</ThemedText> suffixes to provide files for
-          different screen densities
-        </ThemedText>
-        <Image source={require('@/assets/images/react-logo.png')} style={{ alignSelf: 'center' }} />
-        <ExternalLink href="https://reactnative.dev/docs/images">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Custom fonts">
-        <ThemedText>
-          Open <ThemedText type="defaultSemiBold">app/_layout.tsx</ThemedText> to see how to load{' '}
-          <ThemedText style={{ fontFamily: 'SpaceMono' }}>
-            custom fonts such as this one.
-          </ThemedText>
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/versions/latest/sdk/font">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Light and dark mode components">
-        <ThemedText>
-          This template has light and dark mode support. The{' '}
-          <ThemedText type="defaultSemiBold">useColorScheme()</ThemedText> hook lets you inspect
-          what the user's current color scheme is, and so you can adjust UI colors accordingly.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/develop/user-interface/color-themes/">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Animations">
-        <ThemedText>
-          This template includes an example of an animated component. The{' '}
-          <ThemedText type="defaultSemiBold">components/HelloWave.tsx</ThemedText> component uses
-          the powerful <ThemedText type="defaultSemiBold">react-native-reanimated</ThemedText>{' '}
-          library to create a waving hand animation.
-        </ThemedText>
-        {Platform.select({
-          ios: (
-            <ThemedText>
-              The <ThemedText type="defaultSemiBold">components/ParallaxScrollView.tsx</ThemedText>{' '}
-              component provides a parallax effect for the header image.
-            </ThemedText>
-          ),
-        })}
-      </Collapsible>
-    </ParallaxScrollView>
-  );
+interface AbsenceForm {
+  start_date: string;
+  end_date: string;
+  duration: number;
+  reason: string;
+  image: string | null;
+  imageName: string;
 }
 
+const UploadAbsences: React.FC = () => {
+  const [loading, setLoading] = useState(false);
+  const [absenceForm, setAbsenceForm] = useState<AbsenceForm>({
+    start_date: "",
+    end_date: "",
+    duration: 0,
+    reason: "",
+    image: null,
+    imageName: "",
+  });
+  const [showDatePicker, setShowDatePicker] = useState<"start_date" | "end_date" | null>(null);
+
+  const reasons = [
+    "Accident de transport",
+    "Maladie",
+    "Raison familiale",
+    "Evènement entreprise",
+    "Autre",
+  ];
+
+  const handleDateChange = (field: "start_date" | "end_date", selectedDate: Date | undefined) => {
+    if (selectedDate) {
+      setAbsenceForm((prev) => ({
+        ...prev,
+        [field]: selectedDate.toISOString().split("T")[0],
+      }));
+    }
+    setShowDatePicker(null); // Close the picker after selection
+  };
+
+  const handleReasonChange = (reason: string) => {
+    setAbsenceForm((prev) => ({ ...prev, reason }));
+  };
+
+  const handleImagePick = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setAbsenceForm((prev) => ({
+        ...prev,
+        image: result.assets[0].uri,
+        imageName: result.assets[0].uri.split("/").pop() || "",
+      }));
+    }
+  };
+
+  const recapAbsence = () => {
+    return `
+      Raison : ${absenceForm.reason}
+
+      Du ${format(new Date(absenceForm.start_date), "dd/MM/yyyy")} au ${format(
+      new Date(absenceForm.end_date),
+      "dd/MM/yyyy"
+    )}
+
+      Durée : ${absenceForm.duration} ${
+      absenceForm.duration > 1 ? "jours ouvrés" : "jour ouvré"
+    }`;
+  };
+
+  const handleUploadAbsence = () => {
+    if (
+      !absenceForm.start_date ||
+      !absenceForm.end_date ||
+      !absenceForm.reason ||
+      !absenceForm.image
+    ) {
+      Alert.alert("Erreur", "Veuillez remplir tous les champs");
+      return;
+    }
+
+    const startDate = new Date(absenceForm.start_date);
+    const endDate = new Date(absenceForm.end_date);
+
+    if (startDate >= endDate) {
+      Alert.alert("Erreur", "La date de début doit être antérieure à la date de retour");
+      return;
+    }
+
+    let duration = 0;
+    let tempDate = new Date(startDate);
+
+    while (tempDate < endDate) {
+      if (tempDate.getDay() !== 0 && tempDate.getDay() !== 6) {
+        duration++;
+      }
+      tempDate.setDate(tempDate.getDate() + 1);
+    }
+
+    setAbsenceForm((prev) => ({ ...prev, duration }));
+
+    Alert.alert("Confirmation", recapAbsence(), [
+      { text: "Annuler", style: "cancel" },
+      {
+        text: "Confirmer",
+        onPress: async () => {
+          setLoading(true);
+          try {
+            const response = await ApiActions.post({
+              route: "uploadAbsence",
+              params: absenceForm,
+            });
+            if (response.status === 200) {
+              setLoading(false);
+              Alert.alert("Succès", "Absence envoyée avec succès");
+              setAbsenceForm({
+                start_date: "",
+                end_date: "",
+                reason: "",
+                image: null,
+                imageName: "",
+                duration: 0,
+              });
+            } else {
+              throw new Error();
+            }
+          } catch (error) {
+            setLoading(false);
+            Alert.alert("Erreur", "Une erreur est survenue");
+          }
+        },
+      },
+    ]);
+  };
+
+  return (
+    <View style={styles.container}>
+      {!loading ? (
+        <View style={styles.form}>
+          <Text style={styles.label}>Date de début</Text>
+          <TouchableOpacity onPress={() => setShowDatePicker("start_date")}>
+            <Text>{absenceForm.start_date || "Sélectionner une date"}</Text>
+          </TouchableOpacity>
+
+          <Text style={styles.label}>Date de retour</Text>
+          <TouchableOpacity onPress={() => setShowDatePicker("end_date")}>
+            <Text>{absenceForm.end_date || "Sélectionner une date"}</Text>
+          </TouchableOpacity>
+
+          <Text style={styles.label}>Motif</Text>
+          {reasons.map((reason, index) => (
+            <TouchableOpacity key={index} onPress={() => handleReasonChange(reason)}>
+              <Text style={styles.reason}>{reason}</Text>
+            </TouchableOpacity>
+          ))}
+
+          <TouchableOpacity onPress={handleImagePick} style={styles.uploadButton}>
+            <Text>Uploader un justificatif</Text>
+          </TouchableOpacity>
+          {absenceForm.imageName && (
+            <Text style={styles.imageName}>Fichier sélectionné : {absenceForm.imageName}</Text>
+          )}
+
+          <Button title="Valider" onPress={handleUploadAbsence} />
+        </View>
+      ) : (
+        <ActivityIndicator size="large" color="#0828A7" />
+      )}
+
+      {showDatePicker && (
+        <Modal
+          transparent={true}
+          visible={true}
+          animationType="slide"
+          onRequestClose={() => setShowDatePicker(null)}
+        >
+          <TouchableWithoutFeedback onPress={() => setShowDatePicker(null)}>
+            <View style={styles.modalBackground}>
+              <DateTimePicker
+                value={new Date(absenceForm[showDatePicker] || Date.now())}
+                mode="date"
+                display="default"
+                onChange={(event, date) => handleDateChange(showDatePicker, date)}
+              />
+            </View>
+          </TouchableWithoutFeedback>
+        </Modal>
+      )}
+    </View>
+  );
+};
+
 const styles = StyleSheet.create({
-  headerImage: {
-    color: '#808080',
-    bottom: -90,
-    left: -35,
-    position: 'absolute',
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#f9f9f9",
   },
-  titleContainer: {
-    flexDirection: 'row',
-    gap: 8,
+  form: {
+    width: "90%",
+    padding: 20,
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    elevation: 5,
+  },
+  label: {
+    fontSize: 16,
+    marginVertical: 10,
+  },
+  reason: {
+    padding: 10,
+    backgroundColor: "#f0f0f0",
+    borderRadius: 5,
+    marginVertical: 5,
+  },
+  uploadButton: {
+    padding: 15,
+    backgroundColor: "#ddd",
+    borderRadius: 5,
+    alignItems: "center",
+    marginVertical: 10,
+  },
+  imageName: {
+    fontSize: 14,
+    marginVertical: 10,
+  },
+  modalBackground: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
 });
+
+export default UploadAbsences;
