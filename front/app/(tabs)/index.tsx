@@ -8,10 +8,8 @@ WebBrowser.maybeCompleteAuthSession();
 
 const androidClientId = config.ANDROID_CLIENT_ID;
 const iosClientId = config.IOS_CLIENT_ID;
-const webClientId = config.WEB_CLIENT_ID;
+const webClientId = config.LPTF_GOOGLE_CLIENT_ID;
 const googleSecret = config.GOOGLE_CLIENT_SECRET;
-
-console.log("androidClientId", androidClientId);
 
 export default function HomeScreen() {
   const [request, response, promptAsync] = AuthSession.useAuthRequest(
@@ -24,21 +22,15 @@ export default function HomeScreen() {
       redirectUri: AuthSession.makeRedirectUri({
         scheme: "com.schooltool.authsessiongoogle",
       }),
+      usePKCE: true,
       scopes: ["openid", "profile", "email"],
     },
     { authorizationEndpoint: "https://accounts.google.com/o/oauth2/v2/auth" }
   );
 
   const exchangeCodeForToken = async (code: string) => {
-    console.log("code", code);
-    
+
     try {
-      console.log(
-        "redirect adress",
-        AuthSession.makeRedirectUri({
-          scheme: "com.schooltool.authsessiongoogle",
-        })
-      );
 
       const response = await fetch("https://oauth2.googleapis.com/token", {
         method: "POST",
@@ -53,13 +45,23 @@ export default function HomeScreen() {
             scheme: "com.schooltool.authsessiongoogle",
           }),
           grant_type: "authorization_code",
+          code_verifier: request?.codeVerifier,
         }),
       });
 
       const tokenData = await response.json();
 
       if (tokenData.access_token) {
-        fetchUserData(tokenData.access_token);
+        const authToken = await fetch("http://localhost:8082/oauth", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: `token_id=${tokenData.id_token}`,
+        });
+
+        let token = await authToken.json();
+        console.log("authtoken", token);
       } else {
         console.log("Erreur lors de la récupération du token Google :", tokenData);
         Alert.alert("Erreur", "Impossible d'obtenir un jeton d'accès");
@@ -70,21 +72,20 @@ export default function HomeScreen() {
     }
   };
 
-  const fetchUserData = async (accessToken: string) => {
-    try {
-      const userInfoResponse = await fetch("https://www.googleapis.com/oauth2/v2/userinfo", {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      });
-      const userInfo = await userInfoResponse.json();
-      Alert.alert("Connecté", `Bienvenue ${userInfo.name}`);
-    } catch (error) {
-      Alert.alert("Erreur", "Impossible de récupérer les informations utilisateur");
-      console.error(error);
-    }
-  };
-  
+  // const fetchUserData = async (accessToken: string) => {
+  //   try {
+  //     const userInfoResponse = await fetch("https://www.googleapis.com/oauth2/v2/userinfo", {
+  //       headers: { Authorization: `Bearer ${accessToken}` },
+  //     });
+  //     const userInfo = await userInfoResponse.json();
+  //     Alert.alert("Connecté", `Bienvenue ${userInfo.name}`);
+  //   } catch (error) {
+  //     Alert.alert("Erreur", "Impossible de récupérer les informations utilisateur");
+  //     console.error(error);
+  //   }
+  // };
+
   useEffect(() => {
-    console.log("Réponse AuthSession :", response);
     if (response?.type === "success" && response.params?.code) {
       const { code } = response.params;
       exchangeCodeForToken(code);
