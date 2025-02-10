@@ -10,7 +10,7 @@ export default function HomeScreen() {
       <Text style={styles.title}>Bienvenue sur l'application</Text>
       <Button
         title="Se connecter avec Google"
-        onPress={auth?.loginWithGoogle}
+        onPress={() => auth?.loginWithGoogle()}
         color="#4285F4"
       />
     </View>

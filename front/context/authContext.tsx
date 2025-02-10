@@ -49,26 +49,30 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     { authorizationEndpoint: "https://accounts.google.com/o/oauth2/v2/auth" }
   );
 
-  useEffect(() => {
-    const loadUser = async () => {
-      try {
-        const token = await SecureStore.getItemAsync("authToken");
-        if (token) {
-          fetchUser(token);
-        } else {
-          setLoading(false);
-        }
-      } catch (error) {
-        console.error("Erreur lors du chargement des données utilisateur", error);
-        setLoading(false);
-      }
-    };
-    loadUser();
-  }, []);
+  // useEffect(() => {
+  //   const loadUser = async () => {
+  //     try {
+  //       const token = await SecureStore.getItemAsync("authToken");
+  //       if (token) {
+  //         fetchUser(token);
+  //       } else {
+  //         setLoading(false);
+  //       }
+  //     } catch (error) {
+  //       console.error("Erreur lors du chargement des données utilisateur", error);
+  //       setLoading(false);
+  //     }
+  //   };
+  //   loadUser();
+  // }, []);
 
   useEffect(() => {
+    console.log("Google Auth Response:", response);
+
     const handleGoogleResponse = async () => {
       if (response?.type === "success" && response.params?.code) {
+        console.log("Google Auth Code reçu:", response.params.code);
+
         try {
           const tokenResponse = await fetch("https://oauth2.googleapis.com/token", {
             method: "POST",
@@ -91,9 +95,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           });
 
           const tokenData = await tokenResponse.json();
+          console.log("tokenData", tokenData);
           if (tokenData.access_token) {
-            console.log("tokenData", tokenData);
-            
+
             await fetchUser(tokenData.id_token);
           } else {
             Alert.alert("Erreur", "Impossible d'obtenir un jeton d'accès");
@@ -104,7 +108,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
     };
     console.log("response", response);
-    
+
     handleGoogleResponse();
   }, [response]);
 
@@ -153,11 +157,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const loginWithGoogle = async () => {
     try {
-      await promptAsync();
+      const result = await promptAsync();
+      console.log("Résultat de promptAsync:", result);
     } catch (error) {
+      console.error("Erreur lors de la connexion Google:", error);
       Alert.alert("Erreur", "Problème lors de la connexion avec Google");
     }
   };
+  
 
   const logout = async () => {
     try {
