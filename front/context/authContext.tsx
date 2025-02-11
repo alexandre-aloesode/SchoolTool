@@ -1,10 +1,14 @@
 import React, { createContext, useState, useEffect, ReactNode } from "react";
 import * as SecureStore from "expo-secure-store";
 import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // Définir un type pour l'utilisateur
 interface User {
+  // email:string;
+  // role:string;
   token: string;
+  authtoken: string;
 }
 
 // Définir un type pour le contexte
@@ -25,13 +29,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   // Charger les informations utilisateur au lancement
   useEffect(() => {
-    // const loadUser = async () => {
-    //   const token = await SecureStore.getItemAsync("authToken");
-    //   if (token) {
-    //     setUser({ token }); // Décoder et charger plus de données si nécessaire
-    //   }
-    // };
-    // loadUser();
+    const loadUser = async () => {
+      const userData = await AsyncStorage.getItem("userData");
+      if (userData) {
+        const parsedData = JSON.parse(userData);
+        setUser({ 
+          token:parsedData.token,
+          authtoken:parsedData.authtoken
+
+        });
+        console.log("userData", parsedData);
+        
+      }
+    };
+    loadUser();
   }, []);
 
   // Fonction de connexion
@@ -51,7 +62,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   // Fonction de déconnexion
   const logout = async () => {
-    await SecureStore.deleteItemAsync("authToken");
+    await AsyncStorage.removeItem("userData");
     setUser(null); // Réinitialiser l'état utilisateur
   };
 
