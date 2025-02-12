@@ -3,7 +3,7 @@ import { StyleSheet, View, Text, Button } from "react-native";
 import LoginWithGoogle from "@/components/auth/GoogleAuth";
 import AuthContext from "@/context/authContext";
 
-export default function HomeScreen() {
+export default function JobsInProgress() {
   const auth = useContext(AuthContext);
 
   return (

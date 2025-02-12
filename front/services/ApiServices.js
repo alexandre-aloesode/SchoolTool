@@ -4,7 +4,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 async function getSession() {
   try {
-    const session = await AsyncStorage.getItem("session");
+    const session = await AsyncStorage.getItem("userSession");
     return session ? JSON.parse(session) : null;
   } catch (error) {
     console.error("Error fetching session: ", error);
@@ -36,7 +36,7 @@ export const ApiActions = {
       maxBodyLength: Infinity,
       url: `${config.LPTF_API_URL}/${route}?${url}`,
       headers: {
-        Token: session?.token || "",
+        Token: session?.accessToken || "",
       },
     };
     try {
@@ -59,7 +59,7 @@ export const ApiActions = {
       url: `${config.LPTF_API_URL}/${route}?`,
       data: new URLSearchParams(body).toString(),
       headers: {
-        Token: session?.token || "",
+        Token: session?.accessToken || "",
       },
     };
     try {
@@ -82,7 +82,7 @@ export const ApiActions = {
       url: `${config.LPTF_API_URL}/${route}?`,
       data: new URLSearchParams(bodyParams).toString(),
       headers: {
-        Token: session?.token || "",
+        Token: session?.accessToken || "",
       },
     };
     try {
@@ -105,7 +105,7 @@ export const ApiActions = {
       url: `${config.LPTF_API_URL}/${route}?`,
       data: new URLSearchParams(bodyParams).toString(),
       headers: {
-        Token: session?.token || "",
+        Token: session?.accessToken || "",
       },
     };
     try {

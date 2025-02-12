@@ -1,9 +1,11 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useContext, useState } from "react";
 import { StyleSheet, View, Text, Button, Alert, Platform } from "react-native";
 import * as AuthSession from "expo-auth-session";
 import * as WebBrowser from "expo-web-browser";
 import config from "../../config.js";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useRouter } from "expo-router";
+import AuthContext from "@/context/authContext"; // Import du contexte d'auth
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -13,6 +15,10 @@ const webClientId = config.LPTF_GOOGLE_CLIENT_ID;
 const googleSecret = config.GOOGLE_CLIENT_SECRET;
 
 export default function LoginWithGoogle() {
+  const router = useRouter();
+  const { user, setUser } = useContext(AuthContext); // Récupération du contexte d'auth
+  const [loading, setLoading] = useState(true);
+
   const [request, response, promptAsync] = AuthSession.useAuthRequest(
     {
       clientId: Platform.select({
@@ -29,10 +35,21 @@ export default function LoginWithGoogle() {
     { authorizationEndpoint: "https://accounts.google.com/o/oauth2/v2/auth" }
   );
 
-  const exchangeCodeForToken = async (code: string) => {
+  useEffect(() => {
+    // Vérifier si un utilisateur est déjà connecté
+    const checkUserSession = async () => {
+      const userData = await AsyncStorage.getItem("userSession");
+      if (userData) {
+        setUser(JSON.parse(userData)); // Met à jour le contexte utilisateur
+      }
+      setLoading(false);
+    };
 
+    checkUserSession();
+  }, []);
+
+  const exchangeCodeForToken = async (code) => {
     try {
-
       const response = await fetch("https://oauth2.googleapis.com/token", {
         method: "POST",
         headers: {
@@ -64,10 +81,16 @@ export default function LoginWithGoogle() {
         let apiToken = await authToken.json();
         console.log("authtoken", apiToken.authtoken);
         console.log("token", apiToken.token);
-        await AsyncStorage.setItem("userData", JSON.stringify({
+        
+        const userSession = {
           accessToken: apiToken.token,
-          authToken: apiToken.authtoken
-        }));
+          authToken: apiToken.authtoken,
+        };
+        
+        await AsyncStorage.setItem("userSession", JSON.stringify(userSession));
+        setUser(userSession); // Mettre à jour le contexte utilisateur
+        
+        router.replace("/"); // Rediriger vers l'accueil
       } else {
         console.log("Erreur lors de la récupération du token Google :", tokenData);
         Alert.alert("Erreur", "Impossible d'obtenir un jeton d'accès");
@@ -78,19 +101,6 @@ export default function LoginWithGoogle() {
     }
   };
 
-  // const fetchUserData = async (accessToken: string) => {
-  //   try {
-  //     const userInfoResponse = await fetch("https://www.googleapis.com/oauth2/v2/userinfo", {
-  //       headers: { Authorization: `Bearer ${accessToken}` },
-  //     });
-  //     const userInfo = await userInfoResponse.json();
-  //     Alert.alert("Connecté", `Bienvenue ${userInfo.name}`);
-  //   } catch (error) {
-  //     Alert.alert("Erreur", "Impossible de récupérer les informations utilisateur");
-  //     console.error(error);
-  //   }
-  // };
-
   useEffect(() => {
     if (response?.type === "success" && response.params?.code) {
       const { code } = response.params;
@@ -98,10 +108,20 @@ export default function LoginWithGoogle() {
     }
   }, [response]);
 
+  if (loading) {
+    return <Text>Chargement...</Text>;
+  }
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Bienvenue sur l'application</Text>
-      <Button disabled={!request} title="Se connecter avec Google" onPress={() => promptAsync()} color="#4285F4" />
+      {user ? (
+        <Text style={styles.title}>Bienvenue, vous êtes connecté !</Text>
+      ) : (
+        <>
+          <Text style={styles.title}>Bienvenue sur l'application</Text>
+          <Button disabled={!request} title="Se connecter avec Google" onPress={() => promptAsync()} color="#4285F4" />
+        </>
+      )}
     </View>
   );
 }

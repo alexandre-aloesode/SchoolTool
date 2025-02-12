@@ -1,11 +1,12 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { StyleSheet, View, Text, Button } from "react-native";
 import LoginWithGoogle from "@/components/auth/GoogleAuth";
 import AuthContext from "@/context/authContext";
 
-export default function HomeScreen() {
+export default function JobsMain() {
   const auth = useContext(AuthContext);
-
+  console.log("userData", auth);
+  
   return (
     <View style={styles.container}>
       {auth?.user ? (
