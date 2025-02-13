@@ -1,18 +1,20 @@
-# Utilisation de PHP 7.3 avec Apache sur plateforme x86-64
-FROM --platform=linux/x86-64 php:7.3-apache
+# Utilisation de l'image officielle Node.js
+FROM node:18
 
-# Mise à jour des paquets et installation des extensions nécessaires
-RUN apt-get update && apt-get upgrade -y \
-    && apt-get install -y libzip-dev unzip \
-    && docker-php-ext-install mysqli pdo pdo_mysql zip \
-    && a2enmod rewrite
+# Définition du répertoire de travail
+WORKDIR /app
 
-# Définition des permissions correctes
-RUN chown -R www-data:www-data /var/www/html \
-    && chmod -R 755 /var/www/html
+# Copier les fichiers package.json et package-lock.json pour installer les dépendances
+COPY package.json package-lock.json ./
 
-# Exposition du port Apache
-EXPOSE 80
+# Installer les dépendances avec npm
+RUN npm install
 
-# Commande de démarrage
-CMD ["apache2-foreground"]
+# Copier tous les fichiers de l'application
+COPY . .
+
+# Exposer le port utilisé par Metro Bundler (Expo)
+EXPOSE 8081
+
+# Lancer Expo sans `--tunnel`
+CMD ["npx", "expo", "start", "--lan"]
