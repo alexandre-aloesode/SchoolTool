@@ -1,0 +1,66 @@
+version: '3.1'
+
+services:
+  db:
+    image: mysql:8
+    container_name: schooltool-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: schooltool
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    volumes:
+      - db_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+
+  back:
+    build: ./back
+    container_name: schooltool-back
+    restart: always
+    volumes:
+      - ./back:/var/www/html
+    ports:
+      - "8000:80"
+    depends_on:
+      - db
+    environment:
+      - DB_HOST=db
+      - DB_USER=root
+      - DB_PWD=root
+      - DB_NAME=schooltool
+
+  auth:
+    build: ./auth
+    container_name: schooltool-auth
+    restart: always
+    volumes:
+      - ./auth:/var/www/html
+    ports:
+      - "8001:80"
+    depends_on:
+      - db
+    environment:
+      - DB_HOST=db
+      - DB_USER=root
+      - DB_PWD=root
+      - DB_NAME=schooltool
+
+  front:
+    build: ./front
+    container_name: schooltool-front
+    restart: always
+    volumes:
+      - ./front:/app
+    ports:
+      - "8081:8081"
+    depends_on:
+      - back
+      - auth
+    environment:
+      - API_URL=http://localhost:8000
+      - AUTH_URL=http://localhost:8001
+
+volumes:
+  db_data:

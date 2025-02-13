@@ -22,3 +22,7 @@ rad.json
 TestResults.xml
 
 front/config.js
+
+/back/application/config/constants.php
+/auth/application/config/constants.php
+/front/config.js
