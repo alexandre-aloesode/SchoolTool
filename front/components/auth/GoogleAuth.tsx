@@ -70,7 +70,7 @@ export default function LoginWithGoogle() {
       const tokenData = await response.json();
 
       if (tokenData.access_token) {
-        const authToken = await fetch("http://localhost:8082/oauth", {
+        const authToken = await fetch("http://localhost:8001/oauth", {
           method: "POST",
           headers: {
             "Content-Type": "application/x-www-form-urlencoded",
