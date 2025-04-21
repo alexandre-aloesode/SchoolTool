@@ -9,6 +9,8 @@ class LPTF_Controller extends CI_Controller
         parent::__construct();
 
         $this->handleHeader();
+        // var_dump(TAB_ROLES);
+
 
         include APPPATH . 'third_party/JWT/JWT.php';
         $this->jwt = new JWT();

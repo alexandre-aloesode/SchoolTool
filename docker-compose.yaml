@@ -19,7 +19,7 @@ services:
     depends_on:
       - db
     environment:
-      TAB_ROLES: '[ {"id": 1, "name": "student", "access": "Student_Access"}, {"id": 2, "name": "hors-parcours"}, {"id": 3, "name": "alumni"}, {"id": 4, "name": "admin"}, {"id": 5, "name": "crm", "access": "CRM_Access"}, {"id": 6, "name": "corrector", "access": "Corrector_Access"}, {"id": 7, "name": "teacher", "access": "Teacher_Access"}, {"id": 8, "name": "peda", "access": "Peda_Access"}, {"id": 9, "name": "re", "access": "Re_Access"}, {"id": 10, "name": "tutor", "access": "Tutor_Access"}]'
+      TAB_ROLES: '[ {"id": 1, "name": "student", "access": "Student_Access"}, {"id": 2, "name": "hors-parcours"}, {"id": 3, "name": "alumni"}, {"id": 4, "name": "admin"}, {"id": 5, "name": "crm", "access": "CRM_Access"}, {"id": 6, "name": "corrector", "access": "Corrector_Access"}, {"id": 7, "name": "teacher", "access": "Teacher_Access"}, {"id": 8, "name": "peda", "access": "Peda_Access"}, {"id": 9, "name": "re", "access": "Re_Access"}]'
       DB_HOST: db
       DB_USER: root
       DB_PWD: root
@@ -40,11 +40,11 @@ services:
     depends_on:
       - db
     environment:
-      TAB_ROLES: '[ {"id": 1, "name": "student", "access": "Student_Access"}, {"id": 2, "name": "hors-parcours"}, {"id": 3, "name": "alumni"}, {"id": 4, "name": "admin"}, {"id": 5, "name": "crm", "access": "CRM_Access"}, {"id": 6, "name": "corrector", "access": "Corrector_Access"}, {"id": 7, "name": "teacher", "access": "Teacher_Access"}, {"id": 8, "name": "peda", "access": "Peda_Access"}, {"id": 9, "name": "re", "access": "Re_Access"}, {"id": 10, "name": "tutor", "access": "Tutor_Access"}]'
+      TAB_ROLES: '[ {"id": 1, "name": "student", "access": "Student_Access"}, {"id": 2, "name": "hors-parcours"}, {"id": 3, "name": "alumni"}, {"id": 4, "name": "admin"}, {"id": 5, "name": "crm", "access": "CRM_Access"}, {"id": 6, "name": "corrector", "access": "Corrector_Access"}, {"id": 7, "name": "teacher", "access": "Teacher_Access"}, {"id": 8, "name": "peda", "access": "Peda_Access"}, {"id": 9, "name": "re", "access": "Re_Access"}]'
       DB_HOST: db
       DB_USER: root
       DB_PWD: root
-      DB_NAME: schooltool_api
+      DB_NAME: schooltool_auth
       LPTF_JWT_KEY: toto
       GOOGLE_CLIENT_ID: "604347883543-cu73up3fqo5r9gn18tqpkf3tu9ud41s4.apps.googleusercontent.com"
       IS_DEV: true
