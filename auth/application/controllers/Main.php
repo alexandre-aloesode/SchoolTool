@@ -16,6 +16,7 @@ class Main extends CI_Controller {
 	{
 		header('Access-Control-Allow-Origin: *');
 		
+		// var_dump($this->input->post());
 		$authtoken = $this->input->post("authtoken");
 
 		if (!isset($authtoken) || $authtoken == "") {
@@ -61,7 +62,8 @@ class Main extends CI_Controller {
             'user_email' => $user[0]['email'],
 			'role' => $user[0]['role'],
 			'scope' => $scopes,
-			'exp'=> time() + (60*15)
+			// 'exp'=> time() + (60*15)
+			'exp' => time() + 15
 		];
 
 		$token = $jwt->generate($token_data);

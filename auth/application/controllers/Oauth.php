@@ -60,6 +60,7 @@ class Oauth extends LPTF_Controller
 			'role' => $user[0]['role'],
 			'scope' => $scopes,
 			'exp' => time() + (60 * 15)
+			// 'exp' => time() + 15
 		];
 
 		$api_token = $jwt->generate($token_data);

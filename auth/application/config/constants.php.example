@@ -85,6 +85,18 @@ defined('EXIT__AUTO_MIN')      OR define('EXIT__AUTO_MIN', 9); // lowest automat
 defined('EXIT__AUTO_MAX')      OR define('EXIT__AUTO_MAX', 125); // highest automatically-assigned error code
 
 /* API KEY */
-defined('LPTF_JWT_KEY')        OR define('LPTF_JWT_KEY', 
-    "YOUR JWT KEY"
-); // no errors
+defined('LPTF_JWT_KEY')        OR define('LPTF_JWT_KEY', getenv('LPTF_JWT_KEY'));
+// no errors
+
+defined('IS_DEV')        OR define('IS_DEV', getenv('IS_DEV'));
+defined('DB_HOST') OR define('DB_HOST', getenv('DB_HOST'));
+defined('DB_USER') OR define('DB_USER', getenv('DB_USER'));
+defined('DB_PWD') OR define('DB_PWD', getenv('DB_PWD'));
+defined('DB_NAME') OR define('DB_NAME',  getenv('DB_NAME'));
+
+defined('TAB_ROLES') or define('TAB_ROLES', json_decode(getenv('TAB_ROLES')));
+
+defined('GOOGLE_CLIENT_ID') or define('GOOGLE_CLIENT_ID', getenv('GOOGLE_CLIENT_ID'));
+defined('GOOGLE_CLIENT_EMAIL') or define('GOOGLE_CLIENT_EMAIL', "YOUR CLIENT EMAIL");
+defined('GOOGLE_PRIVATE_KEY') or define('GOOGLE_PRIVATE_KEY', "YOUR PRIVATE KEY");
+defined('GOOGLE_DRIVE_ABSENCE_FOLDER') or define('GOOGLE_DRIVE_ABSENCE_FOLDER', "YOUR FOLDER ID");

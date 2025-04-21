@@ -36,7 +36,7 @@ const JobsAvailable = () => {
           style={styles.picker}
           onValueChange={(itemValue) => setSelectedUnit(itemValue)}
         >
-          <Picker.Item label="Tous les Units" value="All" key="all" />
+          <Picker.Item label="Toutes les Units" value="All" key="all" />
           {[...new Set(jobsAvailable.map(job => job.job_unit_name))].map((unit, index) => (
             <Picker.Item label={unit} value={unit} key={index} />
           ))}
