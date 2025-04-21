@@ -13,6 +13,7 @@ const androidClientId = config.ANDROID_CLIENT_ID;
 const iosClientId = config.IOS_CLIENT_ID;
 const webClientId = config.LPTF_GOOGLE_CLIENT_ID;
 const googleSecret = config.GOOGLE_CLIENT_SECRET;
+const authUrl = config.LPTF_AUTH_API_URL;
 
 export default function LoginWithGoogle() {
   const router = useRouter();
@@ -70,7 +71,7 @@ export default function LoginWithGoogle() {
       const tokenData = await response.json();
 
       if (tokenData.access_token) {
-        const authToken = await fetch("http://localhost:8082/oauth", {
+        const authToken = await fetch(`${authUrl}/oauth`, {
           method: "POST",
           headers: {
             "Content-Type": "application/x-www-form-urlencoded",
@@ -79,8 +80,6 @@ export default function LoginWithGoogle() {
         });
 
         let apiToken = await authToken.json();
-        console.log("authtoken", apiToken.authtoken);
-        console.log("token", apiToken.token);
         
         const userSession = {
           accessToken: apiToken.token,

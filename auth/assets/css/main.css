@@ -1,0 +1,14 @@
+.app-body {
+    font-family: 'Roboto Mono', monospace;
+}
+
+
+.blue-backround {
+    background-color: #88c1d0;
+}
+
+.page-main {
+    margin: 0px;
+    margin-top: 25px;
+    max-width: 100%;
+}

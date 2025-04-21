@@ -1,24 +1,75 @@
-### AL ###
-#Template for AL projects for Dynamics 365 Business Central
-#launch.json folder
-.vscode/
-#Cache folder
-.alcache/
-#Symbols folder
-.alpackages/
-#Snapshots folder
-.snapshots/
-#Testing Output folder
-.output/
-#Extension App-file
-*.app
-#Rapid Application Development File
-rad.json
-#Translation Base-file
-*.g.xlf
-#License-file
-*.flf
-#Test results file
-TestResults.xml
+# 🚀 GÉNÉRAL (macOS, Linux, Windows)
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
 
-front/config.js
+# 🚀 BACKEND (CodeIgniter - back & auth)
+# Cache et logs
+/back/application/cache/*
+!/back/application/cache/index.html
+
+/auth/application/cache/*
+!/auth/application/cache/index.html
+
+/back/application/logs/*
+!/back/application/logs/index.html
+
+/auth/application/logs/*
+!/auth/application/logs/index.html
+
+!/back/application/*/.htaccess
+!/auth/application/*/.htaccess
+
+# Composer
+/back/composer.lock
+/back/vendor/
+
+ /auth/composer.lock
+ /auth/vendor/
+
+# 🚀 FRONTEND (Expo / Node.js)
+/front/node_modules/
+/front/yarn.lock
+/front/npm-debug.log*
+/front/expo/*
+/front/.expo/
+/front/.expo-shared/
+
+# 🚀 USER GUIDE (CodeIgniter - back & auth)
+/back/user_guide_src/build/*
+/back/user_guide_src/cilexer/build/*
+/back/user_guide_src/cilexer/dist/*
+/back/user_guide_src/cilexer/pycilexer.egg-info/*
+
+/auth/user_guide_src/build/*
+/auth/user_guide_src/cilexer/build/*
+/auth/user_guide_src/cilexer/dist/*
+/auth/user_guide_src/cilexer/pycilexer.egg-info/*
+
+# 🚀 IDE FILES (VS Code, Sublime, JetBrains)
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+/tests/tests/
+/tests/results/
+
+# 🚀 DATABASE CONFIG (Empêche l'exposition des accès DB du back & auth)
+/back/application/config/database.php
+/back/application/config/constants.php
+/back/application/helpers/token_helper.php
+
+/auth/application/config/database.php
+/auth/application/config/constants.php
+/auth/application/helpers/token_helper.php
+
+# 🚀 DOCKER
+docker-compose.override.yml
+.dockerignore
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+.env*.local

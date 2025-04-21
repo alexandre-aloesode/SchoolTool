@@ -1,0 +1,68 @@
+services:
+  db:
+    image: mariadb
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    ports:
+      - 3307:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+
+  back:
+    build: ./back
+    container_name: schooltool-back
+    restart: always
+    volumes:
+      - ./back:/var/www/html
+    ports:
+      - "8000:80"
+    depends_on:
+      - db
+    environment:
+      TAB_ROLES: '[ {"id": 1, "name": "student", "access": "Student_Access"}, {"id": 2, "name": "hors-parcours"}, {"id": 3, "name": "alumni"}, {"id": 4, "name": "admin"}, {"id": 5, "name": "crm", "access": "CRM_Access"}, {"id": 6, "name": "corrector", "access": "Corrector_Access"}, {"id": 7, "name": "teacher", "access": "Teacher_Access"}, {"id": 8, "name": "peda", "access": "Peda_Access"}, {"id": 9, "name": "re", "access": "Re_Access"}, {"id": 10, "name": "tutor", "access": "Tutor_Access"}]'
+      DB_HOST: db
+      DB_USER: root
+      DB_PWD: root
+      DB_NAME: schooltool_api
+      LPTF_JWT_KEY: toto
+      GOOGLE_CLIENT_ID: "604347883543-cu73up3fqo5r9gn18tqpkf3tu9ud41s4.apps.googleusercontent.com"
+      GOOGLE_DRIVE_ABSENCE_FOLDER: "toFill"
+      IS_DEV: true
+
+  auth:
+    build: ./auth
+    container_name: schooltool-auth
+    restart: always
+    volumes:
+      - ./auth:/var/www/html
+    ports:
+      - "8001:80"
+    depends_on:
+      - db
+    environment:
+      TAB_ROLES: '[ {"id": 1, "name": "student", "access": "Student_Access"}, {"id": 2, "name": "hors-parcours"}, {"id": 3, "name": "alumni"}, {"id": 4, "name": "admin"}, {"id": 5, "name": "crm", "access": "CRM_Access"}, {"id": 6, "name": "corrector", "access": "Corrector_Access"}, {"id": 7, "name": "teacher", "access": "Teacher_Access"}, {"id": 8, "name": "peda", "access": "Peda_Access"}, {"id": 9, "name": "re", "access": "Re_Access"}, {"id": 10, "name": "tutor", "access": "Tutor_Access"}]'
+      DB_HOST: db
+      DB_USER: root
+      DB_PWD: root
+      DB_NAME: schooltool_api
+      LPTF_JWT_KEY: toto
+      GOOGLE_CLIENT_ID: "604347883543-cu73up3fqo5r9gn18tqpkf3tu9ud41s4.apps.googleusercontent.com"
+      IS_DEV: true
+
+  front:
+    build: ./front
+    container_name: schooltool-front
+    restart: always
+    volumes:
+      - ./front:/app
+    ports:
+      - "8082:8081"
+    depends_on:
+      - back
+      - auth
+    environment:
+      API_URL: "http://localhost:8000"
+      AUTH_URL: "http://localhost:8001"
+
+volumes:
+  db_data:

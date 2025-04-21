@@ -1,14 +1,87 @@
 import axios from "axios";
 import config from "../config";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { router } from "expo-router";
 
-async function getSession() {
+async function getApiToken() {
   try {
     const session = await AsyncStorage.getItem("userSession");
-    return session ? JSON.parse(session) : null;
+
+    if (session === undefined || session === null) {
+      router.push("/");
+      return null;
+    }
+
+    const parsedSession = JSON.parse(session);
+
+    if (isTokenExpired(parsedSession.accessToken)) {
+      const newToken = await refreshToken(parsedSession);
+      if (newToken) {
+        await AsyncStorage.setItem(
+          "userSession",
+          JSON.stringify({
+            ...parsedSession,
+            accessToken: newToken,
+          })
+        );
+        return newToken;
+      }
+      else {
+        router.push("/");
+        return null;
+      }
+    }
+
+    return parsedSession.accessToken;
   } catch (error) {
     console.error("Error fetching session: ", error);
     return null;
+  }
+}
+
+function isTokenExpired(token) {
+  if (!token) return true;
+  try {
+    const base64Url = token.split(".")[1];
+    const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+    const payload = JSON.parse(atob(base64));
+
+    const currentTime = Math.floor(Date.now() / 1000);
+
+    return payload.exp < currentTime;
+  } catch (err) {
+    console.error("Failed to decode token:", err);
+    return true;
+  }
+}
+
+async function refreshToken(session) {
+  try {
+    const formData = new FormData();
+    formData.append("authtoken", session?.authToken);
+    let params = {
+      method: "post",
+      maxBodyLength: Infinity,
+      url: `${config.LPTF_AUTH_API_URL}/refresh`,
+      data: formData,
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    };
+    const response = await axios.request(params);
+
+    const refreshedToken = response.data?.token;
+
+    if (!refreshedToken) {
+      console.error("No token received from refresh");
+      return null;
+    }
+
+    return refreshedToken;
+  } catch (error) {
+    console.error("Failed to refresh token:", error);
+    await AsyncStorage.removeItem("userSession"); // optional: force logout
+    throw error;
   }
 }
 
@@ -30,13 +103,19 @@ export const ApiActions = {
   async get(payload) {
     let route = payload.route;
     let url = buildUrl(payload.params);
-    const session = await getSession();
+
+    const token = await getApiToken();
+    if (!token) {
+      router.push("/");
+      return null;
+    }
+
     let params = {
       method: "get",
       maxBodyLength: Infinity,
       url: `${config.LPTF_API_URL}/${route}?${url}`,
       headers: {
-        Token: session?.accessToken || "",
+        Token: token || "",
       },
     };
     try {
@@ -51,7 +130,12 @@ export const ApiActions = {
   async post(payload) {
     let route = payload.route;
     const body = payload.params;
-    const session = await getSession();
+
+    const token = await getApiToken();
+    if (!token) {
+      router.push("/");
+      return null;
+    }
 
     let params = {
       method: "post",
@@ -59,7 +143,7 @@ export const ApiActions = {
       url: `${config.LPTF_API_URL}/${route}?`,
       data: new URLSearchParams(body).toString(),
       headers: {
-        Token: session?.accessToken || "",
+        Token: token || "",
       },
     };
     try {
@@ -74,7 +158,12 @@ export const ApiActions = {
   async put(payload) {
     let route = payload.route;
     const bodyParams = payload.params;
-    const session = await getSession();
+
+    const token = await getApiToken();
+    if (!token) {
+      router.push("/");
+      return null;
+    }
 
     let params = {
       method: "put",
@@ -82,7 +171,7 @@ export const ApiActions = {
       url: `${config.LPTF_API_URL}/${route}?`,
       data: new URLSearchParams(bodyParams).toString(),
       headers: {
-        Token: session?.accessToken || "",
+        Token: token || "",
       },
     };
     try {
@@ -97,7 +186,12 @@ export const ApiActions = {
   async delete(payload) {
     let route = payload.route;
     const bodyParams = payload.params;
-    const session = await getSession();
+
+    const token = await getApiToken();
+    if (!token) {
+      router.push("/");
+      return null;
+    }
 
     let params = {
       method: "delete",
@@ -105,7 +199,7 @@ export const ApiActions = {
       url: `${config.LPTF_API_URL}/${route}?`,
       data: new URLSearchParams(bodyParams).toString(),
       headers: {
-        Token: session?.accessToken || "",
+        Token: token || "",
       },
     };
     try {
