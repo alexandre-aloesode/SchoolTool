@@ -94,9 +94,12 @@ defined('DB_USER') OR define('DB_USER', getenv('DB_USER'));
 defined('DB_PWD') OR define('DB_PWD', getenv('DB_PWD'));
 defined('DB_NAME') OR define('DB_NAME',  getenv('DB_NAME'));
 
-defined('TAB_ROLES') or define('TAB_ROLES', json_decode(getenv('TAB_ROLES')));
+defined('TAB_ROLES') or define('TAB_ROLES', json_decode($_ENV['TAB_ROLES'], true));
 
 defined('GOOGLE_CLIENT_ID') or define('GOOGLE_CLIENT_ID', getenv('GOOGLE_CLIENT_ID'));
 defined('GOOGLE_CLIENT_EMAIL') or define('GOOGLE_CLIENT_EMAIL', "YOUR CLIENT EMAIL");
 defined('GOOGLE_PRIVATE_KEY') or define('GOOGLE_PRIVATE_KEY', "YOUR PRIVATE KEY");
 defined('GOOGLE_DRIVE_ABSENCE_FOLDER') or define('GOOGLE_DRIVE_ABSENCE_FOLDER', "YOUR FOLDER ID");
+
+
+
