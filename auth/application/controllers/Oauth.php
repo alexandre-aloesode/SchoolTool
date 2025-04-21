@@ -1,35 +1,29 @@
 <?php
-defined('BASEPATH') OR exit('No direct script access allowed');
+defined('BASEPATH') or exit('No direct script access allowed');
 require_once APPPATH . 'core/LPTF_Controller.php';
-class Oauth extends LPTF_Controller {
+class Oauth extends LPTF_Controller
+{
 
-	public function __construct() {
+	public function __construct()
+	{
 		parent::__construct();
 
 		// include APPPATH.'third_party/JWT/JWT.php';
 		$this->load->model('User_model');
 		$this->load->helper('string');
-	
 	}
 
 	public function index()
 	{
 		header('Access-Control-Allow-Origin: *');
-		if (defined('IS_DEV')) {
-			$google_client_id = "604347883543-cu73up3fqo5r9gn18tqpkf3tu9ud41s4.apps.googleusercontent.com";
-		} else {
-			$google_client_id = "776344449452-o05h7394ddmtomd0ga92v4p04va4bmb5.apps.googleusercontent.com";
-		}
 
 		$token_id = $this->input->post("token_id");
-
-		$client = new Google_Client(['client_id' => $google_client_id]);
+		$client = new Google_Client();
 		try {
-			$payload = $client->verifyIdToken($token_id);
-		}
-		catch (Exception $e) {
+			$payload = $client->verifyIdToken($token_id, GOOGLE_CLIENT_ID);
+		} catch (Exception $e) {
 			echo json_encode(["error" => "You are not one of us."]);
-			return(false);
+			return (false);
 		}
 		if ($payload) {
 			$google_id = $payload['sub'];
@@ -43,13 +37,13 @@ class Oauth extends LPTF_Controller {
 				$domain = "gmail.com";
 		} else {
 			echo json_encode(["error" => "You are not one of us."]);
-			return(false);
+			return (false);
 		}
 
 		$user = $this->User_model->GetUser(array('email' => $email));
 		if (empty($user)) {
 			echo json_encode(["error" => "You are not one of us."]);
-			return(false);
+			return (false);
 		}
 
 		// Récupération du scope
@@ -61,11 +55,11 @@ class Oauth extends LPTF_Controller {
 
 		$jwt = new JWT();
 		$token_data = [
-            'user_id' => $user[0]['id'],
-            'user_email' => $user[0]['email'],
+			'user_id' => $user[0]['id'],
+			'user_email' => $user[0]['email'],
 			'role' => $user[0]['role'],
 			'scope' => $scopes,
-			'exp'=> time() + (60*15)
+			'exp' => time() + (60 * 15)
 		];
 
 		$api_token = $jwt->generate($token_data);
