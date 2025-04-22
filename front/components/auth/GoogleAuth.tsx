@@ -2,18 +2,19 @@ import React, { useEffect, useContext, useState } from "react";
 import { StyleSheet, View, Text, Button, Alert, Platform } from "react-native";
 import * as AuthSession from "expo-auth-session";
 import * as WebBrowser from "expo-web-browser";
-import config from "../../config.js";
+import { ENV } from "@/utils/env";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import AuthContext from "@/context/authContext"; // Import du contexte d'auth
 
 WebBrowser.maybeCompleteAuthSession();
 
-const androidClientId = config.ANDROID_CLIENT_ID;
-const iosClientId = config.IOS_CLIENT_ID;
-const webClientId = config.LPTF_GOOGLE_CLIENT_ID;
-const googleSecret = config.GOOGLE_CLIENT_SECRET;
-const authUrl = config.LPTF_AUTH_API_URL;
+
+const androidClientId = ENV.ANDROID_CLIENT_ID;
+const iosClientId = ENV.IOS_CLIENT_ID;
+const webClientId = ENV.LPTF_GOOGLE_CLIENT_ID;
+const googleSecret = ENV.GOOGLE_CLIENT_SECRET;
+const authUrl = ENV.LPTF_AUTH_API_URL;
 
 export default function LoginWithGoogle() {
   const router = useRouter();
@@ -27,15 +28,20 @@ export default function LoginWithGoogle() {
         android: androidClientId,
         default: webClientId,
       }),
+      // redirectUri: `https://auth.expo.io/@alexaloesode/schooltool`,
+      //Prod config
       redirectUri: AuthSession.makeRedirectUri({
-        scheme: "com.schooltool.authsessiongoogle",
+        native: "com.schooltool.authsessiongoogle:/oauthredirect"
       }),
+      // redirectUri: AuthSession.makeRedirectUri({
+      //   useProxy: true,
+      // }),
       usePKCE: true,
       scopes: ["openid", "profile", "email"],
     },
     { authorizationEndpoint: "https://accounts.google.com/o/oauth2/v2/auth" }
   );
-
+  
   useEffect(() => {
     // Vérifier si un utilisateur est déjà connecté
     const checkUserSession = async () => {
@@ -50,7 +56,7 @@ export default function LoginWithGoogle() {
   }, []);
 
   const exchangeCodeForToken = async (code) => {
-    try {
+    try {    
       const response = await fetch("https://oauth2.googleapis.com/token", {
         method: "POST",
         headers: {

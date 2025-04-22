@@ -52,11 +52,16 @@ services:
   front:
     build: ./front
     container_name: schooltool-front
+    tty: true
+    stdin_open: true
     restart: always
     volumes:
       - ./front:/app
     ports:
       - "8082:8081"
+      - "19000:19000" # Metro Bundler
+      - "19001:19001" # WebSocket (live/hot reload)
+      - "19002:19002" # React Native Debugger
     depends_on:
       - back
       - auth

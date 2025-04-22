@@ -1,5 +1,5 @@
 import axios from "axios";
-import config from "../config";
+import { ENV } from "@/utils/env";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 
@@ -62,7 +62,7 @@ async function refreshToken(session) {
     let params = {
       method: "post",
       maxBodyLength: Infinity,
-      url: `${config.LPTF_AUTH_API_URL}/refresh`,
+      url: `${ENV.LPTF_AUTH_API_URL}/refresh`,
       data: formData,
       headers: {
         "Content-Type": "multipart/form-data",
@@ -113,7 +113,7 @@ export const ApiActions = {
     let params = {
       method: "get",
       maxBodyLength: Infinity,
-      url: `${config.LPTF_API_URL}/${route}?${url}`,
+      url: `${ENV.LPTF_API_URL}/${route}?${url}`,
       headers: {
         Token: token || "",
       },
@@ -140,7 +140,7 @@ export const ApiActions = {
     let params = {
       method: "post",
       maxBodyLength: Infinity,
-      url: `${config.LPTF_API_URL}/${route}?`,
+      url: `${ENV.LPTF_API_URL}/${route}?`,
       data: new URLSearchParams(body).toString(),
       headers: {
         Token: token || "",
@@ -168,7 +168,7 @@ export const ApiActions = {
     let params = {
       method: "put",
       maxBodyLength: Infinity,
-      url: `${config.LPTF_API_URL}/${route}?`,
+      url: `${ENV.LPTF_API_URL}/${route}?`,
       data: new URLSearchParams(bodyParams).toString(),
       headers: {
         Token: token || "",
@@ -196,7 +196,7 @@ export const ApiActions = {
     let params = {
       method: "delete",
       maxBodyLength: Infinity,
-      url: `${config.LPTF_API_URL}/${route}?`,
+      url: `${ENV.LPTF_API_URL}/${route}?`,
       data: new URLSearchParams(bodyParams).toString(),
       headers: {
         Token: token || "",
