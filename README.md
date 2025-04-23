@@ -32,4 +32,4 @@ export default {
 
 <!-- In the /back and /auth folders, rename the application/config/constants.php.example file into constants.php -->
 
-docker compose exec front npx expo start --tunnel
+<!-- docker compose exec front npx expo start --tunnel -->
