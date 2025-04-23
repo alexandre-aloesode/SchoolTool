@@ -21,18 +21,27 @@ export default function LoginWithGoogle() {
   const { user, setUser } = useContext(AuthContext); // Récupération du contexte d'auth
   const [loading, setLoading] = useState(true);
 
+  const redirectUri = AuthSession.makeRedirectUri({ useProxy: true });
+  console.log("Redirect URI:", redirectUri);
+  
+
   const [request, response, promptAsync] = AuthSession.useAuthRequest(
     {
       clientId: Platform.select({
         ios: iosClientId,
-        android: androidClientId,
+        android: webClientId,
         default: webClientId,
       }),
+
       // redirectUri: `https://auth.expo.io/@alexaloesode/schooltool`,
+      redirectUri,
+
       //Prod config
-      redirectUri: AuthSession.makeRedirectUri({
-        native: "com.schooltool.authsessiongoogle:/oauthredirect"
-      }),
+      // redirectUri: AuthSession.makeRedirectUri({
+      //   native: "com.schooltool.authsessiongoogle:/oauthredirect"
+      // }),
+
+      //Dev config
       // redirectUri: AuthSession.makeRedirectUri({
       //   useProxy: true,
       // }),
@@ -64,11 +73,16 @@ export default function LoginWithGoogle() {
         },
         body: new URLSearchParams({
           code,
+
           client_secret: Platform.OS === "web" ? googleSecret : undefined,
-          client_id: Platform.select({ ios: iosClientId, android: androidClientId, default: webClientId }),
-          redirect_uri: AuthSession.makeRedirectUri({
-            scheme: "com.schooltool.authsessiongoogle",
-          }),
+          client_id: Platform.select({ ios: iosClientId, android: webClientId, default: webClientId }),
+
+          // redirect_uri: AuthSession.makeRedirectUri({
+          //   scheme: "com.schooltool.authsessiongoogle",
+          // }),
+          // redirect_uri: `https://auth.expo.io/@alexaloesode/schooltool`,
+          redirect_uri: redirectUri,
+
           grant_type: "authorization_code",
           code_verifier: request?.codeVerifier,
         }),
@@ -124,7 +138,7 @@ export default function LoginWithGoogle() {
       ) : (
         <>
           <Text style={styles.title}>Bienvenue sur l'application</Text>
-          <Button disabled={!request} title="Se connecter avec Google" onPress={() => promptAsync()} color="#4285F4" />
+          <Button disabled={!request} title="Se connecter avec Google" onPress={() => promptAsync({ useProxy: true })} color="#4285F4" />
         </>
       )}
     </View>
