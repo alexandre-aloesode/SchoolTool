@@ -2,6 +2,10 @@ import axios from "axios";
 import { ENV } from "@/utils/env";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
+import React, { useContext } from "react";
+import AuthContext from "@/context/authContext";
+
+  const auth = useContext(AuthContext);
 
 async function getApiToken() {
   try {
@@ -69,11 +73,14 @@ async function refreshToken(session) {
       },
     };
     const response = await axios.request(params);
+    console.log("Response from refresh token:", response.data);
+    
 
     const refreshedToken = response.data?.token;
 
     if (!refreshedToken) {
       console.error("No token received from refresh");
+      auth.logout();
       return null;
     }
 

@@ -21,7 +21,14 @@ export default function LoginWithGoogle() {
   const { user, setUser } = useContext(AuthContext); // Récupération du contexte d'auth
   const [loading, setLoading] = useState(true);
 
-  const redirectUri = AuthSession.makeRedirectUri({ useProxy: true });
+  // const redirectUri = AuthSession.makeRedirectUri({ useProxy: true });
+  const redirectUri = `https://auth.expo.io/@alexaloesode/schooltool`;
+
+  //Prod config
+  // const redirectUri = AuthSession.makeRedirectUri({
+  //       native: "com.schooltool.authsessiongoogle:/oauthredirect"
+  //     }),
+  
   console.log("Redirect URI:", redirectUri);
   
 
@@ -32,21 +39,9 @@ export default function LoginWithGoogle() {
         android: webClientId,
         default: webClientId,
       }),
-
-      // redirectUri: `https://auth.expo.io/@alexaloesode/schooltool`,
       redirectUri,
-
-      //Prod config
-      // redirectUri: AuthSession.makeRedirectUri({
-      //   native: "com.schooltool.authsessiongoogle:/oauthredirect"
-      // }),
-
-      //Dev config
-      // redirectUri: AuthSession.makeRedirectUri({
-      //   useProxy: true,
-      // }),
       usePKCE: true,
-      scopes: ["openid", "profile", "email"],
+      scopes: ["openid", "profile", "email", "https://www.googleapis.com/auth/calendar.readonly"],
     },
     { authorizationEndpoint: "https://accounts.google.com/o/oauth2/v2/auth" }
   );
@@ -104,12 +99,16 @@ export default function LoginWithGoogle() {
         const userSession = {
           accessToken: apiToken.token,
           authToken: apiToken.authtoken,
+          googleAccessToken: tokenData.access_token,
+          googleExpiresIn: tokenData.expires_in,
+          googleScope: tokenData.scope,
         };
         
-        await AsyncStorage.setItem("userSession", JSON.stringify(userSession));
-        setUser(userSession); // Mettre à jour le contexte utilisateur
         
-        router.replace("/"); // Rediriger vers l'accueil
+        await AsyncStorage.setItem("userSession", JSON.stringify(userSession));
+        setUser(userSession);
+        
+        router.replace("/");
       } else {
         console.log("Erreur lors de la récupération du token Google :", tokenData);
         Alert.alert("Erreur", "Impossible d'obtenir un jeton d'accès");
