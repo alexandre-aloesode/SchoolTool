@@ -103,9 +103,19 @@ const GoogleCalendarWidget = () => {
 
 const styles = StyleSheet.create({
   wrapper: {
-    marginTop: 20,
-    marginBottom: 60,
-    width: "100%",
+    marginTop: 10,
+    marginBottom: 20,
+    width: "90%",
+    borderRadius: 12,
+    backgroundColor: "#fff",
+    paddingVertical: 10,
+    paddingHorizontal: 6,
+    minHeight: 310,
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
   },
   nav: {
     flexDirection: "row",
@@ -124,9 +134,10 @@ const styles = StyleSheet.create({
   },
   grid: {
     flexDirection: "row",
+    paddingHorizontal: 8,
   },
   column: {
-    minWidth: columnMinWidth,
+    minWidth: 130,
     padding: 8,
     backgroundColor: "#f9f9f9",
     borderRadius: 8,
