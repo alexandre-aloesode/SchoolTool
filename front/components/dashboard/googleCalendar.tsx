@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { View, Text, StyleSheet, Dimensions, ScrollView } from "react-native";
+import { View, Text, StyleSheet, Dimensions, ScrollView, Modal, TouchableOpacity, Pressable } from "react-native";
 import dayjs from "dayjs";
 import AuthContext from "@/context/authContext";
 
@@ -9,7 +9,8 @@ const columnMinWidth = 130;
 const GoogleCalendarWidget = () => {
   const { user } = useContext(AuthContext);
   const [events, setEvents] = useState([]);
-  const [startOfWeek, setStartOfWeek] = useState(dayjs().startOf("week").add(1, "day")); // Lundi
+  const [startOfWeek, setStartOfWeek] = useState(dayjs().startOf("week").add(1, "day"));
+  const [selectedEvent, setSelectedEvent] = useState(null);
 
   const fetchEvents = async () => {
     try {
@@ -42,33 +43,32 @@ const GoogleCalendarWidget = () => {
     return { day, events: dayEvents };
   });
 
+  const isToday = (date) => dayjs().isSame(date, "day");
+
   return (
     <View style={styles.wrapper}>
+      {/* Navigation semaine */}
       <View style={styles.nav}>
         <Text style={styles.arrow} onPress={() => setStartOfWeek(prev => prev.subtract(7, "day"))}>◀</Text>
         <Text style={styles.weekText}>Semaine du {startOfWeek.format("DD/MM/YYYY")}</Text>
         <Text style={styles.arrow} onPress={() => setStartOfWeek(prev => prev.add(7, "day"))}>▶</Text>
       </View>
 
+      {/* Grille des jours */}
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={[
-          styles.grid,
-          { width: Math.max(columnMinWidth * groupedEvents.length, screenWidth) },
-        ]}
+        contentContainerStyle={[styles.grid, { width: Math.max(columnMinWidth * groupedEvents.length, screenWidth) }]}
       >
         {groupedEvents.map(({ day, events }, index) => (
-          <View key={index} style={styles.column}>
+          <View key={index} style={[styles.column, isToday(day) && styles.today]}>
             <Text style={styles.dayTitle}>{day.format("ddd DD/MM")}</Text>
             {events.length > 0 ? (
               events.map((event) => (
-                <View key={event.id} style={styles.eventCard}>
+                <Pressable key={event.id} onPress={() => setSelectedEvent(event)} style={styles.eventCard}>
                   <Text style={styles.eventTitle}>{event.summary}</Text>
-                  <Text style={styles.eventTime}>
-                    {dayjs(event.start.dateTime || event.start.date).format("HH:mm")}
-                  </Text>
-                </View>
+                  <Text style={styles.eventTime}>{dayjs(event.start.dateTime || event.start.date).format("HH:mm")}</Text>
+                </Pressable>
               ))
             ) : (
               <Text style={styles.noEvent}>—</Text>
@@ -76,6 +76,27 @@ const GoogleCalendarWidget = () => {
           </View>
         ))}
       </ScrollView>
+
+      {/* Modal d'événement */}
+      <Modal
+        visible={!!selectedEvent}
+        animationType="slide"
+        transparent
+        onRequestClose={() => setSelectedEvent(null)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>{selectedEvent?.summary}</Text>
+            <Text>{dayjs(selectedEvent?.start.dateTime || selectedEvent?.start.date).format("dddd DD MMMM YYYY • HH:mm")}</Text>
+            {selectedEvent?.description && (
+              <Text style={styles.modalDescription}>{selectedEvent.description}</Text>
+            )}
+            <Pressable onPress={() => setSelectedEvent(null)} style={styles.modalClose}>
+              <Text style={styles.modalCloseText}>Fermer</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -106,13 +127,15 @@ const styles = StyleSheet.create({
   },
   column: {
     minWidth: columnMinWidth,
-    flexGrow: 1,
-    flexShrink: 0,
     padding: 8,
     backgroundColor: "#f9f9f9",
     borderRadius: 8,
     marginHorizontal: 4,
     alignItems: "center",
+  },
+  today: {
+    borderWidth: 2,
+    borderColor: "#1188aa",
   },
   dayTitle: {
     fontWeight: "bold",
@@ -139,6 +162,40 @@ const styles = StyleSheet.create({
   noEvent: {
     fontStyle: "italic",
     color: "#aaa",
+  },
+
+  // Modal
+  modalOverlay: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
+  },
+  modalContent: {
+    width: "85%",
+    backgroundColor: "#fff",
+    padding: 20,
+    borderRadius: 10,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
+  modalDescription: {
+    marginTop: 10,
+    color: "#444",
+  },
+  modalClose: {
+    marginTop: 20,
+    alignSelf: "center",
+    padding: 10,
+    backgroundColor: "#1188aa",
+    borderRadius: 6,
+  },
+  modalCloseText: {
+    color: "#fff",
+    fontWeight: "bold",
   },
 });
 
