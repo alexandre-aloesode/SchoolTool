@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { View, Text, StyleSheet, Dimensions, ScrollView, Modal, TouchableOpacity, Pressable } from "react-native";
 import dayjs from "dayjs";
 import AuthContext from "@/context/authContext";
+import { getValidGoogleAccessToken } from "@/utils/googleToken";
 
 const screenWidth = Dimensions.get("window").width;
 const columnMinWidth = 130;
@@ -13,13 +14,16 @@ const GoogleCalendarWidget = () => {
   const [selectedEvent, setSelectedEvent] = useState(null);
 
   const fetchEvents = async () => {
+    const token = await getValidGoogleAccessToken();
+    if (!token) return;
+  
     try {
       const endOfWeek = startOfWeek.add(6, "day").endOf("day");
       const response = await fetch(
         `https://www.googleapis.com/calendar/v3/calendars/primary/events?timeMin=${startOfWeek.toISOString()}&timeMax=${endOfWeek.toISOString()}&singleEvents=true&orderBy=startTime`,
         {
           headers: {
-            Authorization: `Bearer ${user?.googleAccessToken}`,
+            Authorization: `Bearer ${token}`,
           },
         }
       );

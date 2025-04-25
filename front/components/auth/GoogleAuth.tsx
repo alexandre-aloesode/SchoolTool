@@ -9,7 +9,6 @@ import AuthContext from "@/context/authContext"; // Import du contexte d'auth
 
 WebBrowser.maybeCompleteAuthSession();
 
-
 const androidClientId = ENV.ANDROID_CLIENT_ID;
 const iosClientId = ENV.IOS_CLIENT_ID;
 const webClientId = ENV.LPTF_GOOGLE_CLIENT_ID;
@@ -21,16 +20,15 @@ export default function LoginWithGoogle() {
   const { user, setUser } = useContext(AuthContext); // Récupération du contexte d'auth
   const [loading, setLoading] = useState(true);
 
-  // const redirectUri = AuthSession.makeRedirectUri({ useProxy: true });
-  const redirectUri = `https://auth.expo.io/@alexaloesode/schooltool`;
+  const redirectUri = AuthSession.makeRedirectUri({ useProxy: true });
+  // const redirectUri = `https://auth.expo.io/@alexaloesode/schooltool`;
 
   //Prod config
   // const redirectUri = AuthSession.makeRedirectUri({
   //       native: "com.schooltool.authsessiongoogle:/oauthredirect"
   //     }),
-  
+
   console.log("Redirect URI:", redirectUri);
-  
 
   const [request, response, promptAsync] = AuthSession.useAuthRequest(
     {
@@ -41,11 +39,20 @@ export default function LoginWithGoogle() {
       }),
       redirectUri,
       usePKCE: true,
-      scopes: ["openid", "profile", "email", "https://www.googleapis.com/auth/calendar.readonly"],
+      scopes: [
+        "openid",
+        "profile",
+        "email",
+        "https://www.googleapis.com/auth/calendar.readonly",
+      ],
+      extraParams: {
+        access_type: "offline",
+        prompt: "consent", // pour forcer Google à renvoyer le refresh_token à chaque fois
+      },
     },
     { authorizationEndpoint: "https://accounts.google.com/o/oauth2/v2/auth" }
   );
-  
+
   useEffect(() => {
     // Vérifier si un utilisateur est déjà connecté
     const checkUserSession = async () => {
@@ -60,7 +67,7 @@ export default function LoginWithGoogle() {
   }, []);
 
   const exchangeCodeForToken = async (code) => {
-    try {    
+    try {
       const response = await fetch("https://oauth2.googleapis.com/token", {
         method: "POST",
         headers: {
@@ -70,7 +77,11 @@ export default function LoginWithGoogle() {
           code,
 
           client_secret: Platform.OS === "web" ? googleSecret : undefined,
-          client_id: Platform.select({ ios: iosClientId, android: webClientId, default: webClientId }),
+          client_id: Platform.select({
+            ios: iosClientId,
+            android: webClientId,
+            default: webClientId,
+          }),
 
           // redirect_uri: AuthSession.makeRedirectUri({
           //   scheme: "com.schooltool.authsessiongoogle",
@@ -95,27 +106,36 @@ export default function LoginWithGoogle() {
         });
 
         let apiToken = await authToken.json();
-        
+
         const userSession = {
           accessToken: apiToken.token,
           authToken: apiToken.authtoken,
           googleAccessToken: tokenData.access_token,
           googleExpiresIn: tokenData.expires_in,
           googleScope: tokenData.scope,
+          googleRefreshToken: tokenData.refresh_token,
         };
-        
-        
+
         await AsyncStorage.setItem("userSession", JSON.stringify(userSession));
         setUser(userSession);
-        
+
         router.replace("/");
       } else {
-        console.log("Erreur lors de la récupération du token Google :", tokenData);
+        console.log(
+          "Erreur lors de la récupération du token Google :",
+          tokenData
+        );
         Alert.alert("Erreur", "Impossible d'obtenir un jeton d'accès");
       }
     } catch (error) {
-      console.error("Erreur lors de l'échange du code contre un jeton :", error);
-      Alert.alert("Erreur", "Problème lors de l'échange du code d'autorisation");
+      console.error(
+        "Erreur lors de l'échange du code contre un jeton :",
+        error
+      );
+      Alert.alert(
+        "Erreur",
+        "Problème lors de l'échange du code d'autorisation"
+      );
     }
   };
 
@@ -137,7 +157,12 @@ export default function LoginWithGoogle() {
       ) : (
         <>
           <Text style={styles.title}>Bienvenue sur l'application</Text>
-          <Button disabled={!request} title="Se connecter avec Google" onPress={() => promptAsync({ useProxy: true })} color="#4285F4" />
+          <Button
+            disabled={!request}
+            title="Se connecter avec Google"
+            onPress={() => promptAsync({ useProxy: true })}
+            color="#4285F4"
+          />
         </>
       )}
     </View>
