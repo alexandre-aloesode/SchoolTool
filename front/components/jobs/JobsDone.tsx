@@ -4,14 +4,12 @@ import {
   Text,
   FlatList,
   StyleSheet,
-  Modal,
   Dimensions,
   Pressable,
-  ScrollView,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
-import { IconButton, Button } from "react-native-paper";
 import { ApiActions } from "@/services/ApiServices";
+import JobDoneReviewModal from "./modals/JobDoneReviewModal";
 
 const screenWidth = Dimensions.get("window").width;
 
@@ -69,6 +67,7 @@ const JobsDone = () => {
       params: {
         job_name: "",
         registration_id: "",
+        group_id: "",
         job_unit_name: "",
         job_unit_id: allUnitIds,
         order: "click_date",
@@ -90,13 +89,12 @@ const JobsDone = () => {
   };
 
   const renderJob = ({ item }) => (
-    <View style={styles.row}>
+    <Pressable style={styles.row} onPress={() => openJobModal(item)}>
       <Text style={[styles.jobTitle, { flex: 1 }]}>{item.job_name}</Text>
       <View style={[styles.jobDetails, { flex: 2 }]}>
         <Text style={styles.unitText}>{item.job_unit_name}</Text>
-        <IconButton icon="magnify" size={20} onPress={() => openJobModal(item)} />
       </View>
-    </View>
+    </Pressable>
   );
 
   return (
@@ -155,35 +153,12 @@ const JobsDone = () => {
         />
       </View>
 
-      {/* Modal Popup */}
-      <Modal animationType="slide" transparent={true} visible={modalVisible}>
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <ScrollView>
-              <Text style={styles.modalTitle}>
-                [{selectedJob?.job_unit_name}] {selectedJob?.job_name}
-              </Text>
-
-              <Text style={styles.modalSubtitle}>{selectedJob?.group_name || selectedJob?.job_code}</Text>
-              <Text style={styles.modalDescription}>
-                {selectedJob?.job_description || "Aucune description disponible."}
-              </Text>
-
-              <Text style={styles.modalInfo}>👨‍🏫 Chef de groupe : {selectedJob?.lead_email}</Text>
-              <Text style={styles.modalInfo}>📅 Début : {selectedJob?.start_date}</Text>
-              <Text style={styles.modalInfo}>📅 Fin : {selectedJob?.end_date}</Text>
-
-              <Button
-                mode="contained"
-                onPress={() => setModalVisible(false)}
-                style={{ marginTop: 16 }}
-              >
-                Fermer
-              </Button>
-            </ScrollView>
-          </View>
-        </View>
-      </Modal>
+      {/* Modal */}
+      <JobDoneReviewModal
+        visible={modalVisible}
+        job={selectedJob}
+        onClose={() => setModalVisible(false)}
+      />
     </View>
   );
 };
@@ -248,41 +223,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-  },
-
-  // Modal
-  modalContainer: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.5)",
-    justifyContent: "center",
-    padding: 16,
-  },
-  modalContent: {
-    backgroundColor: "white",
-    borderRadius: 12,
-    padding: 20,
-    elevation: 5,
-  },
-  modalTitle: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#e91e63",
-    marginBottom: 8,
-  },
-  modalSubtitle: {
-    fontSize: 14,
-    fontWeight: "600",
-    marginBottom: 6,
-  },
-  modalDescription: {
-    fontSize: 13,
-    marginBottom: 8,
-    color: "#333",
-  },
-  modalInfo: {
-    fontSize: 13,
-    marginBottom: 4,
-    color: "#555",
   },
 });
 

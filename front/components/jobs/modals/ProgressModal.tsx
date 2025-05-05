@@ -28,7 +28,7 @@ const ProgressModal = ({ visible, job, onClose, onReport }) => {
         setLoading(true);
         try {
           const regReq = await ApiActions.get({
-            route: "/registration",
+            route: "registration",
             params: {
               job_name: "",
               group_name: "",
@@ -55,7 +55,7 @@ const ProgressModal = ({ visible, job, onClose, onReport }) => {
           });
 
           const skillsReq = await ApiActions.get({
-            route: "/job/skill",
+            route: "job/skill",
             params: {
               job_id: job.job_id,
               skill_name: "",
@@ -66,7 +66,7 @@ const ProgressModal = ({ visible, job, onClose, onReport }) => {
           });
 
           const membersReq = await ApiActions.get({
-            route: "/group",
+            route: "group",
             params: {
               group_id: job.group_id,
               member: "",
@@ -105,7 +105,7 @@ const ProgressModal = ({ visible, job, onClose, onReport }) => {
   
     try {
       await ApiActions.put({
-        route: "/group/click",
+        route: "group/click",
         params: {
           group_id: jobData.group_id,
         },

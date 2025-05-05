@@ -20,7 +20,7 @@ const ReviewModal = ({ visible, groupId, onClose }) => {
         setLoading(true);
         try {
           const response = await ApiActions.get({
-            route: "/group/review",
+            route: "group/review",
             params: {
               group_id: groupId,
             },
