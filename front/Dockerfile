@@ -13,8 +13,13 @@ RUN npm install
 # Copier tous les fichiers de l'application
 COPY . .
 
+COPY .env .env
+
 # Exposer le port utilisé par Metro Bundler (Expo)
 EXPOSE 8081
+EXPOSE 19000 19001 19002
 
 # Lancer Expo sans `--tunnel`
-CMD ["npx", "expo", "start", "--lan"]
+CMD ["npx", "expo", "start", "--tunnel"]
+
+

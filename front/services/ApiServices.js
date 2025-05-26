@@ -1,7 +1,11 @@
 import axios from "axios";
-import config from "../config";
+import { ENV } from "@/utils/env";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
+import React, { useContext } from "react";
+import AuthContext from "@/context/authContext";
+
+  const auth = useContext(AuthContext);
 
 async function getApiToken() {
   try {
@@ -62,18 +66,21 @@ async function refreshToken(session) {
     let params = {
       method: "post",
       maxBodyLength: Infinity,
-      url: `${config.LPTF_AUTH_API_URL}/refresh`,
+      url: `${ENV.LPTF_AUTH_API_URL}/refresh`,
       data: formData,
       headers: {
         "Content-Type": "multipart/form-data",
       },
     };
     const response = await axios.request(params);
+    console.log("Response from refresh token:", response.data);
+    
 
     const refreshedToken = response.data?.token;
 
     if (!refreshedToken) {
       console.error("No token received from refresh");
+      auth.logout();
       return null;
     }
 
@@ -113,7 +120,7 @@ export const ApiActions = {
     let params = {
       method: "get",
       maxBodyLength: Infinity,
-      url: `${config.LPTF_API_URL}/${route}?${url}`,
+      url: `${ENV.LPTF_API_URL}/${route}?${url}`,
       headers: {
         Token: token || "",
       },
@@ -140,7 +147,7 @@ export const ApiActions = {
     let params = {
       method: "post",
       maxBodyLength: Infinity,
-      url: `${config.LPTF_API_URL}/${route}?`,
+      url: `${ENV.LPTF_API_URL}/${route}?`,
       data: new URLSearchParams(body).toString(),
       headers: {
         Token: token || "",
@@ -168,7 +175,7 @@ export const ApiActions = {
     let params = {
       method: "put",
       maxBodyLength: Infinity,
-      url: `${config.LPTF_API_URL}/${route}?`,
+      url: `${ENV.LPTF_API_URL}/${route}?`,
       data: new URLSearchParams(bodyParams).toString(),
       headers: {
         Token: token || "",
@@ -196,7 +203,7 @@ export const ApiActions = {
     let params = {
       method: "delete",
       maxBodyLength: Infinity,
-      url: `${config.LPTF_API_URL}/${route}?`,
+      url: `${ENV.LPTF_API_URL}/${route}?`,
       data: new URLSearchParams(bodyParams).toString(),
       headers: {
         Token: token || "",

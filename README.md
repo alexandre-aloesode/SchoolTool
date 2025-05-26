@@ -27,7 +27,9 @@ export default {
 
     LPTF_API_URL:'http://localhost:8000',
     LPTF_AUTH_API_URL :'http://localhost:8001',
-  };
+  };  .
 
 
 <!-- In the /back and /auth folders, rename the application/config/constants.php.example file into constants.php -->
+
+<!-- docker compose exec front npx expo start --tunnel -->

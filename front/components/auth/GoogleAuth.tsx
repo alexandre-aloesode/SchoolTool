@@ -2,36 +2,53 @@ import React, { useEffect, useContext, useState } from "react";
 import { StyleSheet, View, Text, Button, Alert, Platform } from "react-native";
 import * as AuthSession from "expo-auth-session";
 import * as WebBrowser from "expo-web-browser";
-import config from "../../config.js";
+import { ENV } from "@/utils/env";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import AuthContext from "@/context/authContext"; // Import du contexte d'auth
 
 WebBrowser.maybeCompleteAuthSession();
 
-const androidClientId = config.ANDROID_CLIENT_ID;
-const iosClientId = config.IOS_CLIENT_ID;
-const webClientId = config.LPTF_GOOGLE_CLIENT_ID;
-const googleSecret = config.GOOGLE_CLIENT_SECRET;
-const authUrl = config.LPTF_AUTH_API_URL;
+const androidClientId = ENV.ANDROID_CLIENT_ID;
+const iosClientId = ENV.IOS_CLIENT_ID;
+const webClientId = ENV.LPTF_GOOGLE_CLIENT_ID;
+const googleSecret = ENV.GOOGLE_CLIENT_SECRET;
+const authUrl = ENV.LPTF_AUTH_API_URL;
 
 export default function LoginWithGoogle() {
   const router = useRouter();
   const { user, setUser } = useContext(AuthContext); // Récupération du contexte d'auth
   const [loading, setLoading] = useState(true);
 
+  const redirectUri = AuthSession.makeRedirectUri({ useProxy: true });
+  // const redirectUri = `https://auth.expo.io/@alexaloesode/schooltool`;
+
+  //Prod config
+  // const redirectUri = AuthSession.makeRedirectUri({
+  //       native: "com.schooltool.authsessiongoogle:/oauthredirect"
+  //     }),
+
+  console.log("Redirect URI:", redirectUri);
+
   const [request, response, promptAsync] = AuthSession.useAuthRequest(
     {
       clientId: Platform.select({
         ios: iosClientId,
-        android: androidClientId,
+        android: webClientId,
         default: webClientId,
       }),
-      redirectUri: AuthSession.makeRedirectUri({
-        scheme: "com.schooltool.authsessiongoogle",
-      }),
+      redirectUri,
       usePKCE: true,
-      scopes: ["openid", "profile", "email"],
+      scopes: [
+        "openid",
+        "profile",
+        "email",
+        "https://www.googleapis.com/auth/calendar.readonly",
+      ],
+      extraParams: {
+        access_type: "offline",
+        prompt: "consent", // pour forcer Google à renvoyer le refresh_token à chaque fois
+      },
     },
     { authorizationEndpoint: "https://accounts.google.com/o/oauth2/v2/auth" }
   );
@@ -58,11 +75,20 @@ export default function LoginWithGoogle() {
         },
         body: new URLSearchParams({
           code,
+
           client_secret: Platform.OS === "web" ? googleSecret : undefined,
-          client_id: Platform.select({ ios: iosClientId, android: androidClientId, default: webClientId }),
-          redirect_uri: AuthSession.makeRedirectUri({
-            scheme: "com.schooltool.authsessiongoogle",
+          client_id: Platform.select({
+            ios: iosClientId,
+            android: webClientId,
+            default: webClientId,
           }),
+
+          // redirect_uri: AuthSession.makeRedirectUri({
+          //   scheme: "com.schooltool.authsessiongoogle",
+          // }),
+          // redirect_uri: `https://auth.expo.io/@alexaloesode/schooltool`,
+          redirect_uri: redirectUri,
+
           grant_type: "authorization_code",
           code_verifier: request?.codeVerifier,
         }),
@@ -80,23 +106,36 @@ export default function LoginWithGoogle() {
         });
 
         let apiToken = await authToken.json();
-        
+
         const userSession = {
           accessToken: apiToken.token,
           authToken: apiToken.authtoken,
+          googleAccessToken: tokenData.access_token,
+          googleExpiresIn: tokenData.expires_in,
+          googleScope: tokenData.scope,
+          googleRefreshToken: tokenData.refresh_token,
         };
-        
+
         await AsyncStorage.setItem("userSession", JSON.stringify(userSession));
-        setUser(userSession); // Mettre à jour le contexte utilisateur
-        
-        router.replace("/"); // Rediriger vers l'accueil
+        setUser(userSession);
+
+        router.replace("/");
       } else {
-        console.log("Erreur lors de la récupération du token Google :", tokenData);
+        console.log(
+          "Erreur lors de la récupération du token Google :",
+          tokenData
+        );
         Alert.alert("Erreur", "Impossible d'obtenir un jeton d'accès");
       }
     } catch (error) {
-      console.error("Erreur lors de l'échange du code contre un jeton :", error);
-      Alert.alert("Erreur", "Problème lors de l'échange du code d'autorisation");
+      console.error(
+        "Erreur lors de l'échange du code contre un jeton :",
+        error
+      );
+      Alert.alert(
+        "Erreur",
+        "Problème lors de l'échange du code d'autorisation"
+      );
     }
   };
 
@@ -118,7 +157,12 @@ export default function LoginWithGoogle() {
       ) : (
         <>
           <Text style={styles.title}>Bienvenue sur l'application</Text>
-          <Button disabled={!request} title="Se connecter avec Google" onPress={() => promptAsync()} color="#4285F4" />
+          <Button
+            disabled={!request}
+            title="Se connecter avec Google"
+            onPress={() => promptAsync({ useProxy: true })}
+            color="#4285F4"
+          />
         </>
       )}
     </View>
