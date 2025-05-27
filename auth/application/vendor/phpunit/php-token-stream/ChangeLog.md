@@ -4,13 +4,13 @@ All notable changes to `sebastianbergmann/php-token-stream` are documented in th
 
 ## [2.0.2] - 2017-11-27
 
-* Fixed [#69](https://github.com/sebastianbergmann/php-token-stream/issues/69): `PHP_Token_USE_FUNCTION` does not serialize correctly
+- Fixed [#69](https://github.com/sebastianbergmann/php-token-stream/issues/69): `PHP_Token_USE_FUNCTION` does not serialize correctly
 
 ## [2.0.1] - 2017-08-20
 
 ### Fixed
 
-* Fixed [#68](https://github.com/sebastianbergmann/php-token-stream/issues/68): Method with name `empty` wrongly recognized as anonymous function
+- Fixed [#68](https://github.com/sebastianbergmann/php-token-stream/issues/68): Method with name `empty` wrongly recognized as anonymous function
 
 ## [2.0.0] - 2017-08-03
 

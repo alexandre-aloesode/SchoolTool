@@ -16,7 +16,6 @@ for a general introduction to promises.
 - [Promise interop](#promise-interop)
 - [Implementation notes](#implementation-notes)
 
-
 # Features
 
 - [Promises/A+](https://promisesaplus.com/) implementation.
@@ -28,20 +27,17 @@ for a general introduction to promises.
 - C# style async/await coroutine promises using
   `GuzzleHttp\Promise\Coroutine::of()`.
 
-
 # Quick start
 
-A *promise* represents the eventual result of an asynchronous operation. The
+A _promise_ represents the eventual result of an asynchronous operation. The
 primary way of interacting with a promise is through its `then` method, which
 registers callbacks to receive either a promise's eventual value or the reason
 why the promise cannot be fulfilled.
 
-
 ## Callbacks
 
-Callbacks are registered with the `then` method by providing an optional 
+Callbacks are registered with the `then` method by providing an optional
 `$onFulfilled` followed by an optional `$onRejected` function.
-
 
 ```php
 use GuzzleHttp\Promise\Promise;
@@ -59,11 +55,10 @@ $promise->then(
 );
 ```
 
-*Resolving* a promise means that you either fulfill a promise with a *value* or
-reject a promise with a *reason*. Resolving a promises triggers callbacks
+_Resolving_ a promise means that you either fulfill a promise with a _value_ or
+reject a promise with a _reason_. Resolving a promises triggers callbacks
 registered with the promises's `then` method. These callbacks are triggered
 only once and in the order in which they were added.
-
 
 ## Resolving a promise
 
@@ -91,7 +86,6 @@ $promise
 // "Hello, reader."
 $promise->resolve('reader.');
 ```
-
 
 ## Promise forwarding
 
@@ -245,8 +239,7 @@ $promise->reject('foo');
 $promise->wait();
 ```
 
-> PHP Fatal error:  Uncaught exception 'GuzzleHttp\Promise\RejectionException' with message 'The promise was rejected with value: foo'
-
+> PHP Fatal error: Uncaught exception 'GuzzleHttp\Promise\RejectionException' with message 'The promise was rejected with value: foo'
 
 ## Unwrapping a promise
 
@@ -256,7 +249,7 @@ promise if it was fulfilled or throw an exception if it was rejected). This is
 called "unwrapping" the promise. Waiting on a promise will by default unwrap
 the promise state.
 
-You can force a promise to resolve and *not* unwrap the state of the promise
+You can force a promise to resolve and _not_ unwrap the state of the promise
 by passing `false` to the first argument of the `wait` function:
 
 ```php
@@ -274,7 +267,6 @@ wait function will be the value delivered to promise B.
 
 **Note**: when you do not unwrap the promise, no value is returned.
 
-
 # Cancellation
 
 You can cancel a promise that has not yet been fulfilled using the `cancel()`
@@ -282,9 +274,7 @@ method of a promise. When creating a promise you can provide an optional
 cancel function that when invoked cancels the action of computing a resolution
 of the promise.
 
-
 # API
-
 
 ## Promise
 
@@ -313,17 +303,17 @@ assert('waited' === $promise->wait());
 A promise has the following methods:
 
 - `then(callable $onFulfilled, callable $onRejected) : PromiseInterface`
-  
+
   Appends fulfillment and rejection handlers to the promise, and returns a new promise resolving to the return value of the called handler.
 
 - `otherwise(callable $onRejected) : PromiseInterface`
-  
+
   Appends a rejection handler callback to the promise, and returns a new promise resolving to the return value of the callback if it is called, or to its original fulfillment value if the promise is instead fulfilled.
 
 - `wait($unwrap = true) : mixed`
 
   Synchronously waits on the promise to complete.
-  
+
   `$unwrap` controls whether or not the value of the promise is returned for a
   fulfilled promise or if an exception is thrown if the promise is rejected.
   This is set to `true` by default.
@@ -348,7 +338,6 @@ A promise has the following methods:
 
   Rejects the promise with the given `$reason`.
 
-
 ## FulfilledPromise
 
 A fulfilled promise can be created to represent a promise that has been
@@ -365,7 +354,6 @@ $promise->then(function ($value) {
 });
 ```
 
-
 ## RejectedPromise
 
 A rejected promise can be created to represent a promise that has been
@@ -381,7 +369,6 @@ $promise->then(null, function ($reason) {
     echo $reason;
 });
 ```
-
 
 # Promise interop
 
@@ -408,7 +395,6 @@ Please note that wait and cancel chaining is no longer possible when forwarding
 a foreign promise. You will need to wrap a third-party promise with a Guzzle
 promise in order to utilize wait and cancel functions with foreign promises.
 
-
 ## Event Loop Integration
 
 In order to keep the stack size constant, Guzzle promises are resolved
@@ -434,11 +420,9 @@ $loop = React\EventLoop\Factory::create();
 $loop->addPeriodicTimer(0, [$queue, 'run']);
 ```
 
-*TODO*: Perhaps adding a `futureTick()` on each tick would be faster?
-
+_TODO_: Perhaps adding a `futureTick()` on each tick would be faster?
 
 # Implementation notes
-
 
 ## Promise resolution and chaining is handled iteratively
 
@@ -476,7 +460,6 @@ all of its pending handlers to the new promise. When the new promise is
 eventually resolved, all of the pending handlers are delivered the forwarded
 value.
 
-
 ## A promise is the deferred.
 
 Some promise libraries implement promises using a deferred object to represent
@@ -502,31 +485,30 @@ $promise->resolve('foo');
 // prints "foo"
 ```
 
-
 ## Upgrading from Function API
 
 A static API was first introduced in 1.4.0, in order to mitigate problems with functions conflicting between global and local copies of the package. The function API will be removed in 2.0.0. A migration table has been provided here for your convenience:
 
-| Original Function | Replacement Method |
-|----------------|----------------|
-| `queue` | `Utils::queue` |
-| `task` | `Utils::task` |
-| `promise_for` | `Create::promiseFor` |
-| `rejection_for` | `Create::rejectionFor` |
-| `exception_for` | `Create::exceptionFor` |
-| `iter_for` | `Create::iterFor` |
-| `inspect` | `Utils::inspect` |
-| `inspect_all` | `Utils::inspectAll` |
-| `unwrap` | `Utils::unwrap` |
-| `all` | `Utils::all` |
-| `some` | `Utils::some` |
-| `any` | `Utils::any` |
-| `settle` | `Utils::settle` |
-| `each` | `Each::of` |
-| `each_limit` | `Each::ofLimit` |
-| `each_limit_all` | `Each::ofLimitAll` |
-| `!is_fulfilled` | `Is::pending` |
-| `is_fulfilled` | `Is::fulfilled` |
-| `is_rejected` | `Is::rejected` |
-| `is_settled` | `Is::settled` |
-| `coroutine` | `Coroutine::of` |
+| Original Function | Replacement Method     |
+| ----------------- | ---------------------- |
+| `queue`           | `Utils::queue`         |
+| `task`            | `Utils::task`          |
+| `promise_for`     | `Create::promiseFor`   |
+| `rejection_for`   | `Create::rejectionFor` |
+| `exception_for`   | `Create::exceptionFor` |
+| `iter_for`        | `Create::iterFor`      |
+| `inspect`         | `Utils::inspect`       |
+| `inspect_all`     | `Utils::inspectAll`    |
+| `unwrap`          | `Utils::unwrap`        |
+| `all`             | `Utils::all`           |
+| `some`            | `Utils::some`          |
+| `any`             | `Utils::any`           |
+| `settle`          | `Utils::settle`        |
+| `each`            | `Each::of`             |
+| `each_limit`      | `Each::ofLimit`        |
+| `each_limit_all`  | `Each::ofLimitAll`     |
+| `!is_fulfilled`   | `Is::pending`          |
+| `is_fulfilled`    | `Is::fulfilled`        |
+| `is_rejected`     | `Is::rejected`         |
+| `is_settled`      | `Is::settled`          |
+| `coroutine`       | `Coroutine::of`        |

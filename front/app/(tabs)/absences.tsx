@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef } from 'react';
 import {
   View,
   Text,
@@ -10,11 +10,11 @@ import {
   ActivityIndicator,
   Modal,
   TouchableWithoutFeedback,
-} from "react-native";
-import DateTimePicker from "@react-native-community/datetimepicker";
-import * as ImagePicker from "expo-image-picker";
-import { format } from "date-fns";
-import { ApiActions } from "../../services/ApiServices";
+} from 'react-native';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import * as ImagePicker from 'expo-image-picker';
+import { format } from 'date-fns';
+import { ApiActions } from '../../services/ApiServices';
 
 interface AbsenceForm {
   start_date: string;
@@ -28,28 +28,33 @@ interface AbsenceForm {
 const UploadAbsences: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [absenceForm, setAbsenceForm] = useState<AbsenceForm>({
-    start_date: "",
-    end_date: "",
+    start_date: '',
+    end_date: '',
     duration: 0,
-    reason: "",
+    reason: '',
     image: null,
-    imageName: "",
+    imageName: '',
   });
-  const [showDatePicker, setShowDatePicker] = useState<"start_date" | "end_date" | null>(null);
+  const [showDatePicker, setShowDatePicker] = useState<
+    'start_date' | 'end_date' | null
+  >(null);
 
   const reasons = [
-    "Accident de transport",
-    "Maladie",
-    "Raison familiale",
-    "Evènement entreprise",
-    "Autre",
+    'Accident de transport',
+    'Maladie',
+    'Raison familiale',
+    'Evènement entreprise',
+    'Autre',
   ];
 
-  const handleDateChange = (field: "start_date" | "end_date", selectedDate: Date | undefined) => {
+  const handleDateChange = (
+    field: 'start_date' | 'end_date',
+    selectedDate: Date | undefined,
+  ) => {
     if (selectedDate) {
       setAbsenceForm((prev) => ({
         ...prev,
-        [field]: selectedDate.toISOString().split("T")[0],
+        [field]: selectedDate.toISOString().split('T')[0],
       }));
     }
     setShowDatePicker(null); // Close the picker after selection
@@ -69,7 +74,7 @@ const UploadAbsences: React.FC = () => {
       setAbsenceForm((prev) => ({
         ...prev,
         image: result.assets[0].uri,
-        imageName: result.assets[0].uri.split("/").pop() || "",
+        imageName: result.assets[0].uri.split('/').pop() || '',
       }));
     }
   };
@@ -78,14 +83,14 @@ const UploadAbsences: React.FC = () => {
     return `
       Raison : ${absenceForm.reason}
 
-      Du ${format(new Date(absenceForm.start_date), "dd/MM/yyyy")} au ${format(
-      new Date(absenceForm.end_date),
-      "dd/MM/yyyy"
-    )}
+      Du ${format(new Date(absenceForm.start_date), 'dd/MM/yyyy')} au ${format(
+        new Date(absenceForm.end_date),
+        'dd/MM/yyyy',
+      )}
 
       Durée : ${absenceForm.duration} ${
-      absenceForm.duration > 1 ? "jours ouvrés" : "jour ouvré"
-    }`;
+        absenceForm.duration > 1 ? 'jours ouvrés' : 'jour ouvré'
+      }`;
   };
 
   const handleUploadAbsence = () => {
@@ -95,7 +100,7 @@ const UploadAbsences: React.FC = () => {
       !absenceForm.reason ||
       !absenceForm.image
     ) {
-      Alert.alert("Erreur", "Veuillez remplir tous les champs");
+      Alert.alert('Erreur', 'Veuillez remplir tous les champs');
       return;
     }
 
@@ -103,7 +108,10 @@ const UploadAbsences: React.FC = () => {
     const endDate = new Date(absenceForm.end_date);
 
     if (startDate >= endDate) {
-      Alert.alert("Erreur", "La date de début doit être antérieure à la date de retour");
+      Alert.alert(
+        'Erreur',
+        'La date de début doit être antérieure à la date de retour',
+      );
       return;
     }
 
@@ -119,26 +127,26 @@ const UploadAbsences: React.FC = () => {
 
     setAbsenceForm((prev) => ({ ...prev, duration }));
 
-    Alert.alert("Confirmation", recapAbsence(), [
-      { text: "Annuler", style: "cancel" },
+    Alert.alert('Confirmation', recapAbsence(), [
+      { text: 'Annuler', style: 'cancel' },
       {
-        text: "Confirmer",
+        text: 'Confirmer',
         onPress: async () => {
           setLoading(true);
           try {
             const response = await ApiActions.post({
-              route: "uploadAbsence",
+              route: 'uploadAbsence',
               params: absenceForm,
             });
             if (response.status === 200) {
               setLoading(false);
-              Alert.alert("Succès", "Absence envoyée avec succès");
+              Alert.alert('Succès', 'Absence envoyée avec succès');
               setAbsenceForm({
-                start_date: "",
-                end_date: "",
-                reason: "",
+                start_date: '',
+                end_date: '',
+                reason: '',
                 image: null,
-                imageName: "",
+                imageName: '',
                 duration: 0,
               });
             } else {
@@ -146,7 +154,7 @@ const UploadAbsences: React.FC = () => {
             }
           } catch (error) {
             setLoading(false);
-            Alert.alert("Erreur", "Une erreur est survenue");
+            Alert.alert('Erreur', 'Une erreur est survenue');
           }
         },
       },
@@ -158,27 +166,35 @@ const UploadAbsences: React.FC = () => {
       {!loading ? (
         <View style={styles.form}>
           <Text style={styles.label}>Date de début</Text>
-          <TouchableOpacity onPress={() => setShowDatePicker("start_date")}>
-            <Text>{absenceForm.start_date || "Sélectionner une date"}</Text>
+          <TouchableOpacity onPress={() => setShowDatePicker('start_date')}>
+            <Text>{absenceForm.start_date || 'Sélectionner une date'}</Text>
           </TouchableOpacity>
 
           <Text style={styles.label}>Date de retour</Text>
-          <TouchableOpacity onPress={() => setShowDatePicker("end_date")}>
-            <Text>{absenceForm.end_date || "Sélectionner une date"}</Text>
+          <TouchableOpacity onPress={() => setShowDatePicker('end_date')}>
+            <Text>{absenceForm.end_date || 'Sélectionner une date'}</Text>
           </TouchableOpacity>
 
           <Text style={styles.label}>Motif</Text>
           {reasons.map((reason, index) => (
-            <TouchableOpacity key={index} onPress={() => handleReasonChange(reason)}>
+            <TouchableOpacity
+              key={index}
+              onPress={() => handleReasonChange(reason)}
+            >
               <Text style={styles.reason}>{reason}</Text>
             </TouchableOpacity>
           ))}
 
-          <TouchableOpacity onPress={handleImagePick} style={styles.uploadButton}>
+          <TouchableOpacity
+            onPress={handleImagePick}
+            style={styles.uploadButton}
+          >
             <Text>Uploader un justificatif</Text>
           </TouchableOpacity>
           {absenceForm.imageName && (
-            <Text style={styles.imageName}>Fichier sélectionné : {absenceForm.imageName}</Text>
+            <Text style={styles.imageName}>
+              Fichier sélectionné : {absenceForm.imageName}
+            </Text>
           )}
 
           <Button title="Valider" onPress={handleUploadAbsence} />
@@ -200,7 +216,9 @@ const UploadAbsences: React.FC = () => {
                 value={new Date(absenceForm[showDatePicker] || Date.now())}
                 mode="date"
                 display="default"
-                onChange={(event, date) => handleDateChange(showDatePicker, date)}
+                onChange={(event, date) =>
+                  handleDateChange(showDatePicker, date)
+                }
               />
             </View>
           </TouchableWithoutFeedback>
@@ -213,14 +231,14 @@ const UploadAbsences: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#f9f9f9",
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f9f9f9',
   },
   form: {
-    width: "90%",
+    width: '90%',
     padding: 20,
-    backgroundColor: "#fff",
+    backgroundColor: '#fff',
     borderRadius: 10,
     elevation: 5,
   },
@@ -230,15 +248,15 @@ const styles = StyleSheet.create({
   },
   reason: {
     padding: 10,
-    backgroundColor: "#f0f0f0",
+    backgroundColor: '#f0f0f0',
     borderRadius: 5,
     marginVertical: 5,
   },
   uploadButton: {
     padding: 15,
-    backgroundColor: "#ddd",
+    backgroundColor: '#ddd',
     borderRadius: 5,
-    alignItems: "center",
+    alignItems: 'center',
     marginVertical: 10,
   },
   imageName: {
@@ -247,9 +265,9 @@ const styles = StyleSheet.create({
   },
   modalBackground: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
 });
 

@@ -6,5 +6,4 @@ All notable changes to `sebastianbergmann/code-unit-reverse-lookup` are document
 
 ### Added
 
-* Initial release
-
+- Initial release

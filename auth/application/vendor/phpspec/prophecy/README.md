@@ -52,9 +52,9 @@ First, add Prophecy to the list of dependencies inside your `composer.json`:
 
 ```json
 {
-    "require-dev": {
-        "phpspec/prophecy": "~1.0"
-    }
+  "require-dev": {
+    "phpspec/prophecy": "~1.0"
+  }
 }
 ```
 
@@ -80,7 +80,7 @@ those object prophecies can't create themselves - there should be a Prophet:
 $prophet = new Prophecy\Prophet;
 ```
 
-The Prophet creates prophecies by *prophesizing* them:
+The Prophet creates prophecies by _prophesizing_ them:
 
 ```php
 $prophecy = $prophet->prophesize();
@@ -104,7 +104,7 @@ interfaces, but extend only one parent class.
 ### Dummies
 
 Ok, now we have our object prophecy. What can we do with it? First of all, we can get
-our object *dummy* by revealing its prophecy:
+our object _dummy_ by revealing its prophecy:
 
 ```php
 $dummy = $prophecy->reveal();
@@ -126,7 +126,7 @@ prophecy.
 
 Ok, now we know how to create basic prophecies and reveal dummies from them. That's
 awesome if we don't care about our _doubles_ (objects that reflect originals)
-interactions. If we do, we need to use *stubs* or *mocks*.
+interactions. If we do, we need to use _stubs_ or _mocks_.
 
 A stub is an object double, which doesn't have any expectations about the object behavior,
 but when put in specific environment, behaves in specific way. Ok, I know, it's cryptic,
@@ -226,7 +226,7 @@ actually is.
 
 You see, even if method arguments used during method prophecy creation look
 like simple method arguments, in reality they are not. They are argument token
-wildcards.  As a matter of fact, `->setName('everzet')` looks like a simple call just
+wildcards. As a matter of fact, `->setName('everzet')` looks like a simple call just
 because Prophecy automatically transforms it under the hood into:
 
 ```php
@@ -332,7 +332,7 @@ $stub = $prophecy->reveal();
 
 As you might see, the only difference between how we get dummies and stubs is that with
 stubs we describe every object conversation instead of just agreeing with `null` returns
-(object being *dummy*). As a matter of fact, after you define your first promise
+(object being _dummy_). As a matter of fact, after you define your first promise
 (method call), Prophecy will force you to define all the communications - it throws
 the `UnexpectedCallException` for any call you didn't describe with object prophecy before
 calling it on a stub.
@@ -342,7 +342,7 @@ calling it on a stub.
 Now we know how to define doubles without behavior (dummies) and doubles with behavior, but
 no expectations (stubs). What's left is doubles for which we have some expectations. These
 are called mocks and in Prophecy they look almost exactly the same as stubs, except that
-they define *predictions* instead of *promises* on method prophecies:
+they define _predictions_ instead of _promises_ on method prophecies:
 
 ```php
 $entityManager->flush()->shouldBeCalled();

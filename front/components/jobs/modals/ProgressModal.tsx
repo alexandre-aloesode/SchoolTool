@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -9,10 +9,10 @@ import {
   ActivityIndicator,
   Linking,
   Alert,
-} from "react-native";
-import { ApiActions } from "@/services/ApiServices";
-import ReviewModal from "./ReviewModal";
-import { set } from "date-fns";
+} from 'react-native';
+import { ApiActions } from '@/services/ApiServices';
+import ReviewModal from './ReviewModal';
+import { set } from 'date-fns';
 
 const ProgressModal = ({ visible, job, onClose, onReport }) => {
   const [loading, setLoading] = useState(false);
@@ -21,55 +21,54 @@ const ProgressModal = ({ visible, job, onClose, onReport }) => {
   const [jobData, setJobData] = useState(null);
   const [showReview, setShowReview] = useState(false);
 
-
   useEffect(() => {
     if (visible && job) {
       const fetchDetails = async () => {
         setLoading(true);
         try {
           const regReq = await ApiActions.get({
-            route: "/registration",
+            route: '/registration',
             params: {
-              job_name: "",
-              group_name: "",
-              group_id: "",
-              group_is_valid: "",
+              job_name: '',
+              group_name: '',
+              group_id: '',
+              group_is_valid: '',
               registration_id: job.registration_id,
-              lead_email: "",
-              job_description: "",
-              min_students: "",
-              max_students: "",
-              member_is_lead: "",
-              start_date: "",
-              end_date: "",
-              click_date: "",
-              link_subject: "",
-              job_duration: "",
-              job_id: "",
-              job_unit_name: "",
-              job_is_complete: "",
-              job_is_done: "",
-              correction_date: "",
-              order: "job_unit_name",
+              lead_email: '',
+              job_description: '',
+              min_students: '',
+              max_students: '',
+              member_is_lead: '',
+              start_date: '',
+              end_date: '',
+              click_date: '',
+              link_subject: '',
+              job_duration: '',
+              job_id: '',
+              job_unit_name: '',
+              job_is_complete: '',
+              job_is_done: '',
+              correction_date: '',
+              order: 'job_unit_name',
             },
           });
 
           const skillsReq = await ApiActions.get({
-            route: "/job/skill",
+            route: '/job/skill',
             params: {
               job_id: job.job_id,
-              skill_name: "",
-              skill_id: "",
-              needed: "",
-              earned: "",
+              skill_name: '',
+              skill_id: '',
+              needed: '',
+              earned: '',
             },
           });
 
           const membersReq = await ApiActions.get({
-            route: "/group",
+            route: '/group',
             params: {
               group_id: job.group_id,
-              member: "",
+              member: '',
             },
           });
 
@@ -77,7 +76,7 @@ const ProgressModal = ({ visible, job, onClose, onReport }) => {
           setSkills(skillsReq?.data || []);
           setMembers(membersReq?.data[0]?.member || []);
         } catch (err) {
-          console.error("Erreur lors du chargement des détails du job", err);
+          console.error('Erreur lors du chargement des détails du job', err);
         } finally {
           setLoading(false);
         }
@@ -91,7 +90,7 @@ const ProgressModal = ({ visible, job, onClose, onReport }) => {
     if (jobData?.job_link_subject) {
       Linking.openURL(jobData.job_link_subject);
     } else {
-      Alert.alert("Aucun lien de consigne disponible.");
+      Alert.alert('Aucun lien de consigne disponible.');
     }
   };
 
@@ -100,27 +99,33 @@ const ProgressModal = ({ visible, job, onClose, onReport }) => {
   };
 
   const handleMarkAsDone = async () => {
-    const confirmed = confirm("Êtes-vous sûr de vouloir marquer ce projet comme terminé ?");
+    const confirmed = confirm(
+      'Êtes-vous sûr de vouloir marquer ce projet comme terminé ?',
+    );
     if (!confirmed || !jobData?.group_id) return;
-  
+
     try {
       await ApiActions.put({
-        route: "/group/click",
+        route: '/group/click',
         params: {
           group_id: jobData.group_id,
         },
       });
-      alert("Le projet a été marqué comme terminé.");
+      alert('Le projet a été marqué comme terminé.');
       onClose(); // Optionnel : fermer la modale après action
     } catch (err) {
-      console.error("Erreur lors de la validation du projet :", err);
-      alert("Erreur : impossible de marquer ce projet comme terminé.");
+      console.error('Erreur lors de la validation du projet :', err);
+      alert('Erreur : impossible de marquer ce projet comme terminé.');
     }
   };
-  
 
   return (
-    <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
+    <Modal
+      visible={visible}
+      animationType="slide"
+      transparent
+      onRequestClose={onClose}
+    >
       <View style={styles.overlay}>
         <View style={styles.modal}>
           {loading ? (
@@ -141,7 +146,8 @@ const ProgressModal = ({ visible, job, onClose, onReport }) => {
               <Text style={styles.label}>Compétences :</Text>
               {skills.map((skill, i) => (
                 <Text key={i}>
-                  • {skill.skill_name} ({skill.skill_needed} → {skill.skill_earned})
+                  • {skill.skill_name} ({skill.skill_needed} →{' '}
+                  {skill.skill_earned})
                 </Text>
               ))}
 
@@ -153,13 +159,22 @@ const ProgressModal = ({ visible, job, onClose, onReport }) => {
               ))}
 
               <View style={styles.buttonRow}>
-                <Pressable style={[styles.button, styles.instructionBtn]} onPress={handleOpenInstructions}>
+                <Pressable
+                  style={[styles.button, styles.instructionBtn]}
+                  onPress={handleOpenInstructions}
+                >
                   <Text style={styles.buttonText}>Consignes</Text>
                 </Pressable>
-                <Pressable style={[styles.button, styles.reportBtn]} onPress={handleReport}>
+                <Pressable
+                  style={[styles.button, styles.reportBtn]}
+                  onPress={handleReport}
+                >
                   <Text style={styles.buttonText}>Rapport</Text>
                 </Pressable>
-                <Pressable style={[styles.button, styles.doneBtn]} onPress={handleMarkAsDone}>
+                <Pressable
+                  style={[styles.button, styles.doneBtn]}
+                  onPress={handleMarkAsDone}
+                >
                   <Text style={styles.buttonText}>Rendre le projet</Text>
                 </Pressable>
               </View>
@@ -171,7 +186,11 @@ const ProgressModal = ({ visible, job, onClose, onReport }) => {
           )}
         </View>
       </View>
-      <ReviewModal visible={showReview} groupId={jobData?.group_id} onClose={() => setShowReview(false)} />
+      <ReviewModal
+        visible={showReview}
+        groupId={jobData?.group_id}
+        onClose={() => setShowReview(false)}
+      />
     </Modal>
   );
 };
@@ -179,42 +198,42 @@ const ProgressModal = ({ visible, job, onClose, onReport }) => {
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.4)",
-    justifyContent: "center",
-    alignItems: "center",
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   modal: {
-    backgroundColor: "#fff",
+    backgroundColor: '#fff',
     borderRadius: 10,
     padding: 20,
-    width: "90%",
-    maxHeight: "90%",
+    width: '90%',
+    maxHeight: '90%',
   },
   title: {
     fontSize: 18,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     marginBottom: 10,
   },
   label: {
     marginTop: 10,
-    fontWeight: "600",
+    fontWeight: '600',
     marginBottom: 4,
   },
   closeBtn: {
     marginTop: 20,
-    backgroundColor: "#ccc",
+    backgroundColor: '#ccc',
     padding: 10,
     borderRadius: 6,
-    alignItems: "center",
+    alignItems: 'center',
   },
   closeText: {
-    fontWeight: "bold",
+    fontWeight: 'bold',
   },
   buttonRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     marginTop: 20,
-    flexWrap: "wrap",
+    flexWrap: 'wrap',
     gap: 8,
   },
   button: {
@@ -222,20 +241,20 @@ const styles = StyleSheet.create({
     padding: 10,
     marginHorizontal: 4,
     borderRadius: 6,
-    alignItems: "center",
+    alignItems: 'center',
   },
   instructionBtn: {
-    backgroundColor: "#00acc1",
+    backgroundColor: '#00acc1',
   },
   reportBtn: {
-    backgroundColor: "#1976d2",
+    backgroundColor: '#1976d2',
   },
   doneBtn: {
-    backgroundColor: "#e91e63",
+    backgroundColor: '#e91e63',
   },
   buttonText: {
-    color: "#fff",
-    fontWeight: "bold",
+    color: '#fff',
+    fontWeight: 'bold',
   },
 });
 

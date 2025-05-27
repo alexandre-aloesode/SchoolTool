@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
 import {
   Modal,
   View,
@@ -7,8 +7,8 @@ import {
   ActivityIndicator,
   ScrollView,
   Pressable,
-} from "react-native";
-import { ApiActions } from "@/services/ApiServices";
+} from 'react-native';
+import { ApiActions } from '@/services/ApiServices';
 
 const ReviewModal = ({ visible, groupId, onClose }) => {
   const [loading, setLoading] = useState(false);
@@ -20,14 +20,14 @@ const ReviewModal = ({ visible, groupId, onClose }) => {
         setLoading(true);
         try {
           const response = await ApiActions.get({
-            route: "/group/review",
+            route: '/group/review',
             params: {
               group_id: groupId,
             },
           });
           setReview(response?.data || null);
         } catch (err) {
-          console.error("Erreur de chargement du rapport", err);
+          console.error('Erreur de chargement du rapport', err);
         } finally {
           setLoading(false);
         }
@@ -38,7 +38,12 @@ const ReviewModal = ({ visible, groupId, onClose }) => {
   }, [visible, groupId]);
 
   return (
-    <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
+    <Modal
+      visible={visible}
+      animationType="slide"
+      transparent
+      onRequestClose={onClose}
+    >
       <View style={styles.overlay}>
         <View style={styles.modal}>
           {loading ? (
@@ -57,7 +62,9 @@ const ReviewModal = ({ visible, groupId, onClose }) => {
                     {review.skill.map((s, i) => (
                       <View key={i} style={styles.skillRow}>
                         <Text style={styles.skillName}>{s.skill_name}</Text>
-                        <Text style={styles.skillPts}>{s.job_skill_earned}</Text>
+                        <Text style={styles.skillPts}>
+                          {s.job_skill_earned}
+                        </Text>
                         <Text style={styles.skillStatus}>{s.skill_status}</Text>
                       </View>
                     ))}
@@ -84,24 +91,24 @@ const ReviewModal = ({ visible, groupId, onClose }) => {
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.4)",
-    justifyContent: "center",
-    alignItems: "center",
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   modal: {
-    backgroundColor: "#fff",
+    backgroundColor: '#fff',
     borderRadius: 10,
     padding: 20,
-    width: "90%",
-    maxHeight: "90%",
+    width: '90%',
+    maxHeight: '90%',
   },
   title: {
     fontSize: 18,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     marginBottom: 12,
   },
   label: {
-    fontWeight: "600",
+    fontWeight: '600',
     marginTop: 12,
   },
   value: {
@@ -112,37 +119,37 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   skillRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     marginBottom: 6,
   },
   skillName: {
     flex: 2,
-    fontWeight: "500",
+    fontWeight: '500',
   },
   skillPts: {
     flex: 1,
-    textAlign: "center",
+    textAlign: 'center',
   },
   skillStatus: {
     flex: 1,
-    textAlign: "right",
+    textAlign: 'right',
   },
   comment: {
-    fontStyle: "italic",
+    fontStyle: 'italic',
     marginTop: 4,
-    color: "#444",
+    color: '#444',
   },
   closeBtn: {
     marginTop: 20,
-    backgroundColor: "#1188aa",
+    backgroundColor: '#1188aa',
     padding: 10,
     borderRadius: 6,
-    alignItems: "center",
+    alignItems: 'center',
   },
   closeText: {
-    color: "#fff",
-    fontWeight: "bold",
+    color: '#fff',
+    fontWeight: 'bold',
   },
 });
 

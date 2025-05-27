@@ -52,7 +52,7 @@ JSON credentials for your project. Go to **APIs & Services** > **Credentials** i
 the [Google Developers Console][developer console] and select
 **Service account** from the **Add credentials** dropdown.
 
-> This file is your *only copy* of these credentials. It should never be
+> This file is your _only copy_ of these credentials. It should never be
 > committed with your source code, and should be stored securely.
 
 Once downloaded, store the path to this file in the
@@ -74,7 +74,7 @@ call. For the example below, you must enable the `Drive API`.
 
 #### Call the APIs
 
-As long as you update the environment variable below to point to *your* JSON
+As long as you update the environment variable below to point to _your_ JSON
 credentials file, the following code should output a list of your Drive files.
 
 ```php
@@ -125,6 +125,7 @@ $client->getEmitter()->attach($subscriber);
 ```
 
 #### Call using an ID Token
+
 If your application is running behind Cloud Run, or using Cloud Identity-Aware
 Proxy (IAP), you will need to fetch an ID token to access your application. For
 this, use the static method `getIdTokenMiddleware` on

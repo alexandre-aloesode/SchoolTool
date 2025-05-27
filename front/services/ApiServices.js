@@ -1,18 +1,18 @@
-import axios from "axios";
-import { ENV } from "@/utils/env";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { router } from "expo-router";
-import React, { useContext } from "react";
-import AuthContext from "@/context/authContext";
+import axios from 'axios';
+import { ENV } from '@/utils/env';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { router } from 'expo-router';
+import React, { useContext } from 'react';
+import AuthContext from '@/context/authContext';
 
-  const auth = useContext(AuthContext);
+const auth = useContext(AuthContext);
 
 async function getApiToken() {
   try {
-    const session = await AsyncStorage.getItem("userSession");
+    const session = await AsyncStorage.getItem('userSession');
 
     if (session === undefined || session === null) {
-      router.push("/");
+      router.push('/');
       return null;
     }
 
@@ -22,23 +22,22 @@ async function getApiToken() {
       const newToken = await refreshToken(parsedSession);
       if (newToken) {
         await AsyncStorage.setItem(
-          "userSession",
+          'userSession',
           JSON.stringify({
             ...parsedSession,
             accessToken: newToken,
-          })
+          }),
         );
         return newToken;
-      }
-      else {
-        router.push("/");
+      } else {
+        router.push('/');
         return null;
       }
     }
 
     return parsedSession.accessToken;
   } catch (error) {
-    console.error("Error fetching session: ", error);
+    console.error('Error fetching session: ', error);
     return null;
   }
 }
@@ -46,15 +45,15 @@ async function getApiToken() {
 function isTokenExpired(token) {
   if (!token) return true;
   try {
-    const base64Url = token.split(".")[1];
-    const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
     const payload = JSON.parse(atob(base64));
 
     const currentTime = Math.floor(Date.now() / 1000);
 
     return payload.exp < currentTime;
   } catch (err) {
-    console.error("Failed to decode token:", err);
+    console.error('Failed to decode token:', err);
     return true;
   }
 }
@@ -62,38 +61,37 @@ function isTokenExpired(token) {
 async function refreshToken(session) {
   try {
     const formData = new FormData();
-    formData.append("authtoken", session?.authToken);
+    formData.append('authtoken', session?.authToken);
     let params = {
-      method: "post",
+      method: 'post',
       maxBodyLength: Infinity,
       url: `${ENV.LPTF_AUTH_API_URL}/refresh`,
       data: formData,
       headers: {
-        "Content-Type": "multipart/form-data",
+        'Content-Type': 'multipart/form-data',
       },
     };
     const response = await axios.request(params);
-    console.log("Response from refresh token:", response.data);
-    
+    console.log('Response from refresh token:', response.data);
 
     const refreshedToken = response.data?.token;
 
     if (!refreshedToken) {
-      console.error("No token received from refresh");
+      console.error('No token received from refresh');
       auth.logout();
       return null;
     }
 
     return refreshedToken;
   } catch (error) {
-    console.error("Failed to refresh token:", error);
-    await AsyncStorage.removeItem("userSession"); // optional: force logout
+    console.error('Failed to refresh token:', error);
+    await AsyncStorage.removeItem('userSession'); // optional: force logout
     throw error;
   }
 }
 
 function buildUrl(params) {
-  let url = "";
+  let url = '';
   Object.keys(params).forEach((key) => {
     if (Array.isArray(params[key])) {
       params[key].forEach((element) => {
@@ -113,23 +111,23 @@ export const ApiActions = {
 
     const token = await getApiToken();
     if (!token) {
-      router.push("/");
+      router.push('/');
       return null;
     }
 
     let params = {
-      method: "get",
+      method: 'get',
       maxBodyLength: Infinity,
       url: `${ENV.LPTF_API_URL}/${route}?${url}`,
       headers: {
-        Token: token || "",
+        Token: token || '',
       },
     };
     try {
       const response = await axios.request(params);
       return response;
     } catch (error) {
-      console.error("GET request error: ", error);
+      console.error('GET request error: ', error);
       throw error;
     }
   },
@@ -140,24 +138,24 @@ export const ApiActions = {
 
     const token = await getApiToken();
     if (!token) {
-      router.push("/");
+      router.push('/');
       return null;
     }
 
     let params = {
-      method: "post",
+      method: 'post',
       maxBodyLength: Infinity,
       url: `${ENV.LPTF_API_URL}/${route}?`,
       data: new URLSearchParams(body).toString(),
       headers: {
-        Token: token || "",
+        Token: token || '',
       },
     };
     try {
       const response = await axios.request(params);
       return response;
     } catch (error) {
-      console.error("POST request error: ", error);
+      console.error('POST request error: ', error);
       throw error;
     }
   },
@@ -168,24 +166,24 @@ export const ApiActions = {
 
     const token = await getApiToken();
     if (!token) {
-      router.push("/");
+      router.push('/');
       return null;
     }
 
     let params = {
-      method: "put",
+      method: 'put',
       maxBodyLength: Infinity,
       url: `${ENV.LPTF_API_URL}/${route}?`,
       data: new URLSearchParams(bodyParams).toString(),
       headers: {
-        Token: token || "",
+        Token: token || '',
       },
     };
     try {
       const response = await axios.request(params);
       return response;
     } catch (error) {
-      console.error("PUT request error: ", error);
+      console.error('PUT request error: ', error);
       throw error;
     }
   },
@@ -196,24 +194,24 @@ export const ApiActions = {
 
     const token = await getApiToken();
     if (!token) {
-      router.push("/");
+      router.push('/');
       return null;
     }
 
     let params = {
-      method: "delete",
+      method: 'delete',
       maxBodyLength: Infinity,
       url: `${ENV.LPTF_API_URL}/${route}?`,
       data: new URLSearchParams(bodyParams).toString(),
       headers: {
-        Token: token || "",
+        Token: token || '',
       },
     };
     try {
       const response = await axios.request(params);
       return response;
     } catch (error) {
-      console.error("DELETE request error: ", error);
+      console.error('DELETE request error: ', error);
       throw error;
     }
   },

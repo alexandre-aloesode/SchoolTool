@@ -18,4 +18,4 @@ script: ./vendor/bin/phpunit
 
 notifications:
   email: false
-  irc: "irc.freenode.org#phpunit"
+  irc: 'irc.freenode.org#phpunit'

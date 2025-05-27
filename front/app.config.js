@@ -1,56 +1,56 @@
-import "dotenv/config";
+import 'dotenv/config';
 
 export default () => ({
   expo: {
-    name: "SchoolTool",
-    slug: "schooltool",
-    version: "1.0.0",
-    orientation: "portrait",
-    scheme: "com.schooltool.authsessiongoogle",
-    icon: "./assets/images/icon.png",
-    userInterfaceStyle: "automatic",
+    name: 'SchoolTool',
+    slug: 'schooltool',
+    version: '1.0.0',
+    orientation: 'portrait',
+    scheme: 'com.schooltool.authsessiongoogle',
+    icon: './assets/images/icon.png',
+    userInterfaceStyle: 'automatic',
     newArchEnabled: true,
 
     // 📱 Android config
     android: {
-      package: "com.schooltool.authsessiongoogle",
+      package: 'com.schooltool.authsessiongoogle',
       adaptiveIcon: {
-        foregroundImage: "./assets/images/adaptive-icon.png",
-        backgroundColor: "#ffffff",
-      }
+        foregroundImage: './assets/images/adaptive-icon.png',
+        backgroundColor: '#ffffff',
+      },
     },
 
     // 🍎 iOS config
     ios: {
-      bundleIdentifier: "com.schooltool.authsessiongoogle",
-      supportsTablet: true
+      bundleIdentifier: 'com.schooltool.authsessiongoogle',
+      supportsTablet: true,
     },
 
     // 🌐 Web config
     web: {
-      bundler: "metro",
-      output: "static",
-      favicon: "./assets/images/favicon.png"
+      bundler: 'metro',
+      output: 'static',
+      favicon: './assets/images/favicon.png',
     },
 
     // 🔌 Plugins utilisés
     plugins: [
-      "expo-router",
+      'expo-router',
       [
-        "expo-splash-screen",
+        'expo-splash-screen',
         {
-          image: "./assets/images/splash-icon.png",
+          image: './assets/images/splash-icon.png',
           imageWidth: 200,
-          resizeMode: "contain",
-          backgroundColor: "#ffffff"
-        }
+          resizeMode: 'contain',
+          backgroundColor: '#ffffff',
+        },
       ],
-      "expo-secure-store"
+      'expo-secure-store',
     ],
 
     // 🧪 Fonctionnalités expérimentales
     experiments: {
-      typedRoutes: true
+      typedRoutes: true,
     },
 
     // 🔐 Variables d'environnement injectées depuis .env
@@ -64,9 +64,8 @@ export default () => ({
       LPTF_AUTH_API_URL: process.env.LPTF_AUTH_API_URL,
       // 📦 EAS Project ID (obligatoire pour les builds)
       eas: {
-        projectId: "e427c0d9-fe3e-4038-a31e-f4a072fc7a79"
-      }
+        projectId: 'e427c0d9-fe3e-4038-a31e-f4a072fc7a79',
+      },
     },
-    
-  }
+  },
 });

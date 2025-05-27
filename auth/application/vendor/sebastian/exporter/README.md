@@ -1,5 +1,4 @@
-Exporter
-========
+# Exporter
 
 [![Build Status](https://secure.travis-ci.org/sebastianbergmann/exporter.png?branch=master)](https://travis-ci.org/sebastianbergmann/exporter)
 
@@ -169,4 +168,3 @@ You can add this library as a local, per-project dependency to your project usin
 If you only need this library during development, for instance to run your project's test suite, then you should add it as a development-time dependency:
 
     composer require --dev sebastian/exporter
-
