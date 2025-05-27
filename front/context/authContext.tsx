@@ -1,5 +1,5 @@
-import React, { createContext, useState, useEffect } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import React, { createContext, useState, useEffect } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const AuthContext = createContext(null);
 
@@ -8,7 +8,7 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const loadUserData = async () => {
-      const storedUser = await AsyncStorage.getItem("userSession");
+      const storedUser = await AsyncStorage.getItem('userSession');
       if (storedUser) {
         setUser(JSON.parse(storedUser));
       }
@@ -17,7 +17,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const logout = async () => {
-    await AsyncStorage.removeItem("userSession");
+    await AsyncStorage.removeItem('userSession');
     setUser(null);
   };
 

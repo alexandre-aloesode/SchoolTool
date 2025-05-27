@@ -13,7 +13,12 @@ const AvailableModal = ({ visible, job, onClose }) => {
   const [groupVisible, setGroupVisible] = useState(false);
 
   return (
-    <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
+    <Modal
+      visible={visible}
+      animationType="slide"
+      transparent
+      onRequestClose={onClose}
+    >
       <View style={styles.modalOverlay}>
         <View style={styles.modalContent}>
           <ScrollView>
@@ -31,7 +36,10 @@ const AvailableModal = ({ visible, job, onClose }) => {
               {job?.job_min_students} à {job?.job_max_students}
             </Text>
 
-            <Pressable style={styles.groupBtn} onPress={() => setGroupVisible(true)}>
+            <Pressable
+              style={styles.groupBtn}
+              onPress={() => setGroupVisible(true)}
+            >
               <Text style={styles.groupText}>Groupe</Text>
             </Pressable>
 

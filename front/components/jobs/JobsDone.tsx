@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -8,20 +8,20 @@ import {
   Dimensions,
   Pressable,
   ScrollView,
-} from "react-native";
-import { Picker } from "@react-native-picker/picker";
-import { IconButton, Button } from "react-native-paper";
-import { ApiActions } from "@/services/ApiServices";
+} from 'react-native';
+import { Picker } from '@react-native-picker/picker';
+import { IconButton, Button } from 'react-native-paper';
+import { ApiActions } from '@/services/ApiServices';
 
-const screenWidth = Dimensions.get("window").width;
+const screenWidth = Dimensions.get('window').width;
 
 const JobsDone = () => {
   const [promotions, setPromotions] = useState([]);
   const [units, setUnits] = useState([]);
   const [jobsDone, setJobsDone] = useState([]);
 
-  const [selectedPromotion, setSelectedPromotion] = useState("");
-  const [selectedUnit, setSelectedUnit] = useState("all");
+  const [selectedPromotion, setSelectedPromotion] = useState('');
+  const [selectedUnit, setSelectedUnit] = useState('all');
 
   const [selectedJob, setSelectedJob] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
@@ -38,24 +38,24 @@ const JobsDone = () => {
 
   const fetchInitialData = async () => {
     const history = await ApiActions.get({
-      route: "promotion/history",
+      route: 'promotion/history',
       params: {
-        promotion_id: "",
-        promotion_name: "",
+        promotion_id: '',
+        promotion_name: '',
       },
     });
 
     setPromotions(history.data);
-    setSelectedPromotion(history.data[0]?.promotion_id || "");
+    setSelectedPromotion(history.data[0]?.promotion_id || '');
   };
 
   const loadUnitsAndJobs = async () => {
     const unitResponse = await ApiActions.get({
-      route: "promotion/unit",
+      route: 'promotion/unit',
       params: {
         promotion_id: selectedPromotion,
-        unit_id: "",
-        unit_name: "",
+        unit_id: '',
+        unit_name: '',
       },
     });
 
@@ -65,14 +65,14 @@ const JobsDone = () => {
     const allUnitIds = allUnits.map((u) => u.unit_id);
 
     const jobsResponse = await ApiActions.get({
-      route: "job/done",
+      route: 'job/done',
       params: {
-        job_name: "",
-        registration_id: "",
-        job_unit_name: "",
+        job_name: '',
+        registration_id: '',
+        job_unit_name: '',
         job_unit_id: allUnitIds,
-        order: "click_date",
-        desc: "",
+        order: 'click_date',
+        desc: '',
       },
     });
 
@@ -80,7 +80,7 @@ const JobsDone = () => {
   };
 
   const filteredJobs = () => {
-    if (selectedUnit === "all") return jobsDone;
+    if (selectedUnit === 'all') return jobsDone;
     return jobsDone.filter((job) => job.job_unit_id === selectedUnit);
   };
 
@@ -94,7 +94,11 @@ const JobsDone = () => {
       <Text style={[styles.jobTitle, { flex: 1 }]}>{item.job_name}</Text>
       <View style={[styles.jobDetails, { flex: 2 }]}>
         <Text style={styles.unitText}>{item.job_unit_name}</Text>
-        <IconButton icon="magnify" size={20} onPress={() => openJobModal(item)} />
+        <IconButton
+          icon="magnify"
+          size={20}
+          onPress={() => openJobModal(item)}
+        />
       </View>
     </View>
   );
@@ -111,7 +115,7 @@ const JobsDone = () => {
             selectedValue={selectedPromotion}
             onValueChange={(val) => {
               setSelectedPromotion(val);
-              setSelectedUnit("all");
+              setSelectedUnit('all');
             }}
             style={styles.picker}
           >
@@ -164,14 +168,23 @@ const JobsDone = () => {
                 [{selectedJob?.job_unit_name}] {selectedJob?.job_name}
               </Text>
 
-              <Text style={styles.modalSubtitle}>{selectedJob?.group_name || selectedJob?.job_code}</Text>
+              <Text style={styles.modalSubtitle}>
+                {selectedJob?.group_name || selectedJob?.job_code}
+              </Text>
               <Text style={styles.modalDescription}>
-                {selectedJob?.job_description || "Aucune description disponible."}
+                {selectedJob?.job_description ||
+                  'Aucune description disponible.'}
               </Text>
 
-              <Text style={styles.modalInfo}>👨‍🏫 Chef de groupe : {selectedJob?.lead_email}</Text>
-              <Text style={styles.modalInfo}>📅 Début : {selectedJob?.start_date}</Text>
-              <Text style={styles.modalInfo}>📅 Fin : {selectedJob?.end_date}</Text>
+              <Text style={styles.modalInfo}>
+                👨‍🏫 Chef de groupe : {selectedJob?.lead_email}
+              </Text>
+              <Text style={styles.modalInfo}>
+                📅 Début : {selectedJob?.start_date}
+              </Text>
+              <Text style={styles.modalInfo}>
+                📅 Fin : {selectedJob?.end_date}
+              </Text>
 
               <Button
                 mode="contained"
@@ -192,20 +205,20 @@ const styles = StyleSheet.create({
   container: {
     borderRadius: 8,
     padding: 16,
-    backgroundColor: "white",
+    backgroundColor: 'white',
     margin: 16,
-    borderColor: "#ccc",
+    borderColor: '#ccc',
     borderWidth: 1,
     flex: 1,
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: "bold",
-    color: "#e91e63",
+    fontWeight: 'bold',
+    color: '#e91e63',
     marginBottom: 12,
   },
   selectorsContainer: {
-    flexDirection: screenWidth < 500 ? "column" : "row",
+    flexDirection: screenWidth < 500 ? 'column' : 'row',
     gap: 12,
     marginBottom: 12,
   },
@@ -214,14 +227,14 @@ const styles = StyleSheet.create({
   },
   pickerLabel: {
     fontSize: 13,
-    fontWeight: "600",
-    color: "#555",
+    fontWeight: '600',
+    color: '#555',
     marginBottom: 4,
   },
   picker: {
     height: 42,
-    backgroundColor: "#f9f9f9",
-    borderColor: "#ccc",
+    backgroundColor: '#f9f9f9',
+    borderColor: '#ccc',
     borderWidth: 1,
     borderRadius: 4,
   },
@@ -229,60 +242,60 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   row: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingVertical: 10,
-    borderBottomColor: "#eee",
+    borderBottomColor: '#eee',
     borderBottomWidth: 1,
   },
   jobTitle: {
     fontSize: 14,
-    fontWeight: "bold",
-    color: "#111",
+    fontWeight: 'bold',
+    color: '#111',
   },
   unitText: {
     fontSize: 13,
-    color: "#444",
+    color: '#444',
   },
   jobDetails: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
 
   // Modal
   modalContainer: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.5)",
-    justifyContent: "center",
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
     padding: 16,
   },
   modalContent: {
-    backgroundColor: "white",
+    backgroundColor: 'white',
     borderRadius: 12,
     padding: 20,
     elevation: 5,
   },
   modalTitle: {
     fontSize: 16,
-    fontWeight: "bold",
-    color: "#e91e63",
+    fontWeight: 'bold',
+    color: '#e91e63',
     marginBottom: 8,
   },
   modalSubtitle: {
     fontSize: 14,
-    fontWeight: "600",
+    fontWeight: '600',
     marginBottom: 6,
   },
   modalDescription: {
     fontSize: 13,
     marginBottom: 8,
-    color: "#333",
+    color: '#333',
   },
   modalInfo: {
     fontSize: 13,
     marginBottom: 4,
-    color: "#555",
+    color: '#555',
   },
 });
 

@@ -14,7 +14,7 @@ services:
     volumes:
       - ./back:/var/www/html
     ports:
-      - "8000:80"
+      - '8000:80'
     depends_on:
       - db
     environment:
@@ -24,8 +24,8 @@ services:
       DB_PWD: root
       DB_NAME: schooltool_api
       LPTF_JWT_KEY: toto
-      GOOGLE_CLIENT_ID: "604347883543-cu73up3fqo5r9gn18tqpkf3tu9ud41s4.apps.googleusercontent.com"
-      GOOGLE_DRIVE_ABSENCE_FOLDER: "toFill"
+      GOOGLE_CLIENT_ID: '604347883543-cu73up3fqo5r9gn18tqpkf3tu9ud41s4.apps.googleusercontent.com'
+      GOOGLE_DRIVE_ABSENCE_FOLDER: 'toFill'
       IS_DEV: true
 
   auth:
@@ -34,7 +34,7 @@ services:
     volumes:
       - ./auth:/var/www/html
     ports:
-      - "8001:80"
+      - '8001:80'
     depends_on:
       - db
     environment:
@@ -44,7 +44,7 @@ services:
       DB_PWD: root
       DB_NAME: schooltool_auth
       LPTF_JWT_KEY: toto
-      GOOGLE_CLIENT_ID: "604347883543-cu73up3fqo5r9gn18tqpkf3tu9ud41s4.apps.googleusercontent.com"
+      GOOGLE_CLIENT_ID: '604347883543-cu73up3fqo5r9gn18tqpkf3tu9ud41s4.apps.googleusercontent.com'
       IS_DEV: true
 
   front:
@@ -55,16 +55,16 @@ services:
     volumes:
       - ./front:/app
     ports:
-      - "8082:8081"
-      - "19000:19000" # Metro Bundler
-      - "19001:19001" # WebSocket (live/hot reload)
-      - "19002:19002" # React Native Debugger
+      - '8082:8081'
+      - '19000:19000' # Metro Bundler
+      - '19001:19001' # WebSocket (live/hot reload)
+      - '19002:19002' # React Native Debugger
     depends_on:
       - back
       - auth
     environment:
-      API_URL: "http://localhost:8000"
-      AUTH_URL: "http://localhost:8001"
+      API_URL: 'http://localhost:8000'
+      AUTH_URL: 'http://localhost:8001'
 
 volumes:
   db_data:

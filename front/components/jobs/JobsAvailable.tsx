@@ -1,11 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {
-  View,
-  Text,
-  FlatList,
-  StyleSheet,
-  Pressable,
-} from 'react-native';
+import { View, Text, FlatList, StyleSheet, Pressable } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { ApiActions } from '@/services/ApiServices';
 import AvailableModal from './modals/AvailableModal';
@@ -48,16 +42,19 @@ const JobsAvailable = () => {
           onValueChange={(itemValue) => setSelectedUnit(itemValue)}
         >
           <Picker.Item label="Toutes les Units" value="All" key="all" />
-          {[...new Set(jobsAvailable.map((job) => job.job_unit_name))].map((unit, index) => (
-            <Picker.Item label={unit} value={unit} key={index} />
-          ))}
+          {[...new Set(jobsAvailable.map((job) => job.job_unit_name))].map(
+            (unit, index) => (
+              <Picker.Item label={unit} value={unit} key={index} />
+            ),
+          )}
         </Picker>
       </View>
     </View>
   );
 
   const renderJob = ({ item }) => {
-    if (selectedUnit !== 'All' && item.job_unit_name !== selectedUnit) return null;
+    if (selectedUnit !== 'All' && item.job_unit_name !== selectedUnit)
+      return null;
 
     return (
       <Pressable style={styles.row} onPress={() => setSelectedJob(item)}>
@@ -76,7 +73,9 @@ const JobsAvailable = () => {
       <FlatList
         data={jobsAvailable}
         renderItem={renderJob}
-        keyExtractor={(item, index) => item?.job_id?.toString?.() || `job-${index}`}
+        keyExtractor={(item, index) =>
+          item?.job_id?.toString?.() || `job-${index}`
+        }
       />
       <AvailableModal
         visible={!!selectedJob}

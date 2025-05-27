@@ -11,4 +11,3 @@ To add this package as a local, per-project dependency to your project, simply a
             "phpunit/php-text-template": "~1.2"
         }
     }
-

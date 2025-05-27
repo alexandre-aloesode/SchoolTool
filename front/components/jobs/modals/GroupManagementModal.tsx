@@ -59,7 +59,12 @@ const GroupManagementModal = ({ visible, jobId, onClose }) => {
   };
 
   return (
-    <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
+    <Modal
+      visible={visible}
+      animationType="slide"
+      transparent
+      onRequestClose={onClose}
+    >
       <View style={styles.overlay}>
         <View style={styles.modal}>
           <Text style={styles.title}>Groupes disponibles</Text>
@@ -68,14 +73,21 @@ const GroupManagementModal = ({ visible, jobId, onClose }) => {
               groups.map((g) => (
                 <View key={g.group_id} style={styles.groupRow}>
                   <Text style={styles.groupName}>{g.group_name}</Text>
-                  <Text>{g.lead_firstname} {g.lead_lastname}</Text>
-                  <Pressable onPress={() => askToJoinGroup(g.group_id)} style={styles.joinBtn}>
+                  <Text>
+                    {g.lead_firstname} {g.lead_lastname}
+                  </Text>
+                  <Pressable
+                    onPress={() => askToJoinGroup(g.group_id)}
+                    style={styles.joinBtn}
+                  >
                     <Text style={styles.joinText}>Rejoindre</Text>
                   </Pressable>
                 </View>
               ))
             ) : (
-              <Text style={{ marginBottom: 10 }}>Aucun groupe disponible pour ce projet.</Text>
+              <Text style={{ marginBottom: 10 }}>
+                Aucun groupe disponible pour ce projet.
+              </Text>
             )}
 
             <Text style={styles.subTitle}>Créer un groupe</Text>

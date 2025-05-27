@@ -45,7 +45,7 @@
 #### RotatingFileHandler
 
 - The file name format must now contain `{date}` and the date format must be set
-  to one of the predefined FILE_PER_* constants to avoid issues with file rotation.
+  to one of the predefined FILE*PER*\* constants to avoid issues with file rotation.
   See `setFilenameFormat`.
 
 #### LogstashFormatter

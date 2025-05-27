@@ -1,5 +1,4 @@
-Google PHP API Client Services
-==============================
+# Google PHP API Client Services
 
 ## Requirements
 
@@ -8,7 +7,7 @@ Google PHP API Client Services
 ## Usage in v2 of Google API PHP Client
 
 This library is automatically updated daily with new API changes, and tagged weekly.
-It is installed as part of the 
+It is installed as part of the
 [Google API PHP Client](https://github.com/googleapis/google-api-php-client/releases)
 library via Composer, which will pull down the most recent tag.
 
