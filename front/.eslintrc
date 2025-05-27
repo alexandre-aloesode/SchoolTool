@@ -21,6 +21,9 @@
     },
     "plugins": ["react", "react-native", "@typescript-eslint", "prettier"],
     "rules": {
+      "react/prop-types": "off",
+      "react/react-in-jsx-scope": "off",
+      "@typescript-eslint/no-var-requires": "off",
       "prettier/prettier": [
         "error",
         {
@@ -30,9 +33,7 @@
           "tabWidth": 2,
           "printWidth": 80
         }
-      ],
-      "react/prop-types": "off",
-      "@typescript-eslint/explicit-module-boundary-types": "off"
+      ]
     },
     "settings": {
       "react": {
