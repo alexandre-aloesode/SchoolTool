@@ -1,6 +1,6 @@
 ![](https://github.com/googleapis/google-api-php-client/workflows/.github/workflows/tests.yml/badge.svg)
 
-# Google APIs Client Library for PHP #
+# Google APIs Client Library for PHP
 
 **NOTE**: please check to see if the package you'd like to install is available in our
 list of [Google cloud packages](https://cloud.google.com/php/docs/reference) first, as
@@ -24,14 +24,15 @@ For Google Cloud Platform APIs such as [Datastore][cloud-datastore], [Cloud Stor
 [cloud-storage]: https://github.com/googleapis/google-cloud-php-storage
 [cloud-compute]: https://github.com/googleapis/google-cloud-php-compute
 
-## Requirements ##
-* [PHP 5.6.0 or higher](https://www.php.net/)
+## Requirements
 
-## Developer Documentation ##
+- [PHP 5.6.0 or higher](https://www.php.net/)
+
+## Developer Documentation
 
 The [docs folder](docs/) provides detailed guides for using this library.
 
-## Installation ##
+## Installation
 
 You can use **Composer** or simply **Download the Release**
 
@@ -64,18 +65,15 @@ you want to keep in `composer.json`:
 
 ```json
 {
-    "require": {
-        "google/apiclient": "^2.12.1"
-    },
-    "scripts": {
-        "pre-autoload-dump": "Google\\Task\\Composer::cleanup"
-    },
-    "extra": {
-        "google/apiclient-services": [
-            "Drive",
-            "YouTube"
-        ]
-    }
+  "require": {
+    "google/apiclient": "^2.12.1"
+  },
+  "scripts": {
+    "pre-autoload-dump": "Google\\Task\\Composer::cleanup"
+  },
+  "extra": {
+    "google/apiclient-services": ["Drive", "YouTube"]
+  }
 }
 ```
 
@@ -97,14 +95,14 @@ them explicitly:
 
 ```json
 {
-    "extra": {
-        "google/apiclient-services": [
-            "Drive",
-            "YouTube",
-            "YouTubeAnalytics",
-            "YouTubeReporting"
-        ]
-    }
+  "extra": {
+    "google/apiclient-services": [
+      "Drive",
+      "YouTube",
+      "YouTubeAnalytics",
+      "YouTubeReporting"
+    ]
+  }
 }
 ```
 
@@ -121,7 +119,8 @@ require_once '/path/to/google-api-php-client/vendor/autoload.php';
 
 For additional installation and setup instructions, see [the documentation](docs/).
 
-## Examples ##
+## Examples
+
 See the [`examples/`](examples) directory for examples of the key client features. You can
 view them in your browser by running the php built-in web server.
 
@@ -132,7 +131,7 @@ $ php -S localhost:8000 -t examples/
 And then browsing to the host and port you specified
 (in the above example, `http://localhost:8000`).
 
-### Basic Example ###
+### Basic Example
 
 ```php
 // include your composer dependencies
@@ -154,7 +153,7 @@ foreach ($results->getItems() as $item) {
 }
 ```
 
-### Authentication with OAuth ###
+### Authentication with OAuth
 
 > An example of this can be seen in [`examples/simple-file-upload.php`](examples/simple-file-upload.php).
 
@@ -162,35 +161,35 @@ foreach ($results->getItems() as $item) {
 1. Download the JSON credentials
 1. Set the path to these credentials using `Google\Client::setAuthConfig`:
 
-    ```php
-    $client = new Google\Client();
-    $client->setAuthConfig('/path/to/client_credentials.json');
-    ```
+   ```php
+   $client = new Google\Client();
+   $client->setAuthConfig('/path/to/client_credentials.json');
+   ```
 
 1. Set the scopes required for the API you are going to call
 
-    ```php
-    $client->addScope(Google\Service\Drive::DRIVE);
-    ```
+   ```php
+   $client->addScope(Google\Service\Drive::DRIVE);
+   ```
 
 1. Set your application's redirect URI
 
-    ```php
-    // Your redirect URI can be any registered URI, but in this example
-    // we redirect back to this same page
-    $redirect_uri = 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'];
-    $client->setRedirectUri($redirect_uri);
-    ```
+   ```php
+   // Your redirect URI can be any registered URI, but in this example
+   // we redirect back to this same page
+   $redirect_uri = 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'];
+   $client->setRedirectUri($redirect_uri);
+   ```
 
 1. In the script handling the redirect URI, exchange the authorization code for an access token:
 
-    ```php
-    if (isset($_GET['code'])) {
-        $token = $client->fetchAccessTokenWithAuthCode($_GET['code']);
-    }
-    ```
+   ```php
+   if (isset($_GET['code'])) {
+       $token = $client->fetchAccessTokenWithAuthCode($_GET['code']);
+   }
+   ```
 
-### Authentication with Service Accounts ###
+### Authentication with Service Accounts
 
 > An example of this can be seen in [`examples/service-account.php`](examples/service-account.php).
 
@@ -203,28 +202,28 @@ calls return unexpected 401 or 403 errors.
 1. Download the JSON credentials
 1. Set the path to these credentials using the `GOOGLE_APPLICATION_CREDENTIALS` environment variable:
 
-    ```php
-    putenv('GOOGLE_APPLICATION_CREDENTIALS=/path/to/service-account.json');
-    ```
+   ```php
+   putenv('GOOGLE_APPLICATION_CREDENTIALS=/path/to/service-account.json');
+   ```
 
 1. Tell the Google client to use your service account credentials to authenticate:
 
-    ```php
-    $client = new Google\Client();
-    $client->useApplicationDefaultCredentials();
-    ```
+   ```php
+   $client = new Google\Client();
+   $client->useApplicationDefaultCredentials();
+   ```
 
 1. Set the scopes required for the API you are going to call
 
-    ```php
-    $client->addScope(Google\Service\Drive::DRIVE);
-    ```
+   ```php
+   $client->addScope(Google\Service\Drive::DRIVE);
+   ```
 
 1. If you have delegated domain-wide access to the service account and you want to impersonate a user account, specify the email address of the user account using the method setSubject:
 
-    ```php
-    $client->setSubject($user_to_impersonate);
-    ```
+   ```php
+   $client->setSubject($user_to_impersonate);
+   ```
 
 #### How to use a specific JSON key
 
@@ -239,7 +238,7 @@ $client = new Google\Client();
 $client->setAuthConfig($jsonKey);
 ```
 
-### Making Requests ###
+### Making Requests
 
 The classes used to call the API in [google-api-php-client-services](https://github.com/googleapis/google-api-php-client-services) are autogenerated. They map directly to the JSON requests and responses found in the [APIs Explorer](https://developers.google.com/apis-explorer/#p/).
 
@@ -319,9 +318,9 @@ $request->setQuery($query);
 $response = $datastore->projects->runQuery('YOUR_DATASET_ID', $request);
 ```
 
-The method used is a matter of preference, but *it will be very difficult to use this library without first understanding the JSON syntax for the API*, so it is recommended to look at the [APIs Explorer](https://developers.google.com/apis-explorer/#p/) before using any of the services here.
+The method used is a matter of preference, but _it will be very difficult to use this library without first understanding the JSON syntax for the API_, so it is recommended to look at the [APIs Explorer](https://developers.google.com/apis-explorer/#p/) before using any of the services here.
 
-### Making HTTP Requests Directly ###
+### Making HTTP Requests Directly
 
 If Google Authentication is desired for external applications, or a Google API is not available yet in this library, HTTP requests can be made directly.
 
@@ -348,7 +347,7 @@ $httpClient = $client->authorize();
 $response = $httpClient->get('https://www.googleapis.com/plus/v1/people/me');
 ```
 
-### Caching ###
+### Caching
 
 It is recommended to use another caching library to improve performance. This can be done by passing a [PSR-6](https://www.php-fig.org/psr/psr-6/) compatible library to the client:
 
@@ -370,7 +369,7 @@ In this example we use [PHP Cache](http://www.php-cache.com/). Add this to your 
 composer require cache/filesystem-adapter
 ```
 
-### Updating Tokens ###
+### Updating Tokens
 
 When using [Refresh Tokens](https://developers.google.com/identity/protocols/OAuth2InstalledApp#offline) or [Service Account Credentials](https://developers.google.com/identity/protocols/OAuth2ServiceAccount#overview), it may be useful to perform some action when a new access token is granted. To do this, pass a callable to the `setTokenCallback` method on the client:
 
@@ -382,7 +381,7 @@ $tokenCallback = function ($cacheKey, $accessToken) use ($logger) {
 $client->setTokenCallback($tokenCallback);
 ```
 
-### Debugging Your HTTP Request using Charles ###
+### Debugging Your HTTP Request using Charles
 
 It is often very useful to debug your API calls by viewing the raw HTTP request. This library supports the use of [Charles Web Proxy](https://www.charlesproxy.com/documentation/getting-started/). Download and run Charles, and then capture all HTTP traffic through Charles with the following code:
 
@@ -444,31 +443,31 @@ Once the flow is completed, you can see which scopes were granted by calling
 echo $client->getOAuth2Service()->getGrantedScope();
 ```
 
-### Service Specific Examples ###
+### Service Specific Examples
 
 YouTube: https://github.com/youtube/api-samples/tree/master/php
 
-## How Do I Contribute? ##
+## How Do I Contribute?
 
 Please see the [contributing](.github/CONTRIBUTING.md) page for more information. In particular, we love pull requests - but please make sure to sign the contributor license agreement.
 
-## Frequently Asked Questions ##
+## Frequently Asked Questions
 
-### What do I do if something isn't working? ###
+### What do I do if something isn't working?
 
 For support with the library the best place to ask is via the google-api-php-client tag on StackOverflow: https://stackoverflow.com/questions/tagged/google-api-php-client
 
 If there is a specific bug with the library, please [file an issue](https://github.com/googleapis/google-api-php-client/issues) in the GitHub issues tracker, including an example of the failing code and any specific errors retrieved. Feature requests can also be filed, as long as they are core library requests, and not-API specific: for those, refer to the documentation for the individual APIs for the best place to file requests. Please try to provide a clear statement of the problem that the feature would address.
 
-### I want an example of X! ###
+### I want an example of X!
 
 If X is a feature of the library, file away! If X is an example of using a specific service, the best place to go is to the teams for those specific APIs - our preference is to link to their examples rather than add them to the library, as they can then pin to specific versions of the library. If you have any examples for other APIs, let us know and we will happily add a link to the README above!
 
-### Why do some Google\Service classes have weird names? ###
+### Why do some Google\Service classes have weird names?
 
 The _Google\Service_ classes are generally automatically generated from the API discovery documents: https://developers.google.com/discovery/. Sometimes new features are added to APIs with unusual names, which can cause some unexpected or non-standard style naming in the PHP classes.
 
-### How do I deal with non-JSON response types? ###
+### How do I deal with non-JSON response types?
 
 Some services return XML or similar by default, rather than JSON, which is what the library supports. You can request a JSON response by adding an 'alt' argument to optional params that is normally the last argument to a method call:
 
@@ -478,11 +477,11 @@ $opt_params = array(
 );
 ```
 
-### How do I set a field to null? ###
+### How do I set a field to null?
 
 The library strips out nulls from the objects sent to the Google APIs as it is the default value of all of the uninitialized properties. To work around this, set the field you want to null to `Google\Model::NULL_VALUE`. This is a placeholder that will be replaced with a true null when sent over the wire.
 
-## Code Quality ##
+## Code Quality
 
 Run the PHPUnit tests with PHPUnit. You can configure an API key and token in BaseTest.php to run all calls, but this will require some setup on the Google Developer Console.
 

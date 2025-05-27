@@ -13,4 +13,3 @@ To add this component as a local, per-project dependency to your project, simply
     }
 }
 ```
-

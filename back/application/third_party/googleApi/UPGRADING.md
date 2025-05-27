@@ -1,8 +1,6 @@
-Google API Client Upgrade Guide
-===============================
+# Google API Client Upgrade Guide
 
-2.x to 2.10.0
--------------
+## 2.x to 2.10.0
 
 ### Namespaces
 
@@ -19,6 +17,7 @@ $service = new Google_Service_Books($client);
 ```
 
 **After**
+
 ```php
 $client = new Google\Client();
 $service = new Google\Service\Books($client);
@@ -48,8 +47,7 @@ $service = new Google\Service\Books([
 ]);
 ```
 
-1.0 to 2.0
-----------
+## 1.0 to 2.0
 
 The Google API Client for PHP has undergone major internal changes in `2.0`. Please read through
 the list below in order to upgrade to the latest version:
@@ -308,60 +306,60 @@ changed or removed.
 1. Removed methods `Google_Client::getIo` and `Google_Client::setIo`
 1. Refactored `Google_Http_Batch` and `Google_Http_MediaFileUpload` for Guzzle
 1. Added `Google_Client::getHttpClient` and `Google_Client::setHttpClient` for getting and
-setting the Guzzle `GuzzleHttp\ClientInterface` object.
+   setting the Guzzle `GuzzleHttp\ClientInterface` object.
 
 > NOTE: `PSR-7`-compatible libraries can now be used with this library.
 
 ## Other Changes
 
- - [`PSR 3`][PSR 3] `LoggerInterface` is now supported, and [Monolog][Monolog] is used for all
- logging. As a result, all `Google_Logger`-related functionality has been removed:
-    1. Removed `Google_Logger_Abstract`, `Google_Logger_Exception`, `Google_Logger_File`,
-    `Google_Logger_Null`, and `Google_Logger_Psr`
-    1. `Google_Client::setLogger` now requires `Psr\Log\LoggerInterface`
- - [`firebase/jwt`][Firebase JWT] is now used for all JWT signing and verifying. As a result, the
- following classes have been changed or removed:
-    1. Removed `Google_Signer_P12`
-    1. Removed `Google_Verifier_Pem`
-    1. Removed `Google_Auth_LoginTicket` (see below)
- - The following classes and methods have been removed in favor of [`google/auth`][Google Auth]:
-    1. Removed methods `Google_Client::getAuth` and `Google_Client::setAuth`
-    1. Removed `Google_Auth_Abstract`
-        - `Google_Auth_Abstract::sign` and `Google_Auth_Abstract::authenticatedRequest` have been
-        replaced by `Google_Client::authorize`. See the above examples for more details.
-    1. Removed `Google_Auth_AppIdentity`. This is now supported in [`google/auth`][Google Auth AppIdentity]
-    and is used automatically when `Google_Client::useApplicationDefaultCredentials` is called.
-    1. Removed `Google_Auth_AssertionCredentials`. Use `Google_Client::setAuthConfig` instead.
-    1. Removed `Google_Auth_ComputeEngine`. This is now supported in
-    [`google/auth`][Google Auth GCE], and is used automatically when
-    `Google_Client::useApplicationDefaultCredentials` is called.
-    1. Removed `Google_Auth_Exception`
-    1. Removed `Google_Auth_LoginTicket`. Calls to `Google_Client::verifyIdToken` now returns
-    the payload of the ID Token as an array if the verification is successful.
-    1. Removed `Google_Auth_OAuth2`. This functionality is now supported in [`google/auth`][Google Auth OAuth2] and wrapped in `Google_Client`. These changes will only affect applications calling `Google_Client::getAuth`,
-    as the methods on `Google_Client` have not changed.
-    1. Removed `Google_Auth_Simple`. This is now supported in [`google/auth`][Google Auth Simple]
-    and is used automatically when `Google_Client::setDeveloperKey` is called.
- - `Google_Client::sign` has been replaced by `Google_Client::authorize`. This function
-    now takes a `GuzzleHttp\ClientInterface` object and uses the following decision tree for
-    authentication:
-    1. Uses Application Default Credentials when
-    `Google_Client::useApplicationDefaultCredentials` is called
-      - Looks for `GOOGLE_APPLICATION_CREDENTIALS` environment variable if set
-      - Looks in `~/.config/gcloud/application_default_credentials.json`
-      - Otherwise, uses `GCECredentials`
-    1. Uses API Key if set (see `Client::setDeveloperKey`)
-    1. Uses Access Token if set (call `Client::setAccessToken`)
-    1. Automatically refreshes access tokens if one is set and the access token is expired
- - Removed `Google_Config`
- - Removed `Google_Utils`
- - [`PSR-6`][PSR 6] cache is used for all caching. As a result:
-    1. Removed `Google_Cache_Abstract`
-    1. Classes `Google_Cache_Apc`, `Google_Cache_File`, `Google_Cache_Memcache`, and
-    `Google_Cache_Null` now implement `Google\Auth\CacheInterface`.
-    1. Google Auth provides simple [caching utilities][Google Auth Cache] which
-   are used by default unless you provide alternatives.
- - Removed `$boundary` constructor argument for `Google_Http_MediaFileUpload`
+- [`PSR 3`][PSR 3] `LoggerInterface` is now supported, and [Monolog][Monolog] is used for all
+  logging. As a result, all `Google_Logger`-related functionality has been removed:
+  1. Removed `Google_Logger_Abstract`, `Google_Logger_Exception`, `Google_Logger_File`,
+     `Google_Logger_Null`, and `Google_Logger_Psr`
+  1. `Google_Client::setLogger` now requires `Psr\Log\LoggerInterface`
+- [`firebase/jwt`][Firebase JWT] is now used for all JWT signing and verifying. As a result, the
+  following classes have been changed or removed:
+  1. Removed `Google_Signer_P12`
+  1. Removed `Google_Verifier_Pem`
+  1. Removed `Google_Auth_LoginTicket` (see below)
+- The following classes and methods have been removed in favor of [`google/auth`][Google Auth]:
+  1. Removed methods `Google_Client::getAuth` and `Google_Client::setAuth`
+  1. Removed `Google_Auth_Abstract`
+     - `Google_Auth_Abstract::sign` and `Google_Auth_Abstract::authenticatedRequest` have been
+       replaced by `Google_Client::authorize`. See the above examples for more details.
+  1. Removed `Google_Auth_AppIdentity`. This is now supported in [`google/auth`][Google Auth AppIdentity]
+     and is used automatically when `Google_Client::useApplicationDefaultCredentials` is called.
+  1. Removed `Google_Auth_AssertionCredentials`. Use `Google_Client::setAuthConfig` instead.
+  1. Removed `Google_Auth_ComputeEngine`. This is now supported in
+     [`google/auth`][Google Auth GCE], and is used automatically when
+     `Google_Client::useApplicationDefaultCredentials` is called.
+  1. Removed `Google_Auth_Exception`
+  1. Removed `Google_Auth_LoginTicket`. Calls to `Google_Client::verifyIdToken` now returns
+     the payload of the ID Token as an array if the verification is successful.
+  1. Removed `Google_Auth_OAuth2`. This functionality is now supported in [`google/auth`][Google Auth OAuth2] and wrapped in `Google_Client`. These changes will only affect applications calling `Google_Client::getAuth`,
+     as the methods on `Google_Client` have not changed.
+  1. Removed `Google_Auth_Simple`. This is now supported in [`google/auth`][Google Auth Simple]
+     and is used automatically when `Google_Client::setDeveloperKey` is called.
+- `Google_Client::sign` has been replaced by `Google_Client::authorize`. This function
+  now takes a `GuzzleHttp\ClientInterface` object and uses the following decision tree for
+  authentication:
+  1. Uses Application Default Credentials when
+     `Google_Client::useApplicationDefaultCredentials` is called
+  - Looks for `GOOGLE_APPLICATION_CREDENTIALS` environment variable if set
+  - Looks in `~/.config/gcloud/application_default_credentials.json`
+  - Otherwise, uses `GCECredentials`
+  1. Uses API Key if set (see `Client::setDeveloperKey`)
+  1. Uses Access Token if set (call `Client::setAccessToken`)
+  1. Automatically refreshes access tokens if one is set and the access token is expired
+- Removed `Google_Config`
+- Removed `Google_Utils`
+- [`PSR-6`][PSR 6] cache is used for all caching. As a result:
+  1. Removed `Google_Cache_Abstract`
+  1. Classes `Google_Cache_Apc`, `Google_Cache_File`, `Google_Cache_Memcache`, and
+     `Google_Cache_Null` now implement `Google\Auth\CacheInterface`.
+  1. Google Auth provides simple [caching utilities][Google Auth Cache] which
+     are used by default unless you provide alternatives.
+- Removed `$boundary` constructor argument for `Google_Http_MediaFileUpload`
 
 [PSR 3]: https://www.php-fig.org/psr/psr-3/
 [PSR 6]: https://www.php-fig.org/psr/psr-6/

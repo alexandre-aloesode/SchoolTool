@@ -15,7 +15,7 @@ const MAPPING = {
   'chevron.right': 'chevron-right',
   'briefcase.fill': 'work',
   'person.crop.circle.badge.xmark': 'person-off',
-  'calendar': 'calendar-today',
+  calendar: 'calendar-today',
   'calendar.badge.clock': 'event',
 } as Partial<
   Record<
@@ -43,5 +43,12 @@ export function IconSymbol({
   style?: StyleProp<ViewStyle>;
   weight?: SymbolWeight;
 }) {
-  return <MaterialIcons color={color} size={size} name={MAPPING[name]} style={style} />;
+  return (
+    <MaterialIcons
+      color={color}
+      size={size}
+      name={MAPPING[name]}
+      style={style}
+    />
+  );
 }

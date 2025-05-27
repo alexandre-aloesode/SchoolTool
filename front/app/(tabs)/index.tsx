@@ -1,9 +1,9 @@
-import React, { useContext } from "react";
-import { StyleSheet, View, Text, Button } from "react-native";
-import LoginWithGoogle from "@/components/auth/GoogleAuth";
-import AuthContext from "@/context/authContext";
-import LogtimeChart from "@/components/dashboard/logtimes";
-import GoogleCalendarWidget from "@/components/dashboard/googleCalendar";
+import React, { useContext } from 'react';
+import { StyleSheet, View, Text, Button } from 'react-native';
+import LoginWithGoogle from '@/components/auth/GoogleAuth';
+import AuthContext from '@/context/authContext';
+import LogtimeChart from '@/components/dashboard/logtimes';
+import GoogleCalendarWidget from '@/components/dashboard/googleCalendar';
 
 export default function HomeScreen() {
   const auth = useContext(AuthContext);
@@ -27,14 +27,15 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#f7f7f7",
-    paddingTop: 20, paddingBottom: 60,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f7f7f7',
+    paddingTop: 20,
+    paddingBottom: 60,
   },
   title: {
     fontSize: 24,
     marginBottom: 20,
-    color: "#333",
+    color: '#333',
   },
 });

@@ -1,10 +1,12 @@
-import Constants from "expo-constants";
+import Constants from 'expo-constants';
 
 // Supporte Expo Go / Web / EAS Build
 const extra = Constants?.manifest?.extra || Constants?.expoConfig?.extra;
 
 if (!extra) {
-  throw new Error("❌ Impossible de charger les variables d'environnement depuis app.config.js");
+  throw new Error(
+    "❌ Impossible de charger les variables d'environnement depuis app.config.js",
+  );
 }
 
 export const ENV = {

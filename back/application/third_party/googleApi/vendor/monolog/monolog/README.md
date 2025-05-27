@@ -3,7 +3,6 @@
 [![Total Downloads](https://img.shields.io/packagist/dt/monolog/monolog.svg)](https://packagist.org/packages/monolog/monolog)
 [![Latest Stable Version](https://img.shields.io/packagist/v/monolog/monolog.svg)](https://packagist.org/packages/monolog/monolog)
 
-
 Monolog sends your logs to files, sockets, inboxes, databases and various
 web services. See the complete list of handlers below. Special handlers
 allow you to build advanced logging strategies.

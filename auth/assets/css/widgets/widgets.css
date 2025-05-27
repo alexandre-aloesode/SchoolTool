@@ -1,21 +1,21 @@
 .widget-main-container {
-    border-radius: 20px 10px 20px 10px;
-    box-shadow: 8px 8px 10px #aaa;
-    overflow: hidden;
+  border-radius: 20px 10px 20px 10px;
+  box-shadow: 8px 8px 10px #aaa;
+  overflow: hidden;
 }
 
 .widget-title-bar {
-    background-color: #88c1d0;
-    height: 42px;
+  background-color: #88c1d0;
+  height: 42px;
 }
 
 .widget-title {
-    margin: 0px;
-    padding: 0px;
-    margin-left: 25px;
-    color: #275fa0;
+  margin: 0px;
+  padding: 0px;
+  margin-left: 25px;
+  color: #275fa0;
 }
 
 .widget-body {
-    background-color: white;
+  background-color: white;
 }

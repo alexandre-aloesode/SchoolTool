@@ -18,23 +18,23 @@
   "license": "MIT",
   "type": "library",
   "authors": [
-      {
-        "name":     "Paragon Initiative Enterprises",
-        "email":    "security@paragonie.com",
-        "homepage": "https://paragonie.com",
-        "role":     "Maintainer"
-      },
-      {
-        "name":     "Steve 'Sc00bz' Thomas",
-        "email":    "steve@tobtu.com",
-        "homepage": "https://www.tobtu.com",
-        "role":     "Original Developer"
-      }
+    {
+      "name": "Paragon Initiative Enterprises",
+      "email": "security@paragonie.com",
+      "homepage": "https://paragonie.com",
+      "role": "Maintainer"
+    },
+    {
+      "name": "Steve 'Sc00bz' Thomas",
+      "email": "steve@tobtu.com",
+      "homepage": "https://www.tobtu.com",
+      "role": "Original Developer"
+    }
   ],
   "support": {
-    "issues":   "https://github.com/paragonie/constant_time_encoding/issues",
-    "email":    "info@paragonie.com",
-    "source":   "https://github.com/paragonie/constant_time_encoding"
+    "issues": "https://github.com/paragonie/constant_time_encoding/issues",
+    "email": "info@paragonie.com",
+    "source": "https://github.com/paragonie/constant_time_encoding"
   },
   "require": {
     "php": "^7|^8"
