@@ -37,3 +37,6 @@ jobs:
           to: ${{ secrets.EMAIL_USERNAME }}
           from: ${{ secrets.EMAIL_USERNAME }}
           secure: true
+
+      - name: Run tests
+        run: npm test
