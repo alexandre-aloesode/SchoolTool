@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,10 +8,10 @@ import {
   Alert,
   TouchableOpacity,
   ActivityIndicator,
-  Modal,
-  TouchableWithoutFeedback,
+  Platform,
+  FlatList,
+  ScrollView,
 } from 'react-native';
-import DateTimePicker from '@react-native-community/datetimepicker';
 import * as ImagePicker from 'expo-image-picker';
 import { format } from 'date-fns';
 import { ApiActions } from '../../services/ApiServices';
@@ -25,8 +25,17 @@ interface AbsenceForm {
   imageName: string;
 }
 
+interface UploadedAbsence {
+  absence_start_date: string;
+  absence_end_date: string;
+  absence_duration: number;
+  absence_status: number;
+  absence_comment: string | null;
+}
+
 const UploadAbsences: React.FC = () => {
   const [loading, setLoading] = useState(false);
+  const [uploadedAbsences, setUploadedAbsences] = useState<UploadedAbsence[]>([]);
   const [absenceForm, setAbsenceForm] = useState<AbsenceForm>({
     start_date: '',
     end_date: '',
@@ -35,33 +44,38 @@ const UploadAbsences: React.FC = () => {
     image: null,
     imageName: '',
   });
-  const [showDatePicker, setShowDatePicker] = useState<
-    'start_date' | 'end_date' | null
-  >(null);
 
   const reasons = [
     'Accident de transport',
     'Maladie',
     'Raison familiale',
     'Evènement entreprise',
+    'Télétravail',
     'Autre',
   ];
 
-  const handleDateChange = (
-    field: 'start_date' | 'end_date',
-    selectedDate: Date | undefined,
-  ) => {
-    if (selectedDate) {
-      setAbsenceForm((prev) => ({
-        ...prev,
-        [field]: selectedDate.toISOString().split('T')[0],
-      }));
-    }
-    setShowDatePicker(null); // Close the picker after selection
-  };
+  useEffect(() => {
+    fetchUploadedAbsences();
+  }, []);
 
-  const handleReasonChange = (reason: string) => {
-    setAbsenceForm((prev) => ({ ...prev, reason }));
+  const fetchUploadedAbsences = async () => {
+    try {
+      const response = await ApiActions.get({ route: 'absence', params: {
+        id: "",
+        start_date: "",
+        end_date: "",
+        duration: "",
+        email: "",
+        comment: "",
+        status: "",
+        link: "",
+      } });
+      if (response.status === 200) {
+        setUploadedAbsences(response.data || []);
+      }
+    } catch (error) {
+      console.error('Erreur récupération absences');
+    }
   };
 
   const handleImagePick = async () => {
@@ -79,67 +93,45 @@ const UploadAbsences: React.FC = () => {
     }
   };
 
-  const recapAbsence = () => {
-    return `
-      Raison : ${absenceForm.reason}
-
-      Du ${format(new Date(absenceForm.start_date), 'dd/MM/yyyy')} au ${format(
-        new Date(absenceForm.end_date),
-        'dd/MM/yyyy',
-      )}
-
-      Durée : ${absenceForm.duration} ${
-        absenceForm.duration > 1 ? 'jours ouvrés' : 'jour ouvré'
-      }`;
-  };
+  const recapAbsence = () => `
+    Raison : ${absenceForm.reason}
+    Du ${absenceForm.start_date} au ${absenceForm.end_date}
+    Durée : ${absenceForm.duration} ${absenceForm.duration > 1 ? 'jours ouvrés' : 'jour ouvré'}`;
 
   const handleUploadAbsence = () => {
-    if (
-      !absenceForm.start_date ||
-      !absenceForm.end_date ||
-      !absenceForm.reason ||
-      !absenceForm.image
-    ) {
+    
+    const { start_date, end_date, reason, image } = absenceForm;
+    if (!start_date || !end_date || !reason || !image) {      
       Alert.alert('Erreur', 'Veuillez remplir tous les champs');
       return;
     }
 
-    const startDate = new Date(absenceForm.start_date);
-    const endDate = new Date(absenceForm.end_date);
-
-    if (startDate >= endDate) {
-      Alert.alert(
-        'Erreur',
-        'La date de début doit être antérieure à la date de retour',
-      );
+    const start = new Date(start_date);
+    const end = new Date(end_date);
+    if (start >= end) {
+      Alert.alert('Erreur', 'La date de début doit être antérieure à la date de retour');
       return;
     }
 
     let duration = 0;
-    let tempDate = new Date(startDate);
-
-    while (tempDate < endDate) {
-      if (tempDate.getDay() !== 0 && tempDate.getDay() !== 6) {
-        duration++;
-      }
-      tempDate.setDate(tempDate.getDate() + 1);
+    let temp = new Date(start);
+    while (temp < end) {      
+      if (temp.getDay() !== 0 && temp.getDay() !== 6) duration++;
+      temp.setDate(temp.getDate() + 1);
     }
-
-    setAbsenceForm((prev) => ({ ...prev, duration }));
 
     Alert.alert('Confirmation', recapAbsence(), [
       { text: 'Annuler', style: 'cancel' },
       {
         text: 'Confirmer',
-        onPress: async () => {
+        onPress: async () => {          
           setLoading(true);
           try {
             const response = await ApiActions.post({
               route: 'uploadAbsence',
-              params: absenceForm,
+              params: { ...absenceForm, duration },
             });
             if (response.status === 200) {
-              setLoading(false);
               Alert.alert('Succès', 'Absence envoyée avec succès');
               setAbsenceForm({
                 start_date: '',
@@ -149,125 +141,174 @@ const UploadAbsences: React.FC = () => {
                 imageName: '',
                 duration: 0,
               });
-            } else {
-              throw new Error();
-            }
+              fetchUploadedAbsences();
+            } else throw new Error();
           } catch (error) {
+            Alert.alert('Erreur', "L'envoi de l'absence a échoué.");
+          } finally {
             setLoading(false);
-            Alert.alert('Erreur', 'Une erreur est survenue');
           }
         },
       },
     ]);
   };
 
+  const renderAbsenceItem = ({ item }: { item: UploadedAbsence }) => (
+    <View style={styles.absenceCard}>
+      <Text style={styles.absenceText}>
+        📅 Du {format(new Date(item.absence_start_date), 'dd/MM/yyyy')} au {format(new Date(item.absence_end_date), 'dd/MM/yyyy')}
+      </Text>
+      <Text style={styles.absenceText}>🕒 {item.absence_duration} jour(s)</Text>
+      <Text style={styles.absenceText}>
+        ✅ Statut : {item.absence_status === 1 ? 'Validée' : item.absence_status === 2 ? 'Refusée' : 'En attente'}
+      </Text>
+      {item.absence_comment && <Text style={styles.absenceText}>💬 {item.absence_comment}</Text>}
+    </View>
+  );
+
   return (
-    <View style={styles.container}>
+    <ScrollView contentContainerStyle={styles.container}>
       {!loading ? (
         <View style={styles.form}>
+          <Text style={styles.title}>Nouvelle absence</Text>
+
           <Text style={styles.label}>Date de début</Text>
-          <TouchableOpacity onPress={() => setShowDatePicker('start_date')}>
-            <Text>{absenceForm.start_date || 'Sélectionner une date'}</Text>
-          </TouchableOpacity>
+          {Platform.OS === 'web' ? (
+            <TextInput
+              style={styles.input}
+              placeholder="YYYY-MM-DD"
+              value={absenceForm.start_date}
+              onChangeText={(text) => setAbsenceForm((p) => ({ ...p, start_date: text }))}
+            />
+          ) : (
+            <TextInput
+              style={styles.input}
+              placeholder="YYYY-MM-DD"
+              value={absenceForm.start_date}
+              onChangeText={(text) => setAbsenceForm((p) => ({ ...p, start_date: text }))}
+            />
+          )}
 
           <Text style={styles.label}>Date de retour</Text>
-          <TouchableOpacity onPress={() => setShowDatePicker('end_date')}>
-            <Text>{absenceForm.end_date || 'Sélectionner une date'}</Text>
-          </TouchableOpacity>
+          {Platform.OS === 'web' ? (
+            <TextInput
+              style={styles.input}
+              placeholder="YYYY-MM-DD"
+              value={absenceForm.end_date}
+              onChangeText={(text) => setAbsenceForm((p) => ({ ...p, end_date: text }))}
+            />
+          ) : (
+            <TextInput
+              style={styles.input}
+              placeholder="YYYY-MM-DD"
+              value={absenceForm.end_date}
+              onChangeText={(text) => setAbsenceForm((p) => ({ ...p, end_date: text }))}
+            />
+          )}
 
           <Text style={styles.label}>Motif</Text>
           {reasons.map((reason, index) => (
             <TouchableOpacity
               key={index}
-              onPress={() => handleReasonChange(reason)}
+              onPress={() => setAbsenceForm((p) => ({ ...p, reason }))}
+              style={[styles.reasonButton, absenceForm.reason === reason && styles.selectedReason]}
             >
-              <Text style={styles.reason}>{reason}</Text>
+              <Text>{reason}</Text>
             </TouchableOpacity>
           ))}
 
-          <TouchableOpacity
-            onPress={handleImagePick}
-            style={styles.uploadButton}
-          >
-            <Text>Uploader un justificatif</Text>
+          <TouchableOpacity onPress={handleImagePick} style={styles.uploadBtn}>
+            <Text>📎 Joindre un justificatif</Text>
           </TouchableOpacity>
-          {absenceForm.imageName && (
-            <Text style={styles.imageName}>
-              Fichier sélectionné : {absenceForm.imageName}
-            </Text>
-          )}
 
-          <Button title="Valider" onPress={handleUploadAbsence} />
+          {absenceForm.imageName && <Text style={styles.imageName}>🗂️ {absenceForm.imageName}</Text>}
+
+          <Button title="Envoyer" onPress={handleUploadAbsence} />
         </View>
       ) : (
-        <ActivityIndicator size="large" color="#0828A7" />
+        <ActivityIndicator size="large" color="#1e88e5" />
       )}
 
-      {showDatePicker && (
-        <Modal
-          transparent={true}
-          visible={true}
-          animationType="slide"
-          onRequestClose={() => setShowDatePicker(null)}
-        >
-          <TouchableWithoutFeedback onPress={() => setShowDatePicker(null)}>
-            <View style={styles.modalBackground}>
-              <DateTimePicker
-                value={new Date(absenceForm[showDatePicker] || Date.now())}
-                mode="date"
-                display="default"
-                onChange={(event, date) =>
-                  handleDateChange(showDatePicker, date)
-                }
-              />
-            </View>
-          </TouchableWithoutFeedback>
-        </Modal>
-      )}
-    </View>
+      <Text style={styles.sectionTitle}>Absences précédentes</Text>
+      <FlatList
+        data={uploadedAbsences}
+        keyExtractor={(item, index) => `${item.absence_start_date}-${index}`}
+        renderItem={renderAbsenceItem}
+        contentContainerStyle={styles.absenceList}
+      />
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    padding: 16,
     backgroundColor: '#f9f9f9',
   },
   form: {
-    width: '90%',
-    padding: 20,
     backgroundColor: '#fff',
+    padding: 16,
     borderRadius: 10,
-    elevation: 5,
+    marginBottom: 24,
+    elevation: 2,
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: '600',
+    marginBottom: 12,
+  },
+  input: {
+    padding: 12,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    marginBottom: 12,
+    backgroundColor: '#fff',
   },
   label: {
-    fontSize: 16,
-    marginVertical: 10,
+    fontWeight: 'bold',
+    marginBottom: 8,
   },
-  reason: {
+  reasonButton: {
     padding: 10,
-    backgroundColor: '#f0f0f0',
-    borderRadius: 5,
-    marginVertical: 5,
+    borderWidth: 1,
+    borderColor: '#aaa',
+    borderRadius: 6,
+    marginBottom: 8,
   },
-  uploadButton: {
-    padding: 15,
-    backgroundColor: '#ddd',
-    borderRadius: 5,
+  selectedReason: {
+    backgroundColor: '#cde2ff',
+    borderColor: '#1e88e5',
+  },
+  uploadBtn: {
+    padding: 12,
+    backgroundColor: '#eee',
+    borderRadius: 6,
     alignItems: 'center',
     marginVertical: 10,
   },
   imageName: {
-    fontSize: 14,
-    marginVertical: 10,
+    fontSize: 13,
+    marginBottom: 10,
   },
-  modalBackground: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  absenceList: {
+    paddingBottom: 50,
+  },
+  absenceCard: {
+    backgroundColor: '#fff',
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 10,
+    elevation: 1,
+  },
+  absenceText: {
+    fontSize: 13,
+    marginBottom: 4,
   },
 });
 
