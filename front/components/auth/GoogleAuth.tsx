@@ -79,7 +79,7 @@ export default function LoginWithGoogle() {
           client_secret: Platform.OS === 'web' ? googleSecret : undefined,
           client_id: Platform.select({
             ios: iosClientId,
-            android: webClientId,
+            android: androidClientId,
             default: webClientId,
           }),
 

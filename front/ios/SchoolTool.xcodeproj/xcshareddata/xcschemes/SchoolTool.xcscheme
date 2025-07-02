@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-               BuildableName = "front.app"
-               BlueprintName = "front"
-               ReferencedContainer = "container:front.xcodeproj">
+               BuildableName = "SchoolTool.app"
+               BlueprintName = "SchoolTool"
+               ReferencedContainer = "container:SchoolTool.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -33,9 +33,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "00E356ED1AD99517003FC87E"
-               BuildableName = "frontTests.xctest"
-               BlueprintName = "frontTests"
-               ReferencedContainer = "container:front.xcodeproj">
+               BuildableName = "SchoolToolTests.xctest"
+               BlueprintName = "SchoolToolTests"
+               ReferencedContainer = "container:SchoolTool.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -55,9 +55,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "front.app"
-            BlueprintName = "front"
-            ReferencedContainer = "container:front.xcodeproj">
+            BuildableName = "SchoolTool.app"
+            BlueprintName = "SchoolTool"
+            ReferencedContainer = "container:SchoolTool.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -72,9 +72,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "front.app"
-            BlueprintName = "front"
-            ReferencedContainer = "container:front.xcodeproj">
+            BuildableName = "SchoolTool.app"
+            BlueprintName = "SchoolTool"
+            ReferencedContainer = "container:SchoolTool.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>
