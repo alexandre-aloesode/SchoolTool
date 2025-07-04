@@ -3,6 +3,7 @@ import 'dotenv/config';
 export default () => ({
   expo: {
     name: 'SchoolTool',
+    owner: 'alexaloesode',
     slug: 'schooltool',
     version: '1.0.0',
     orientation: 'portrait',
@@ -11,7 +12,6 @@ export default () => ({
     userInterfaceStyle: 'automatic',
     newArchEnabled: true,
 
-    // 📱 Android config
     android: {
       package: 'com.schooltool.authsessiongoogle',
       adaptiveIcon: {
@@ -20,20 +20,17 @@ export default () => ({
       },
     },
 
-    // 🍎 iOS config
     ios: {
       bundleIdentifier: 'com.schooltool.authsessiongoogle',
       supportsTablet: true,
     },
 
-    // 🌐 Web config
     web: {
       bundler: 'metro',
       output: 'static',
       favicon: './assets/images/favicon.png',
     },
 
-    // 🔌 Plugins utilisés
     plugins: [
       'expo-router',
       [
@@ -48,21 +45,21 @@ export default () => ({
       'expo-secure-store',
     ],
 
-    // 🧪 Fonctionnalités expérimentales
     experiments: {
       typedRoutes: true,
     },
 
-    // 🔐 Variables d'environnement injectées depuis .env
     extra: {
       ANDROID_CLIENT_ID: process.env.ANDROID_CLIENT_ID,
+      ANDROID_CLIENT_ID_EXPOGO: process.env.ANDROID_CLIENT_ID_EXPOGO,
       IOS_CLIENT_ID: process.env.IOS_CLIENT_ID,
       WEB_CLIENT_ID: process.env.WEB_CLIENT_ID,
       LPTF_GOOGLE_CLIENT_ID: process.env.LPTF_GOOGLE_CLIENT_ID,
       GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
+      EXPO_GO_GOOGLE_CLIENT_SECRET: process.env.EXPO_GO_GOOGLE_CLIENT_SECRET,
       LPTF_API_URL: process.env.LPTF_API_URL,
       LPTF_AUTH_API_URL: process.env.LPTF_AUTH_API_URL,
-      // 📦 EAS Project ID (obligatoire pour les builds)
+      
       eas: {
         projectId: 'e427c0d9-fe3e-4038-a31e-f4a072fc7a79',
       },
