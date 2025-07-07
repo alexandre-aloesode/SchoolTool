@@ -7,6 +7,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import AuthContext from '@/context/authContext';
 import Constants from 'expo-constants';
+import Toast from 'react-native-toast-message';
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -34,7 +35,6 @@ export default function LoginWithGoogle() {
   const redirectUri = isExpoGo
     ? 'https://auth.expo.io/@alexaloesode/schooltool'
     : AuthSession.makeRedirectUri({ useProxy: true });
-  console.log('Redirect URIs:', redirectUri);
 
   const googleClientId = isExpoGo
     ? ENV.ANDROID_CLIENT_ID_EXPOGO
@@ -43,12 +43,6 @@ export default function LoginWithGoogle() {
       : isAndroid
         ? androidClientId
         : iosClientId;
-
-  console.log('Client ID:', googleClientId);
-  console.log(
-    'AuthSession.makeRedirectUri',
-    AuthSession.makeRedirectUri({ useProxy: true }),
-  );
 
   const [request, response, promptAsync] = AuthSession.useAuthRequest(
     {
@@ -83,7 +77,6 @@ export default function LoginWithGoogle() {
   }, []);
 
   const exchangeCodeForToken = async (code) => {
-    console.log('Exchange code for token:', code);
 
     try {
       const response = await fetch('https://oauth2.googleapis.com/token', {
@@ -128,6 +121,11 @@ export default function LoginWithGoogle() {
 
         await AsyncStorage.setItem('userSession', JSON.stringify(userSession));
         setUser(userSession);
+        Toast.show({
+          type: 'success',
+          text1: 'Connexion réussie',
+          text2: 'Vous êtes maintenant connecté avec Google',
+        });
         router.replace('/');
       } else {
         console.log(
@@ -149,11 +147,8 @@ export default function LoginWithGoogle() {
   };
 
   useEffect(() => {
-    console.log('AuthSession response:', response);
-
     if (response?.type === 'success' && response.params?.code) {
       const { code } = response.params;
-      console.log('Authorization code:', code);
       exchangeCodeForToken(code);
     } else if (response?.type === 'error') {
       console.error('OAuth error:', response.error);
@@ -176,13 +171,13 @@ export default function LoginWithGoogle() {
           <Button
             disabled={!request}
             title="Se connecter avec Google"
-            // onPress={() => promptAsync({ useProxy })}
+            onPress={() => promptAsync({ useProxy })}
             // onPress={() => promptAsync()}
-            onPress={async () => {
-              console.log('Prompting auth...');
-              const result = await promptAsync({ useProxy });
-              console.log('PromptAsync result:', result);
-            }}
+            // onPress={async () => {
+            //   console.log('Prompting auth...');
+            //   const result = await promptAsync({ useProxy });
+            //   console.log('PromptAsync result:', result);
+            // }}
             color="#4285F4"
           />
         </>
