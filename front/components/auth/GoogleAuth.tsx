@@ -31,44 +31,24 @@ export default function LoginWithGoogle() {
 
   const useProxy = isWeb || isExpoGo;
 
-  // const redirectUri = useProxy
-  // ? 'https://auth.expo.io/@SchoolTool/schooltool'
-  // : AuthSession.makeRedirectUri({
-  //     native: 'com.schooltool.authsessiongoogle:/oauthredirect',
-  //   });
+  const redirectUri = isExpoGo
+    ? 'https://auth.expo.io/@alexaloesode/schooltool'
+    : AuthSession.makeRedirectUri({ useProxy: true });
+  console.log('Redirect URIs:', redirectUri);
 
-  // const redirectUri = 'https://auth.expo.io/@SchoolTool/schooltool';
-
-
-    // const redirectUri = AuthSession.makeRedirectUri({
-    //   useProxy: true,
-    // });
-
-
-    // const redirectUri = 'https://auth.expo.io/@alexaloesode/schooltool';
-
-    
-    // const redirectUri = AuthSession.makeRedirectUri({
-    //   native: 'com.schooltool.authsessiongoogle:/oauthredirect',
-    //   useProxy: true,
-    // });
-
-    const redirectUri = isExpoGo
-  ? 'https://auth.expo.io/@alexaloesode/schooltool'
-  : AuthSession.makeRedirectUri({ useProxy: true });
-    console.log('Redirect URIs:', redirectUri);
-
-    const googleClientId = isExpoGo
-  ? ENV.ANDROID_CLIENT_ID_EXPOGO
-  : isWeb
-    ? webClientId
-    : isAndroid
-      ? androidClientId
-      : iosClientId;
+  const googleClientId = isExpoGo
+    ? ENV.ANDROID_CLIENT_ID_EXPOGO
+    : isWeb
+      ? webClientId
+      : isAndroid
+        ? androidClientId
+        : iosClientId;
 
   console.log('Client ID:', googleClientId);
-  console.log("AuthSession.makeRedirectUri", AuthSession.makeRedirectUri({ useProxy: true }));
-
+  console.log(
+    'AuthSession.makeRedirectUri',
+    AuthSession.makeRedirectUri({ useProxy: true }),
+  );
 
   const [request, response, promptAsync] = AuthSession.useAuthRequest(
     {
@@ -104,7 +84,7 @@ export default function LoginWithGoogle() {
 
   const exchangeCodeForToken = async (code) => {
     console.log('Exchange code for token:', code);
-    
+
     try {
       const response = await fetch('https://oauth2.googleapis.com/token', {
         method: 'POST',
@@ -122,10 +102,10 @@ export default function LoginWithGoogle() {
         }),
       });
       const tokenData = await response.json();
-      
-            if (!tokenData.access_token) {
-              console.log('Token response:', tokenData);
-            }
+
+      if (!tokenData.access_token) {
+        console.log('Token response:', tokenData);
+      }
       if (tokenData.access_token) {
         const authToken = await fetch(`${authUrl}/oauth`, {
           method: 'POST',
@@ -170,7 +150,7 @@ export default function LoginWithGoogle() {
 
   useEffect(() => {
     console.log('AuthSession response:', response);
-  
+
     if (response?.type === 'success' && response.params?.code) {
       const { code } = response.params;
       console.log('Authorization code:', code);
