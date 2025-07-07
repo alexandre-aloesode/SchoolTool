@@ -1,0 +1,30 @@
+name: Lint Frontend
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: |
+          cd front
+          npm install
+
+      - name: Run ESLint
+        run: |
+          cd front
+          npx eslint . --ext .ts,.tsx
