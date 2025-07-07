@@ -58,7 +58,7 @@ export default function LoginWithGoogle() {
   : AuthSession.makeRedirectUri({ useProxy: true });
     console.log('Redirect URIs:', redirectUri);
 
-    const client_id = isExpoGo
+    const googleClientId = isExpoGo
   ? ENV.ANDROID_CLIENT_ID_EXPOGO
   : isWeb
     ? webClientId
@@ -66,11 +66,13 @@ export default function LoginWithGoogle() {
       ? androidClientId
       : iosClientId;
 
-  console.log('Client ID:', client_id);
+  console.log('Client ID:', googleClientId);
+  console.log("AuthSession.makeRedirectUri", AuthSession.makeRedirectUri({ useProxy: true }));
+
 
   const [request, response, promptAsync] = AuthSession.useAuthRequest(
     {
-      clientId: client_id,
+      clientId: googleClientId,
       redirectUri,
       usePKCE: true,
       scopes: [
@@ -111,12 +113,9 @@ export default function LoginWithGoogle() {
         },
         body: new URLSearchParams({
           code,
-          client_id: isWeb
-            ? webClientId
-            : isAndroid
-              ? androidClientId
-              : iosClientId,
-          client_secret: useProxy ? googleSecret : '',
+          client_id: googleClientId,
+          // client_secret: useProxy ? googleSecret : '',
+          client_secret: isExpoGo ? undefined : googleSecret,
           redirect_uri: redirectUri,
           grant_type: 'authorization_code',
           code_verifier: request?.codeVerifier,
