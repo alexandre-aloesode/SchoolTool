@@ -460,7 +460,6 @@ object).
   when sending POST requests, allowing for customized headers. See
   https://github.com/guzzle/guzzle/issues/877
 - Improved path URL serialization.
-
   - No longer double percent-encoding characters in the path or query string if
     they are already encoded.
   - Now properly encoding the supplied path to a URL object, instead of only

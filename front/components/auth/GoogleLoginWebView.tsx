@@ -8,12 +8,12 @@ import AuthContext from '@/context/authContext';
 export default function GoogleLoginWebView() {
   const router = useRouter();
   const { setUser } = React.useContext(AuthContext);
-  
+
   const handleWebViewMessage = async (event: any) => {
-      try {
-          console.log('Rendering WebView to:', 'http://192.168.1.106:8001');
-          const data = JSON.parse(event.nativeEvent.data);
-            console.log('Données reçues depuis le WebView:', data);
+    try {
+      console.log('Rendering WebView to:', 'http://192.168.1.106:8001');
+      const data = JSON.parse(event.nativeEvent.data);
+      console.log('Données reçues depuis le WebView:', data);
       if (data.token) {
         const userSession = {
           accessToken: data.token.token,
