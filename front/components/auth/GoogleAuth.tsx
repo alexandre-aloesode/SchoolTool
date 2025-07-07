@@ -5,38 +5,54 @@ import * as WebBrowser from 'expo-web-browser';
 import { ENV } from '@/utils/env';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
-import AuthContext from '@/context/authContext'; // Import du contexte d'auth
+import AuthContext from '@/context/authContext';
+import Constants from 'expo-constants';
 
 WebBrowser.maybeCompleteAuthSession();
 
-const androidClientId = ENV.ANDROID_CLIENT_ID;
+const isWeb = Platform.OS === 'web';
+const isAndroid = Platform.OS === 'android';
+const isExpoGo = Constants.executionEnvironment === 'storeClient';
+
+const androidClientId = isExpoGo
+  ? ENV.ANDROID_CLIENT_ID_EXPOGO
+  : ENV.ANDROID_CLIENT_ID;
 const iosClientId = ENV.IOS_CLIENT_ID;
 const webClientId = ENV.LPTF_GOOGLE_CLIENT_ID;
-const googleSecret = ENV.GOOGLE_CLIENT_SECRET;
+const googleSecret = isExpoGo
+  ? ENV.EXPO_GO_GOOGLE_CLIENT_SECRET
+  : ENV.GOOGLE_CLIENT_SECRET;
 const authUrl = ENV.LPTF_AUTH_API_URL;
 
 export default function LoginWithGoogle() {
   const router = useRouter();
-  const { user, setUser } = useContext(AuthContext); // Récupération du contexte d'auth
+  const { user, setUser } = useContext(AuthContext);
   const [loading, setLoading] = useState(true);
 
-  const redirectUri = AuthSession.makeRedirectUri({ useProxy: true });
-  // const redirectUri = `https://auth.expo.io/@alexaloesode/schooltool`;
+  const useProxy = isWeb || isExpoGo;
 
-  //Prod config
-  // const redirectUri = AuthSession.makeRedirectUri({
-  //       native: "com.schooltool.authsessiongoogle:/oauthredirect"
-  //     }),
+  const redirectUri = isExpoGo
+    ? 'https://auth.expo.io/@alexaloesode/schooltool'
+    : AuthSession.makeRedirectUri({ useProxy: true });
+  console.log('Redirect URIs:', redirectUri);
 
-  console.log('Redirect URI:', redirectUri);
+  const googleClientId = isExpoGo
+    ? ENV.ANDROID_CLIENT_ID_EXPOGO
+    : isWeb
+      ? webClientId
+      : isAndroid
+        ? androidClientId
+        : iosClientId;
+
+  console.log('Client ID:', googleClientId);
+  console.log(
+    'AuthSession.makeRedirectUri',
+    AuthSession.makeRedirectUri({ useProxy: true }),
+  );
 
   const [request, response, promptAsync] = AuthSession.useAuthRequest(
     {
-      clientId: Platform.select({
-        ios: iosClientId,
-        android: webClientId,
-        default: webClientId,
-      }),
+      clientId: googleClientId,
       redirectUri,
       usePKCE: true,
       scopes: [
@@ -47,18 +63,18 @@ export default function LoginWithGoogle() {
       ],
       extraParams: {
         access_type: 'offline',
-        prompt: 'consent', // pour forcer Google à renvoyer le refresh_token à chaque fois
+        prompt: 'consent',
+        response_type: 'code',
       },
     },
     { authorizationEndpoint: 'https://accounts.google.com/o/oauth2/v2/auth' },
   );
 
   useEffect(() => {
-    // Vérifier si un utilisateur est déjà connecté
     const checkUserSession = async () => {
       const userData = await AsyncStorage.getItem('userSession');
       if (userData) {
-        setUser(JSON.parse(userData)); // Met à jour le contexte utilisateur
+        setUser(JSON.parse(userData));
       }
       setLoading(false);
     };
@@ -67,6 +83,8 @@ export default function LoginWithGoogle() {
   }, []);
 
   const exchangeCodeForToken = async (code) => {
+    console.log('Exchange code for token:', code);
+
     try {
       const response = await fetch('https://oauth2.googleapis.com/token', {
         method: 'POST',
@@ -75,27 +93,19 @@ export default function LoginWithGoogle() {
         },
         body: new URLSearchParams({
           code,
-
-          client_secret: Platform.OS === 'web' ? googleSecret : undefined,
-          client_id: Platform.select({
-            ios: iosClientId,
-            android: webClientId,
-            default: webClientId,
-          }),
-
-          // redirect_uri: AuthSession.makeRedirectUri({
-          //   scheme: "com.schooltool.authsessiongoogle",
-          // }),
-          // redirect_uri: `https://auth.expo.io/@alexaloesode/schooltool`,
+          client_id: googleClientId,
+          // client_secret: useProxy ? googleSecret : '',
+          client_secret: isExpoGo ? undefined : googleSecret,
           redirect_uri: redirectUri,
-
           grant_type: 'authorization_code',
           code_verifier: request?.codeVerifier,
         }),
       });
-
       const tokenData = await response.json();
 
+      if (!tokenData.access_token) {
+        console.log('Token response:', tokenData);
+      }
       if (tokenData.access_token) {
         const authToken = await fetch(`${authUrl}/oauth`, {
           method: 'POST',
@@ -105,7 +115,7 @@ export default function LoginWithGoogle() {
           body: `token_id=${tokenData.id_token}`,
         });
 
-        let apiToken = await authToken.json();
+        const apiToken = await authToken.json();
 
         const userSession = {
           accessToken: apiToken.token,
@@ -118,7 +128,6 @@ export default function LoginWithGoogle() {
 
         await AsyncStorage.setItem('userSession', JSON.stringify(userSession));
         setUser(userSession);
-
         router.replace('/');
       } else {
         console.log(
@@ -140,9 +149,16 @@ export default function LoginWithGoogle() {
   };
 
   useEffect(() => {
+    console.log('AuthSession response:', response);
+
     if (response?.type === 'success' && response.params?.code) {
       const { code } = response.params;
+      console.log('Authorization code:', code);
       exchangeCodeForToken(code);
+    } else if (response?.type === 'error') {
+      console.error('OAuth error:', response.error);
+    } else {
+      console.log('OAuth cancelled or unknown response');
     }
   }, [response]);
 
@@ -160,7 +176,13 @@ export default function LoginWithGoogle() {
           <Button
             disabled={!request}
             title="Se connecter avec Google"
-            onPress={() => promptAsync({ useProxy: true })}
+            // onPress={() => promptAsync({ useProxy })}
+            // onPress={() => promptAsync()}
+            onPress={async () => {
+              console.log('Prompting auth...');
+              const result = await promptAsync({ useProxy });
+              console.log('PromptAsync result:', result);
+            }}
             color="#4285F4"
           />
         </>

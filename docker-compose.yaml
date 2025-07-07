@@ -46,6 +46,7 @@ services:
       LPTF_JWT_KEY: toto
       GOOGLE_CLIENT_ID: '604347883543-cu73up3fqo5r9gn18tqpkf3tu9ud41s4.apps.googleusercontent.com'
       IS_DEV: true
+      OAUTH_URL: 'http://localhost:8001/oauth'
 
   front:
     build: ./front
