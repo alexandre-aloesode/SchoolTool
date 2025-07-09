@@ -3,7 +3,7 @@ import { View, Text, FlatList, StyleSheet, Pressable } from 'react-native';
 import { ProgressBar } from 'react-native-paper';
 import { ApiActions } from '@/services/ApiServices';
 import ProgressModal from './modals/ProgressModal';
-import type { JobInProgress } from '@/types/jobs';
+import type { JobInProgress } from '@/types/jobsTypes';
 
 const JobsInProgress = () => {
   const [jobsInProgress, setJobsInProgress] = useState<JobInProgress[]>([]);

@@ -3,7 +3,7 @@ import { View, Text, FlatList, StyleSheet, Pressable } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { ApiActions } from '@/services/ApiServices';
 import AvailableModal from './modals/AvailableModal';
-import type { JobAvailable } from '@/types/jobs';
+import type { JobAvailable } from '@/types/jobsTypes';
 
 const JobsAvailable = () => {
   const [jobsAvailable, setJobsAvailable] = useState<JobAvailable[]>([]);

@@ -9,7 +9,7 @@ import {
   ScrollView,
 } from 'react-native';
 import { ApiActions } from '@/services/ApiServices';
-import { GroupManagementModalProps, JobGroups } from '@/types/jobs';
+import { GroupManagementModalProps, JobGroups } from '@/types/jobsTypes';
 
 const GroupManagementModal: React.FC<GroupManagementModalProps> = ({ visible, jobId, onClose }) => {
   const [groups, setGroups] = useState<JobGroups | null>(null);

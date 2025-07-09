@@ -11,19 +11,26 @@ import {
   TextInput,
 } from 'react-native';
 import { Icon, Button } from 'react-native-paper';
-import { useNavigation } from 'expo-router';
 import { ApiActions } from '@/services/ApiServices';
-import AuthContext from '@/context/authContext';
+import { useAuth } from '@/hooks/useAuth';
 import Toast from 'react-native-toast-message';
+import { StudentInfo, StudentLinks } from '@/types/profileTypes';
 
 export default function ProfileScreen() {
-  const [student, setStudent] = useState(null);
+  const [student, setStudent] = useState<StudentInfo | null>(null);
   const [jobsDone, setJobsDone] = useState(0);
   const [jobsInProgress, setJobsInProgress] = useState(0);
   const [editing, setEditing] = useState(false);
-  const [links, setLinks] = useState({});
-  const auth = useContext(AuthContext);
-  const navigation = useNavigation();
+  const [links, setLinks] = useState<StudentLinks | null>(null);
+  // const [links, setLinks] = useState<StudentLinks | null>({
+  //   github: '',
+  //   plesk: '',
+  //   linkedin: '',
+  //   cv: '',
+  //   personal_website: '',
+  // });
+  
+  const { logout } = useAuth();
 
   const loadProfile = async () => {
     try {
@@ -76,25 +83,32 @@ export default function ProfileScreen() {
     loadProfile();
   }, []);
 
-  const openLink = (url) => {
+  const openLink = (url : string) => {
     if (url) Linking.openURL(url);
   };
 
   const handleLogout = () => {
-    auth.logout();
-    navigation.replace('/');
+    logout();
   };
 
   const handleSaveLinks = async () => {
+    // if (!links || !links.github || !links.plesk || !links.linkedin || !links.cv || !links.personal_website) {
+    //   Toast.show({
+    //     type: 'error',
+    //     text1: 'Erreur',
+    //     text2: 'Veuillez remplir tous les champs avant de sauvegarder.',
+    //   });
+    //   return;
+    // }
     try {
       await ApiActions.put({
         route: 'student',
         params: {
-          github: links.github,
-          plesk: links.plesk,
-          linkedin: links.linkedin,
-          cv: links.cv,
-          personal_website: links.personal_website,
+          github: links?.github,
+          plesk: links?.plesk,
+          linkedin: links?.linkedin,
+          cv: links?.cv,
+          personal_website: links?.personal_website,
         },
       });
       setEditing(false);
@@ -154,7 +168,7 @@ export default function ProfileScreen() {
               <Pressable
                 key={key}
                 style={styles.link}
-                onPress={() => openLink(student[`student_${key}`])}
+                onPress={() => openLink((student as any)[`student_${key}`])}
               >
                 <Icon source={icon} size={24} />
                 <Text style={styles.linkLabel}>{label}</Text>
@@ -176,13 +190,22 @@ export default function ProfileScreen() {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContainer}>
             <Text style={styles.modalTitle}>Modifier mes liens</Text>
-            {Object.entries(links).map(([key, value]) => (
+            {links && Object.entries(links).map(([key, value]) => (
               <TextInput
                 key={key}
                 placeholder={key.charAt(0).toUpperCase() + key.slice(1)}
                 value={value}
                 onChangeText={(text) =>
-                  setLinks((prev) => ({ ...prev, [key]: text }))
+                  setLinks((prev) => ({
+                    ...(prev || {
+                      github: '',
+                      plesk: '',
+                      linkedin: '',
+                      cv: '',
+                      personal_website: '',
+                    }),
+                    [key]: text,
+                  }))
                 }
                 style={styles.input}
               />

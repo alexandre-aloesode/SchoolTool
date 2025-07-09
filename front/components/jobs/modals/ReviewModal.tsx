@@ -9,7 +9,7 @@ import {
   Pressable,
 } from 'react-native';
 import { ApiActions } from '@/services/ApiServices';
-import { JobReview, ReviewModalProps } from '@/types/jobs';
+import { JobReview, ReviewModalProps } from '@/types/jobsTypes';
 
 const ReviewModal: React.FC<ReviewModalProps> = ({ visible, groupId, onClose }) => {
   const [loading, setLoading] = useState(false);

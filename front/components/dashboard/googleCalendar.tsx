@@ -11,7 +11,7 @@ import {
 import dayjs from 'dayjs';
 import { useAuth } from '@/hooks/useAuth';
 import { getValidGoogleAccessToken } from '@/utils/googleToken';
-import type { GoogleCalendarEvent } from '@/types/googleCalendar';
+import type { GoogleCalendarEvent } from '@/types/googleCalendarTypes';
 import type { Dayjs } from 'dayjs';
 
 const screenWidth = Dimensions.get('window').width;

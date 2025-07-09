@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { ApiActions } from '@/services/ApiServices';
 import ReviewModal from './ReviewModal';
-import type { ProgressModalProps, JobInProgress, JobSkills, JobGroupMembers } from '@/types/jobs';
+import type { ProgressModalProps, JobInProgress, JobSkills, JobGroupMembers } from '@/types/jobsTypes';
 
 const ProgressModal: React.FC<ProgressModalProps> = ({ visible, job, onClose, onReport }) => {
   const [loading, setLoading] = useState(false);

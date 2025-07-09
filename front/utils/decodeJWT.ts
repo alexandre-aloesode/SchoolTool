@@ -1,4 +1,4 @@
-import { DecodedJWT } from '@/types/decodedJWT';
+import { DecodedJWT } from '@/types/decodedJWTTypes';
   
   export function decodeJWT(token: string): DecodedJWT | null {
     try {

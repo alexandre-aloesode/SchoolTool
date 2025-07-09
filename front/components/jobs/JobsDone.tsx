@@ -11,7 +11,7 @@ import {
 import { Picker } from '@react-native-picker/picker';
 import { IconButton, Button } from 'react-native-paper';
 import { ApiActions } from '@/services/ApiServices';
-import type { JobDone, JobUnit, JobPromotion } from '@/types/jobs';
+import type { JobDone, JobUnit, JobPromotion } from '@/types/jobsTypes';
 
 const screenWidth = Dimensions.get('window').width;
 

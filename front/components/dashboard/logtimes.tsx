@@ -10,7 +10,7 @@ import {
 import { LineChart } from 'react-native-chart-kit';
 import { ApiActions } from '@/services/ApiServices';
 import dayjs from 'dayjs';
-import type { Logtime } from '@/types/logtimes';
+import type { Logtime } from '@/types/logtimesTypes';
 
 const screenWidth = Dimensions.get('window').width;
 
