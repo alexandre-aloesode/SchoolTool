@@ -9,10 +9,11 @@ import {
   Pressable,
 } from 'react-native';
 import { ApiActions } from '@/services/ApiServices';
+import { JobReview, ReviewModalProps } from '@/types/jobs';
 
-const ReviewModal = ({ visible, groupId, onClose }) => {
+const ReviewModal: React.FC<ReviewModalProps> = ({ visible, groupId, onClose }) => {
   const [loading, setLoading] = useState(false);
-  const [review, setReview] = useState(null);
+  const [review, setReview] = useState<JobReview | null>(null);
 
   useEffect(() => {
     if (visible && groupId) {

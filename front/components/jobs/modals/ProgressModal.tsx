@@ -12,13 +12,13 @@ import {
 } from 'react-native';
 import { ApiActions } from '@/services/ApiServices';
 import ReviewModal from './ReviewModal';
-import { set } from 'date-fns';
+import type { ProgressModalProps, JobInProgress, JobSkills, JobGroupMembers } from '@/types/jobs';
 
-const ProgressModal = ({ visible, job, onClose, onReport }) => {
+const ProgressModal: React.FC<ProgressModalProps> = ({ visible, job, onClose, onReport }) => {
   const [loading, setLoading] = useState(false);
-  const [skills, setSkills] = useState([]);
-  const [members, setMembers] = useState([]);
-  const [jobData, setJobData] = useState(null);
+  const [skills, setSkills] = useState<JobSkills | null>(null);
+  const [members, setMembers] = useState<JobGroupMembers | null>(null);
+  const [jobData, setJobData] = useState<JobInProgress | null>(null);
   const [showReview, setShowReview] = useState(false);
 
   useEffect(() => {
@@ -112,7 +112,7 @@ const ProgressModal = ({ visible, job, onClose, onReport }) => {
         },
       });
       alert('Le projet a été marqué comme terminé.');
-      onClose(); // Optionnel : fermer la modale après action
+      onClose();
     } catch (err) {
       console.error('Erreur lors de la validation du projet :', err);
       alert('Erreur : impossible de marquer ce projet comme terminé.');
@@ -144,7 +144,7 @@ const ProgressModal = ({ visible, job, onClose, onReport }) => {
               <Text>Fin : {jobData?.end_date}</Text>
 
               <Text style={styles.label}>Compétences :</Text>
-              {skills.map((skill, i) => (
+              {Array.isArray(skills) && skills.map((skill, i) => (
                 <Text key={i}>
                   • {skill.skill_name} ({skill.skill_needed} →{' '}
                   {skill.skill_earned})
@@ -152,7 +152,7 @@ const ProgressModal = ({ visible, job, onClose, onReport }) => {
               ))}
 
               <Text style={styles.label}>Membres :</Text>
-              {members.map((m, i) => (
+              {Array.isArray(members) && members.map((m, i) => (
                 <Text key={i}>
                   • {m.student_firstname} {m.student_lastname}
                 </Text>
@@ -188,7 +188,7 @@ const ProgressModal = ({ visible, job, onClose, onReport }) => {
       </View>
       <ReviewModal
         visible={showReview}
-        groupId={jobData?.group_id}
+        groupId={jobData?.group_id ?? null}
         onClose={() => setShowReview(false)}
       />
     </Modal>
