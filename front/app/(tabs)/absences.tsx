@@ -91,8 +91,8 @@ const UploadAbsences: React.FC = () => {
     Raison : ${absenceForm.reason}
     Du ${absenceForm.start_date} au ${absenceForm.end_date}
     Durée : ${absenceForm.duration} ${
-    absenceForm.duration > 1 ? 'jours ouvrés' : 'jour ouvré'
-  }`;
+      absenceForm.duration > 1 ? 'jours ouvrés' : 'jour ouvré'
+    }`;
 
   const handleUploadAbsence = () => {
     const { start_date, end_date, reason, image } = absenceForm;
@@ -170,7 +170,7 @@ const UploadAbsences: React.FC = () => {
             ? 'Refusée'
             : 'En attente'}
       </Text>
-      {item.absence_comment && (
+      {!!item.absence_comment && (
         <Text style={styles.absenceText}>💬 {item.absence_comment}</Text>
       )}
     </View>
@@ -229,11 +229,9 @@ const UploadAbsences: React.FC = () => {
                 <Text>📎 Joindre un justificatif</Text>
               </TouchableOpacity>
 
-              {absenceForm.imageName && (
-                <Text style={styles.imageName}>
-                  🗂️ {absenceForm.imageName}
-                </Text>
-              )}
+              {absenceForm.imageName ? (
+                <Text style={styles.imageName}>🗂️ {absenceForm.imageName}</Text>
+              ) : null}
 
               <Button title="Envoyer" onPress={handleUploadAbsence} />
             </View>
@@ -241,7 +239,9 @@ const UploadAbsences: React.FC = () => {
             <ActivityIndicator size="large" color="#1e88e5" />
           )}
 
-          <Text style={styles.sectionTitle}>Absences précédentes</Text>
+          <View style={{ marginTop: 20 }}>
+            <Text style={styles.sectionTitle}>Absences précédentes</Text>
+          </View>
         </View>
       }
     />
