@@ -6,24 +6,24 @@ import {
   StyleSheet,
   Modal,
   Dimensions,
-  Pressable,
   ScrollView,
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { IconButton, Button } from 'react-native-paper';
 import { ApiActions } from '@/services/ApiServices';
+import type { JobDone, JobUnit, JobPromotion } from '@/types/jobs';
 
 const screenWidth = Dimensions.get('window').width;
 
 const JobsDone = () => {
-  const [promotions, setPromotions] = useState([]);
-  const [units, setUnits] = useState([]);
-  const [jobsDone, setJobsDone] = useState([]);
+  const [promotions, setPromotions] = useState<JobPromotion[]>([]);
+  const [units, setUnits] = useState<JobUnit[]>([]);
+  const [jobsDone, setJobsDone] = useState<JobDone[]>([]);
 
   const [selectedPromotion, setSelectedPromotion] = useState('');
   const [selectedUnit, setSelectedUnit] = useState('all');
 
-  const [selectedJob, setSelectedJob] = useState(null);
+  const [selectedJob, setSelectedJob] = useState<JobDone | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
 
   useEffect(() => {
@@ -74,7 +74,7 @@ const JobsDone = () => {
     
     if (allUnits.status === 200) {
       setUnits(allUnits.data || []);
-      const allUnitIds = allUnits.data.map((u) => u.unit_id);
+      const allUnitIds = (allUnits.data as JobUnit[]).map((u: JobUnit) => u.unit_id);
       const jobsResponse = await ApiActions.get({
         route: 'job/done',
         params: {
@@ -82,6 +82,11 @@ const JobsDone = () => {
           registration_id: '',
           job_unit_name: '',
           job_unit_id: allUnitIds,
+          job_description: '',
+          start_date: '',
+          end_date: '',
+          group_name: '',
+          lead_email: '',
           order: 'click_date',
           desc: '',
         },
@@ -104,30 +109,34 @@ const JobsDone = () => {
     return jobsDone.filter((job) => job.job_unit_id === selectedUnit);
   };
 
-  const openJobModal = (job) => {
+  const openJobModal = (job: JobDone) => {
     setSelectedJob(job);
     setModalVisible(true);
   };
 
-  const renderJob = ({ item }) => (
-    <View style={styles.row}>
-      <Text style={[styles.jobTitle, { flex: 1 }]}>{item.job_name}</Text>
-      <View style={[styles.jobDetails, { flex: 2 }]}>
-        <Text style={styles.unitText}>{item.job_unit_name}</Text>
-        <IconButton
-          icon="magnify"
-          size={20}
-          onPress={() => openJobModal(item)}
-        />
+  const renderJob = ({ item }: { item: JobDone }): JSX.Element | null => {
+    if (!item) return null;
+  
+    return (
+      <View style={styles.row}>
+        <Text style={[styles.jobTitle, { flex: 1 }]}>{item.job_name}</Text>
+        <View style={[styles.jobDetails, { flex: 2 }]}>
+          <Text style={styles.unitText}>{item.job_unit_name}</Text>
+          <IconButton
+            icon="magnify"
+            size={20}
+            onPress={() => openJobModal(item)}
+          />
+        </View>
       </View>
-    </View>
-  );
+    );
+  };
+  
 
   return (
     <View style={styles.container}>
       <Text style={styles.sectionTitle}>Projets finis</Text>
 
-      {/* Selectors */}
       <View style={styles.selectorsContainer}>
         <View style={styles.pickerWrapper}>
           <Text style={styles.pickerLabel}>Promotion</Text>
@@ -168,7 +177,6 @@ const JobsDone = () => {
         </View>
       </View>
 
-      {/* Scrollable Jobs List */}
       <View style={styles.listWrapper}>
         <FlatList
           data={filteredJobs()}
@@ -179,7 +187,6 @@ const JobsDone = () => {
         />
       </View>
 
-      {/* Modal Popup */}
       <Modal animationType="slide" transparent={true} visible={modalVisible}>
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
@@ -189,7 +196,7 @@ const JobsDone = () => {
               </Text>
 
               <Text style={styles.modalSubtitle}>
-                {selectedJob?.group_name || selectedJob?.job_code}
+                {selectedJob?.group_name}
               </Text>
               <Text style={styles.modalDescription}>
                 {selectedJob?.job_description ||

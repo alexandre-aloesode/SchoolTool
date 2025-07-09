@@ -21,7 +21,7 @@ export default function GoogleLoginWebView() {
         };
 
         await AsyncStorage.setItem('userSession', JSON.stringify(userSession));
-        setUser(userSession);
+        // setUser(userSession);const [logtimes, setLogtimes] = useState<Logtime[]>([]);
         router.replace('/');
       } else {
         Alert.alert('Erreur', 'Données reçues invalides depuis le WebView');

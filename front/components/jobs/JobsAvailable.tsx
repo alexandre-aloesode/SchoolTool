@@ -3,11 +3,12 @@ import { View, Text, FlatList, StyleSheet, Pressable } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { ApiActions } from '@/services/ApiServices';
 import AvailableModal from './modals/AvailableModal';
+import type { JobAvailable } from '@/types/jobs';
 
 const JobsAvailable = () => {
-  const [jobsAvailable, setJobsAvailable] = useState([]);
+  const [jobsAvailable, setJobsAvailable] = useState<JobAvailable[]>([]);
   const [selectedUnit, setSelectedUnit] = useState('All');
-  const [selectedJob, setSelectedJob] = useState(null);
+  const [selectedJob, setSelectedJob] = useState<JobAvailable | null>(null);
 
   const getJobsAvailable = async () => {
     const jobsRequest = await ApiActions.get({
@@ -28,7 +29,7 @@ const JobsAvailable = () => {
       console.error("Erreur: aucune réponse de l'API");
       return;
     }
-    
+
     if (jobsRequest.status === 200) {
       setJobsAvailable(jobsRequest.data || []);
     }
@@ -58,7 +59,7 @@ const JobsAvailable = () => {
     </View>
   );
 
-  const renderJob = ({ item }) => {
+  const renderJob = ({ item }: { item: JobAvailable }) => {
     if (selectedUnit !== 'All' && item.job_unit_name !== selectedUnit)
       return null;
 
