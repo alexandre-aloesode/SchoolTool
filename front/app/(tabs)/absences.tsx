@@ -8,7 +8,6 @@ import {
   Alert,
   TouchableOpacity,
   ActivityIndicator,
-  Platform,
   FlatList,
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
@@ -59,11 +58,7 @@ const UploadAbsences: React.FC = () => {
         },
       });
 
-      if (!response) {
-        console.error("Erreur: aucune réponse de l'API");
-        return;
-      }
-
+      if (!response) return;
       if (response.status === 200) {
         setUploadedAbsences(response.data || []);
       }
@@ -91,8 +86,6 @@ const UploadAbsences: React.FC = () => {
     Raison : ${absenceForm.reason}
     Du ${absenceForm.start_date} au ${absenceForm.end_date}
     Durée : ${absenceForm.duration} ${
-      absenceForm.duration > 1 ? 'jours ouvrés' : 'jour ouvré'
-    }`;
       absenceForm.duration > 1 ? 'jours ouvrés' : 'jour ouvré'
     }`;
 
@@ -131,11 +124,7 @@ const UploadAbsences: React.FC = () => {
               route: 'uploadAbsence',
               params: { ...absenceForm, duration },
             });
-            if (!response) {
-              console.error("Erreur: aucune réponse de l'API");
-              return;
-            }
-            if (response.status === 200) {
+            if (response?.status === 200) {
               Alert.alert('Succès', 'Absence envoyée avec succès');
               setAbsenceForm({
                 start_date: '',
@@ -146,7 +135,9 @@ const UploadAbsences: React.FC = () => {
                 duration: 0,
               });
               fetchUploadedAbsences();
-            } else throw new Error();
+            } else {
+              throw new Error();
+            }
           } catch (error) {
             Alert.alert('Erreur', "L'envoi de l'absence a échoué.");
           } finally {
@@ -231,9 +222,9 @@ const UploadAbsences: React.FC = () => {
                 <Text>📎 Joindre un justificatif</Text>
               </TouchableOpacity>
 
-              {absenceForm.imageName && (
+              {absenceForm.imageName ? (
                 <Text style={styles.imageName}>🗂️ {absenceForm.imageName}</Text>
-              )}
+              ) : null}
 
               <Button title="Envoyer" onPress={handleUploadAbsence} />
             </View>
@@ -305,9 +296,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 10,
-  },
-  absenceList: {
-    paddingBottom: 50,
   },
   absenceCard: {
     backgroundColor: '#fff',
