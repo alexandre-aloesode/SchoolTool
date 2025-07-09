@@ -23,8 +23,14 @@ const JobsAvailable = () => {
         order: 'job_unit_name',
       },
     });
-    if (jobsRequest) {
-      setJobsAvailable(jobsRequest.data);
+
+    if (!jobsRequest) {
+      console.error("Erreur: aucune réponse de l'API");
+      return;
+    }
+    
+    if (jobsRequest.status === 200) {
+      setJobsAvailable(jobsRequest.data || []);
     }
   };
 

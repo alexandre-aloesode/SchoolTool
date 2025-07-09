@@ -21,8 +21,13 @@ const JobsInProgress = () => {
         job_is_done: '',
       },
     });
-    if (jobsRequest) {
-      setJobsInProgress(jobsRequest.data);
+    if (!jobsRequest) {
+      console.error("Erreur: aucune réponse de l'API");
+      return;
+    }
+    
+    if (jobsRequest.status === 200) {
+      setJobsInProgress(jobsRequest.data || []);
     }
   };
 

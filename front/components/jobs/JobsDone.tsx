@@ -45,12 +45,20 @@ const JobsDone = () => {
       },
     });
 
-    setPromotions(history.data);
-    setSelectedPromotion(history.data[0]?.promotion_id || '');
+    if (!history) {
+      console.error("Erreur: aucune réponse de l'API");
+      return;
+    }
+    
+    if (history.status === 200) {
+      setPromotions(history.data || []);
+      setSelectedPromotion(history.data[0]?.promotion_id || '');
+    }
+
   };
 
   const loadUnitsAndJobs = async () => {
-    const unitResponse = await ApiActions.get({
+    const allUnits = await ApiActions.get({
       route: 'promotion/unit',
       params: {
         promotion_id: selectedPromotion,
@@ -59,24 +67,36 @@ const JobsDone = () => {
       },
     });
 
-    const allUnits = unitResponse.data;
-    setUnits(allUnits);
+    if (!allUnits) {
+      console.error("Erreur: aucune réponse de l'API");
+      return;
+    }
+    
+    if (allUnits.status === 200) {
+      setUnits(allUnits.data || []);
+      const allUnitIds = allUnits.data.map((u) => u.unit_id);
+      const jobsResponse = await ApiActions.get({
+        route: 'job/done',
+        params: {
+          job_name: '',
+          registration_id: '',
+          job_unit_name: '',
+          job_unit_id: allUnitIds,
+          order: 'click_date',
+          desc: '',
+        },
+      });
+  
+      if (!jobsResponse) {
+        console.error("Erreur: aucune réponse de l'API");
+        return;
+      }
+      
+      if (jobsResponse.status === 200) {
+        setJobsDone(jobsResponse.data || []);
+      }
+    }
 
-    const allUnitIds = allUnits.map((u) => u.unit_id);
-
-    const jobsResponse = await ApiActions.get({
-      route: 'job/done',
-      params: {
-        job_name: '',
-        registration_id: '',
-        job_unit_name: '',
-        job_unit_id: allUnitIds,
-        order: 'click_date',
-        desc: '',
-      },
-    });
-
-    setJobsDone(jobsResponse.data);
   };
 
   const filteredJobs = () => {

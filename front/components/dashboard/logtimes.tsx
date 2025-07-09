@@ -18,7 +18,7 @@ const Logtimes = () => {
   const [loading, setLoading] = useState(true);
   const [weekStart, setWeekStart] = useState(
     dayjs().startOf('week').add(1, 'day'),
-  ); // Lundi
+  );
 
   const fetchLogtimes = async () => {
     setLoading(true);
@@ -34,7 +34,15 @@ const Logtimes = () => {
       },
     });
 
-    setLogtimes(logtimesResponse.data || []);
+    if (!logtimesResponse) {
+      console.error("Erreur: aucune réponse de l'API");
+      return;
+    }
+    
+    if (logtimesResponse.status === 200) {
+      setLogtimes(logtimesResponse.data || []);
+    }
+
     setLoading(false);
   };
 

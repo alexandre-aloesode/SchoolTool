@@ -54,6 +54,12 @@ const UploadAbsences: React.FC = () => {
         status: "",
         link: "",
       } });
+      
+      if (!response) {
+        console.error("Erreur: aucune réponse de l'API");
+        return;
+      }
+      
       if (response.status === 200) {
         setUploadedAbsences(response.data || []);
       }
