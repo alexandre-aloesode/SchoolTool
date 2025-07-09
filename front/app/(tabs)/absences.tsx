@@ -10,28 +10,11 @@ import {
   ActivityIndicator,
   Platform,
   FlatList,
-  ScrollView,
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { format } from 'date-fns';
 import { ApiActions } from '../../services/ApiServices';
-
-interface AbsenceForm {
-  start_date: string;
-  end_date: string;
-  duration: number;
-  reason: string;
-  image: string | null;
-  imageName: string;
-}
-
-interface UploadedAbsence {
-  absence_start_date: string;
-  absence_end_date: string;
-  absence_duration: number;
-  absence_status: number;
-  absence_comment: string | null;
-}
+import type { AbsenceForm, UploadedAbsence } from '@/types/absencesTypes';
 
 const UploadAbsences: React.FC = () => {
   const [loading, setLoading] = useState(false);
@@ -75,6 +58,12 @@ const UploadAbsences: React.FC = () => {
           link: '',
         },
       });
+
+      if (!response) {
+        console.error("Erreur: aucune réponse de l'API");
+        return;
+      }
+
       if (response.status === 200) {
         setUploadedAbsences(response.data || []);
       }
@@ -101,7 +90,9 @@ const UploadAbsences: React.FC = () => {
   const recapAbsence = () => `
     Raison : ${absenceForm.reason}
     Du ${absenceForm.start_date} au ${absenceForm.end_date}
-    Durée : ${absenceForm.duration} ${absenceForm.duration > 1 ? 'jours ouvrés' : 'jour ouvré'}`;
+    Durée : ${absenceForm.duration} ${
+      absenceForm.duration > 1 ? 'jours ouvrés' : 'jour ouvré'
+    }`;
 
   const handleUploadAbsence = () => {
     const { start_date, end_date, reason, image } = absenceForm;
@@ -138,6 +129,10 @@ const UploadAbsences: React.FC = () => {
               route: 'uploadAbsence',
               params: { ...absenceForm, duration },
             });
+            if (!response) {
+              console.error("Erreur: aucune réponse de l'API");
+              return;
+            }
             if (response.status === 200) {
               Alert.alert('Succès', 'Absence envoyée avec succès');
               setAbsenceForm({
@@ -182,89 +177,72 @@ const UploadAbsences: React.FC = () => {
   );
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      {!loading ? (
-        <View style={styles.form}>
-          <Text style={styles.title}>Nouvelle absence</Text>
+    <FlatList
+      data={uploadedAbsences}
+      keyExtractor={(item, index) => `${item.absence_start_date}-${index}`}
+      renderItem={renderAbsenceItem}
+      contentContainerStyle={styles.container}
+      ListHeaderComponent={
+        <View>
+          {!loading ? (
+            <View style={styles.form}>
+              <Text style={styles.title}>Nouvelle absence</Text>
 
-          <Text style={styles.label}>Date de début</Text>
-          {Platform.OS === 'web' ? (
-            <TextInput
-              style={styles.input}
-              placeholder="YYYY-MM-DD"
-              value={absenceForm.start_date}
-              onChangeText={(text) =>
-                setAbsenceForm((p) => ({ ...p, start_date: text }))
-              }
-            />
+              <Text style={styles.label}>Date de début</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="YYYY-MM-DD"
+                value={absenceForm.start_date}
+                onChangeText={(text) =>
+                  setAbsenceForm((p) => ({ ...p, start_date: text }))
+                }
+              />
+
+              <Text style={styles.label}>Date de retour</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="YYYY-MM-DD"
+                value={absenceForm.end_date}
+                onChangeText={(text) =>
+                  setAbsenceForm((p) => ({ ...p, end_date: text }))
+                }
+              />
+
+              <Text style={styles.label}>Motif</Text>
+              {reasons.map((reason, index) => (
+                <TouchableOpacity
+                  key={index}
+                  onPress={() => setAbsenceForm((p) => ({ ...p, reason }))}
+                  style={[
+                    styles.reasonButton,
+                    absenceForm.reason === reason && styles.selectedReason,
+                  ]}
+                >
+                  <Text>{reason}</Text>
+                </TouchableOpacity>
+              ))}
+
+              <TouchableOpacity
+                onPress={handleImagePick}
+                style={styles.uploadBtn}
+              >
+                <Text>📎 Joindre un justificatif</Text>
+              </TouchableOpacity>
+
+              {absenceForm.imageName && (
+                <Text style={styles.imageName}>🗂️ {absenceForm.imageName}</Text>
+              )}
+
+              <Button title="Envoyer" onPress={handleUploadAbsence} />
+            </View>
           ) : (
-            <TextInput
-              style={styles.input}
-              placeholder="YYYY-MM-DD"
-              value={absenceForm.start_date}
-              onChangeText={(text) =>
-                setAbsenceForm((p) => ({ ...p, start_date: text }))
-              }
-            />
+            <ActivityIndicator size="large" color="#1e88e5" />
           )}
 
-          <Text style={styles.label}>Date de retour</Text>
-          {Platform.OS === 'web' ? (
-            <TextInput
-              style={styles.input}
-              placeholder="YYYY-MM-DD"
-              value={absenceForm.end_date}
-              onChangeText={(text) =>
-                setAbsenceForm((p) => ({ ...p, end_date: text }))
-              }
-            />
-          ) : (
-            <TextInput
-              style={styles.input}
-              placeholder="YYYY-MM-DD"
-              value={absenceForm.end_date}
-              onChangeText={(text) =>
-                setAbsenceForm((p) => ({ ...p, end_date: text }))
-              }
-            />
-          )}
-
-          <Text style={styles.label}>Motif</Text>
-          {reasons.map((reason, index) => (
-            <TouchableOpacity
-              key={index}
-              onPress={() => setAbsenceForm((p) => ({ ...p, reason }))}
-              style={[
-                styles.reasonButton,
-                absenceForm.reason === reason && styles.selectedReason,
-              ]}
-            >
-              <Text>{reason}</Text>
-            </TouchableOpacity>
-          ))}
-
-          <TouchableOpacity onPress={handleImagePick} style={styles.uploadBtn}>
-            <Text>📎 Joindre un justificatif</Text>
-          </TouchableOpacity>
-
-          {absenceForm.imageName && (
-            <Text style={styles.imageName}>🗂️ {absenceForm.imageName}</Text>
-          )}
-
-          <Button title="Envoyer" onPress={handleUploadAbsence} />
+          <Text style={styles.sectionTitle}>Absences précédentes</Text>
         </View>
-      ) : (
-        <ActivityIndicator size="large" color="#1e88e5" />
-      )}
-
-      <Text style={styles.sectionTitle}>Absences précédentes</Text>
-      <FlatList
-        data={uploadedAbsences}
-        keyExtractor={(item, index) => `${item.absence_start_date}-${index}`}
-        renderItem={renderAbsenceItem}
-        contentContainerStyle={styles.absenceList}
-      />
-    </ScrollView>
+      }
+    />
   );
 };
 

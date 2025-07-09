@@ -1,28 +1,44 @@
-import React, { createContext, useState, useEffect } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { createContext, useState, useEffect, ReactNode } from 'react';
+import { Session } from '@/utils/session';
+import type { UserData, AuthContextType, UserSession } from '@/types/authTypes';
+import { useRouter } from 'expo-router';
 
-const AuthContext = createContext(null);
+const AuthContext = createContext<AuthContextType | null>(null);
 
-export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+interface AuthProviderProps {
+  children: ReactNode;
+}
+
+export const AuthProvider = ({ children }: AuthProviderProps) => {
+  const [user, setUser] = useState<UserData | null>(null);
+  const [session, setSession] = useState<UserSession | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
-    const loadUserData = async () => {
-      const storedUser = await AsyncStorage.getItem('userSession');
-      if (storedUser) {
-        setUser(JSON.parse(storedUser));
-      }
+    const loadStored = async () => {
+      const storedUser = await Session.getUserData();
+      const storedSession = await Session.getSession();
+      if (storedUser) setUser(storedUser);
+      if (storedSession) setSession(storedSession);
     };
-    loadUserData();
+    loadStored();
   }, []);
 
   const logout = async () => {
-    await AsyncStorage.removeItem('userSession');
-    setUser(null);
+    try {
+      await Session.clear();
+      setUser(null);
+      setSession(null);
+      router.replace('/');
+    } catch (error) {
+      console.error('Erreur lors de la déconnexion :', error);
+    }
   };
 
   return (
-    <AuthContext.Provider value={{ user, setUser, logout }}>
+    <AuthContext.Provider
+      value={{ user, session, setUser, setSession, logout }}
+    >
       {children}
     </AuthContext.Provider>
   );

@@ -17,6 +17,10 @@ const MAPPING = {
   'person.crop.circle.badge.xmark': 'person-off',
   calendar: 'calendar-today',
   'calendar.badge.clock': 'event',
+  'person.crop.circle': 'person',
+  'person.fill.xmark': 'person-off',
+  'airplane.departure': 'flight-takeoff',
+  'calendar.badge.minus': 'event-busy',
 } as Partial<
   Record<
     import('expo-symbols').SymbolViewProps['name'],

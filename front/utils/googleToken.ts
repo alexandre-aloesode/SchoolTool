@@ -1,24 +1,20 @@
-// utils/googleToken.ts
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Session } from '@/utils/session';
 import { ENV } from '@/utils/env';
 
 export const getValidGoogleAccessToken = async (): Promise<string | null> => {
   try {
-    const session = await AsyncStorage.getItem('userSession');
+    const session = await Session.getSession();
     if (!session) return null;
 
-    const { googleAccessToken, googleRefreshToken, googleExpiresAt } =
-      JSON.parse(session);
-
+    const { googleAccessToken, googleRefreshToken, googleExpiresAt } = session;
     const now = Date.now();
 
     if (googleAccessToken && googleExpiresAt && now < googleExpiresAt) {
-      // Token is still valid
       return googleAccessToken;
     }
 
     if (!googleRefreshToken) {
-      console.warn('Pas de refresh token disponible.');
+      console.warn('Aucun refresh token disponible.');
       return null;
     }
 
@@ -38,21 +34,21 @@ export const getValidGoogleAccessToken = async (): Promise<string | null> => {
     const tokenData = await refreshResponse.json();
 
     if (!tokenData.access_token) {
-      console.error('Erreur de refresh du token:', tokenData);
+      console.error('Erreur lors du rafraîchissement du token :', tokenData);
       return null;
     }
 
     const updatedSession = {
-      ...JSON.parse(session),
+      ...session,
       googleAccessToken: tokenData.access_token,
       googleExpiresAt: Date.now() + tokenData.expires_in * 1000,
     };
 
-    await AsyncStorage.setItem('userSession', JSON.stringify(updatedSession));
+    await Session.updateSessionOnly(updatedSession);
 
     return tokenData.access_token;
-  } catch (err) {
-    console.error('Erreur dans getValidGoogleAccessToken:', err);
+  } catch (error) {
+    console.error('Erreur dans getValidGoogleAccessToken :', error);
     return null;
   }
 };

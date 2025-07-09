@@ -1,4 +1,3 @@
-// GroupManagementModal.tsx
 import React, { useEffect, useState } from 'react';
 import {
   View,
@@ -10,9 +9,14 @@ import {
   ScrollView,
 } from 'react-native';
 import { ApiActions } from '@/services/ApiServices';
+import { GroupManagementModalProps, JobGroups } from '@/types/jobsTypes';
 
-const GroupManagementModal = ({ visible, jobId, onClose }) => {
-  const [groups, setGroups] = useState([]);
+const GroupManagementModal: React.FC<GroupManagementModalProps> = ({
+  visible,
+  jobId,
+  onClose,
+}) => {
+  const [groups, setGroups] = useState<JobGroups | null>(null);
   const [groupName, setGroupName] = useState('');
 
   useEffect(() => {
@@ -32,7 +36,14 @@ const GroupManagementModal = ({ visible, jobId, onClose }) => {
         lead_lastname: '',
       },
     });
-    setGroups(res?.data || []);
+    if (!res) {
+      console.error("Erreur: aucune réponse de l'API");
+      return;
+    }
+
+    if (res.status === 200) {
+      setGroups(res.data || []);
+    }
   };
 
   const createGroup = async () => {
@@ -48,7 +59,7 @@ const GroupManagementModal = ({ visible, jobId, onClose }) => {
     fetchGroups();
   };
 
-  const askToJoinGroup = async (groupId) => {
+  const askToJoinGroup = async (groupId: number | string) => {
     await ApiActions.post({
       route: '/waitinglist',
       params: {
@@ -69,7 +80,7 @@ const GroupManagementModal = ({ visible, jobId, onClose }) => {
         <View style={styles.modal}>
           <Text style={styles.title}>Groupes disponibles</Text>
           <ScrollView>
-            {groups.length > 0 ? (
+            {Array.isArray(groups) && groups.length > 0 ? (
               groups.map((g) => (
                 <View key={g.group_id} style={styles.groupRow}>
                   <Text style={styles.groupName}>{g.group_name}</Text>

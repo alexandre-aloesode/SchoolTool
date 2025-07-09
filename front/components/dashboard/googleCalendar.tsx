@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -6,25 +6,29 @@ import {
   Dimensions,
   ScrollView,
   Modal,
-  TouchableOpacity,
   Pressable,
 } from 'react-native';
 import dayjs from 'dayjs';
-import AuthContext from '@/context/authContext';
+import { useAuth } from '@/hooks/useAuth';
 import { getValidGoogleAccessToken } from '@/utils/googleToken';
+import type { GoogleCalendarEvent } from '@/types/googleCalendarTypes';
+import type { Dayjs } from 'dayjs';
 
 const screenWidth = Dimensions.get('window').width;
 const columnMinWidth = 130;
 
 const GoogleCalendarWidget = () => {
-  const { user } = useContext(AuthContext);
-  const [events, setEvents] = useState([]);
+  const { user } = useAuth();
+  const [events, setEvents] = useState<GoogleCalendarEvent[]>([]);
+  const [selectedEvent, setSelectedEvent] =
+    useState<GoogleCalendarEvent | null>(null);
   const [startOfWeek, setStartOfWeek] = useState(
     dayjs().startOf('week').add(1, 'day'),
   );
-  const [selectedEvent, setSelectedEvent] = useState(null);
 
   const fetchEvents = async () => {
+    if (!user) return;
+
     const token = await getValidGoogleAccessToken();
     if (!token) return;
 
@@ -49,7 +53,7 @@ const GoogleCalendarWidget = () => {
   };
 
   useEffect(() => {
-    if (user?.googleAccessToken) fetchEvents();
+    fetchEvents();
   }, [startOfWeek]);
 
   const days = Array.from({ length: 7 }).map((_, i) =>
@@ -63,11 +67,10 @@ const GoogleCalendarWidget = () => {
     return { day, events: dayEvents };
   });
 
-  const isToday = (date) => dayjs().isSame(date, 'day');
+  const isToday = (date: Dayjs) => dayjs().isSame(date, 'day');
 
   return (
     <View style={styles.wrapper}>
-      {/* Navigation semaine */}
       <View style={styles.nav}>
         <Text
           style={styles.arrow}
@@ -86,7 +89,6 @@ const GoogleCalendarWidget = () => {
         </Text>
       </View>
 
-      {/* Grille des jours */}
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -125,7 +127,6 @@ const GoogleCalendarWidget = () => {
         ))}
       </ScrollView>
 
-      {/* Modal d'événement */}
       <Modal
         visible={!!selectedEvent}
         animationType="slide"

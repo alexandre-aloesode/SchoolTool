@@ -3,10 +3,11 @@ import { View, Text, FlatList, StyleSheet, Pressable } from 'react-native';
 import { ProgressBar } from 'react-native-paper';
 import { ApiActions } from '@/services/ApiServices';
 import ProgressModal from './modals/ProgressModal';
+import type { JobInProgress } from '@/types/jobsTypes';
 
 const JobsInProgress = () => {
-  const [jobsInProgress, setJobsInProgress] = useState([]);
-  const [selectedJob, setSelectedJob] = useState(null);
+  const [jobsInProgress, setJobsInProgress] = useState<JobInProgress[]>([]);
+  const [selectedJob, setSelectedJob] = useState<JobInProgress | null>(null);
 
   const getJobsInProgress = async () => {
     const jobsRequest = await ApiActions.get({
@@ -21,8 +22,13 @@ const JobsInProgress = () => {
         job_is_done: '',
       },
     });
-    if (jobsRequest) {
-      setJobsInProgress(jobsRequest.data);
+    if (!jobsRequest) {
+      console.error("Erreur: aucune réponse de l'API");
+      return;
+    }
+
+    if (jobsRequest.status === 200) {
+      setJobsInProgress(jobsRequest.data || []);
     }
   };
 
@@ -30,13 +36,18 @@ const JobsInProgress = () => {
     getJobsInProgress();
   }, []);
 
-  const getProgressInfo = (job) => {
-    const startDate = new Date(job.start_date.replace(' ', 'T'));
-    const endDate = new Date(job.end_date.replace(' ', 'T'));
+  const getProgressInfo = (job: JobInProgress) => {
+    const startStr = String(job.start_date).replace(' ', 'T');
+    const endStr = String(job.end_date).replace(' ', 'T');
+
+    const startDate = new Date(startStr);
+    const endDate = new Date(endStr);
     const today = new Date();
 
-    const duration = (endDate - startDate) / (1000 * 60 * 60 * 24);
-    const remaining = (endDate - today) / (1000 * 60 * 60 * 24);
+    const duration =
+      (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24);
+    const remaining =
+      (endDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24);
     const delay = Math.max(0, -remaining);
     const progress = Math.min(
       1,
@@ -53,7 +64,8 @@ const JobsInProgress = () => {
     </View>
   );
 
-  const renderJob = ({ item }) => {
+  const renderJob = ({ item }: { item: JobInProgress }): JSX.Element | null => {
+    if (!item) return null;
     const { progress, delay, isLate } = getProgressInfo(item);
 
     return (
@@ -91,6 +103,7 @@ const JobsInProgress = () => {
         visible={!!selectedJob}
         job={selectedJob}
         onClose={() => setSelectedJob(null)}
+        onReport={() => {}}
       />
     </View>
   );

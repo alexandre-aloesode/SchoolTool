@@ -8,8 +8,13 @@ import {
   Pressable,
 } from 'react-native';
 import GroupManagementModal from './GroupManagementModal';
+import type { AvailableModalProps } from '@/types/jobsTypes';
 
-const AvailableModal = ({ visible, job, onClose }) => {
+const AvailableModal: React.FC<AvailableModalProps> = ({
+  visible,
+  job,
+  onClose,
+}) => {
   const [groupVisible, setGroupVisible] = useState(false);
 
   return (
@@ -50,7 +55,7 @@ const AvailableModal = ({ visible, job, onClose }) => {
         </View>
         <GroupManagementModal
           visible={groupVisible}
-          jobId={job?.job_id}
+          jobId={job?.job_id ?? null}
           onClose={() => setGroupVisible(false)}
         />
       </View>

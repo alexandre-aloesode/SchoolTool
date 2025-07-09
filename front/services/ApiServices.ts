@@ -2,47 +2,44 @@ import axios from 'axios';
 import { ENV } from '@/utils/env';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
-import React, { useContext } from 'react';
-import AuthContext from '@/context/authContext';
+import { Session } from '@/utils/session';
+import type { AxiosResponse } from 'axios';
+import type { UserSession } from '@/types/authTypes';
 
-const auth = useContext(AuthContext);
+type ApiPayload = {
+  route: string;
+  params: Record<string, any>;
+};
 
 async function getApiToken() {
   try {
-    const session = await AsyncStorage.getItem('userSession');
+    const session = await Session.getSession();
 
-    if (session === undefined || session === null) {
+    if (!session) {
       router.push('/');
       return null;
     }
 
-    const parsedSession = JSON.parse(session);
-
-    if (isTokenExpired(parsedSession.accessToken)) {
-      const newToken = await refreshToken(parsedSession);
+    if (isTokenExpired(session.accessToken)) {
+      const newToken = await refreshToken(session);
       if (newToken) {
-        await AsyncStorage.setItem(
-          'userSession',
-          JSON.stringify({
-            ...parsedSession,
-            accessToken: newToken,
-          }),
-        );
+        await Session.updateAccessToken(newToken);
         return newToken;
       } else {
+        await Session.clear();
         router.push('/');
         return null;
       }
     }
 
-    return parsedSession.accessToken;
+    return session.accessToken;
   } catch (error) {
     console.error('Error fetching session: ', error);
     return null;
   }
 }
 
-function isTokenExpired(token) {
+function isTokenExpired(token: string): boolean {
   if (!token) return true;
   try {
     const base64Url = token.split('.')[1];
@@ -58,7 +55,7 @@ function isTokenExpired(token) {
   }
 }
 
-async function refreshToken(session) {
+async function refreshToken(session: UserSession): Promise<string | null> {
   try {
     const formData = new FormData();
     formData.append('authtoken', session?.authToken);
@@ -72,15 +69,13 @@ async function refreshToken(session) {
       },
     };
     const response = await axios.request(params);
-    console.log('Response from refresh token:', response.data);
-
     const refreshedToken = response.data?.token;
 
-    if (!refreshedToken) {
-      console.error('No token received from refresh');
-      auth.logout();
-      return null;
-    }
+    // if (!refreshedToken) {
+    //   console.error('No token received from refresh');
+    //   auth.logout();
+    //   return null;
+    // }
 
     return refreshedToken;
   } catch (error) {
@@ -90,7 +85,9 @@ async function refreshToken(session) {
   }
 }
 
-function buildUrl(params) {
+function buildUrl(
+  params: Record<string, string | number | (string | number)[]>,
+): string {
   let url = '';
   Object.keys(params).forEach((key) => {
     if (Array.isArray(params[key])) {
@@ -105,7 +102,7 @@ function buildUrl(params) {
 }
 
 export const ApiActions = {
-  async get(payload) {
+  async get(payload: ApiPayload): Promise<AxiosResponse | null> {
     let route = payload.route;
     let url = buildUrl(payload.params);
 
@@ -132,7 +129,7 @@ export const ApiActions = {
     }
   },
 
-  async post(payload) {
+  async post(payload: ApiPayload): Promise<AxiosResponse | null> {
     let route = payload.route;
     const body = payload.params;
 
@@ -160,7 +157,7 @@ export const ApiActions = {
     }
   },
 
-  async put(payload) {
+  async put(payload: ApiPayload): Promise<AxiosResponse | null> {
     let route = payload.route;
     const bodyParams = payload.params;
 
@@ -188,7 +185,7 @@ export const ApiActions = {
     }
   },
 
-  async delete(payload) {
+  async delete(payload: ApiPayload): Promise<AxiosResponse | null> {
     let route = payload.route;
     const bodyParams = payload.params;
 
