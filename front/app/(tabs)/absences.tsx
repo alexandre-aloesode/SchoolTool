@@ -15,23 +15,7 @@ import {
 import * as ImagePicker from 'expo-image-picker';
 import { format } from 'date-fns';
 import { ApiActions } from '../../services/ApiServices';
-
-interface AbsenceForm {
-  start_date: string;
-  end_date: string;
-  duration: number;
-  reason: string;
-  image: string | null;
-  imageName: string;
-}
-
-interface UploadedAbsence {
-  absence_start_date: string;
-  absence_end_date: string;
-  absence_duration: number;
-  absence_status: number;
-  absence_comment: string | null;
-}
+import type { AbsenceForm, UploadedAbsence } from '@/types/absencesTypes';
 
 const UploadAbsences: React.FC = () => {
   const [loading, setLoading] = useState(false);
