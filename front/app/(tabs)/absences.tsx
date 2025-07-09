@@ -8,7 +8,6 @@ import {
   Alert,
   TouchableOpacity,
   ActivityIndicator,
-  Platform,
   FlatList,
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
@@ -59,11 +58,7 @@ const UploadAbsences: React.FC = () => {
         },
       });
 
-      if (!response) {
-        console.error("Erreur: aucune réponse de l'API");
-        return;
-      }
-
+      if (!response) return;
       if (response.status === 200) {
         setUploadedAbsences(response.data || []);
       }
@@ -129,11 +124,7 @@ const UploadAbsences: React.FC = () => {
               route: 'uploadAbsence',
               params: { ...absenceForm, duration },
             });
-            if (!response) {
-              console.error("Erreur: aucune réponse de l'API");
-              return;
-            }
-            if (response.status === 200) {
+            if (response?.status === 200) {
               Alert.alert('Succès', 'Absence envoyée avec succès');
               setAbsenceForm({
                 start_date: '',
@@ -144,7 +135,9 @@ const UploadAbsences: React.FC = () => {
                 duration: 0,
               });
               fetchUploadedAbsences();
-            } else throw new Error();
+            } else {
+              throw new Error();
+            }
           } catch (error) {
             Alert.alert('Erreur', "L'envoi de l'absence a échoué.");
           } finally {
@@ -170,7 +163,7 @@ const UploadAbsences: React.FC = () => {
             ? 'Refusée'
             : 'En attente'}
       </Text>
-      {item.absence_comment && (
+      {!!item.absence_comment && (
         <Text style={styles.absenceText}>💬 {item.absence_comment}</Text>
       )}
     </View>
@@ -229,9 +222,9 @@ const UploadAbsences: React.FC = () => {
                 <Text>📎 Joindre un justificatif</Text>
               </TouchableOpacity>
 
-              {absenceForm.imageName && (
+              {absenceForm.imageName ? (
                 <Text style={styles.imageName}>🗂️ {absenceForm.imageName}</Text>
-              )}
+              ) : null}
 
               <Button title="Envoyer" onPress={handleUploadAbsence} />
             </View>
@@ -239,7 +232,9 @@ const UploadAbsences: React.FC = () => {
             <ActivityIndicator size="large" color="#1e88e5" />
           )}
 
-          <Text style={styles.sectionTitle}>Absences précédentes</Text>
+          <View style={{ marginTop: 20 }}>
+            <Text style={styles.sectionTitle}>Absences précédentes</Text>
+          </View>
         </View>
       }
     />
@@ -301,9 +296,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 10,
-  },
-  absenceList: {
-    paddingBottom: 50,
   },
   absenceCard: {
     backgroundColor: '#fff',
