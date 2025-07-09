@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -6,18 +6,17 @@ import {
   Dimensions,
   ScrollView,
   Modal,
-  TouchableOpacity,
   Pressable,
 } from 'react-native';
 import dayjs from 'dayjs';
-import AuthContext from '@/context/authContext';
+import { useAuth } from '@/hooks/useAuth';
 import { getValidGoogleAccessToken } from '@/utils/googleToken';
 
 const screenWidth = Dimensions.get('window').width;
 const columnMinWidth = 130;
 
 const GoogleCalendarWidget = () => {
-  const { user } = useContext(AuthContext);
+  const { user } = useAuth();
   const [events, setEvents] = useState([]);
   const [startOfWeek, setStartOfWeek] = useState(
     dayjs().startOf('week').add(1, 'day'),
@@ -25,6 +24,8 @@ const GoogleCalendarWidget = () => {
   const [selectedEvent, setSelectedEvent] = useState(null);
 
   const fetchEvents = async () => {
+    if (!user) return;
+
     const token = await getValidGoogleAccessToken();
     if (!token) return;
 
@@ -49,7 +50,7 @@ const GoogleCalendarWidget = () => {
   };
 
   useEffect(() => {
-    if (user?.googleAccessToken) fetchEvents();
+    fetchEvents();
   }, [startOfWeek]);
 
   const days = Array.from({ length: 7 }).map((_, i) =>

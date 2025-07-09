@@ -4,38 +4,32 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
 import React, { useContext } from 'react';
 import AuthContext from '@/context/authContext';
+import { Session } from '@/utils/session';
 
 const auth = useContext(AuthContext);
 
 async function getApiToken() {
   try {
-    const session = await AsyncStorage.getItem('userSession');
+    const session = await Session.getSession();
 
-    if (session === undefined || session === null) {
+    if (!session) {
       router.push('/');
       return null;
     }
 
-    const parsedSession = JSON.parse(session);
-
-    if (isTokenExpired(parsedSession.accessToken)) {
-      const newToken = await refreshToken(parsedSession);
+    if (isTokenExpired(session.accessToken)) {
+      const newToken = await refreshToken(session);
       if (newToken) {
-        await AsyncStorage.setItem(
-          'userSession',
-          JSON.stringify({
-            ...parsedSession,
-            accessToken: newToken,
-          }),
-        );
+        await Session.updateAccessToken(newToken);
         return newToken;
       } else {
+        await Session.clear();
         router.push('/');
         return null;
       }
     }
 
-    return parsedSession.accessToken;
+    return session.accessToken;
   } catch (error) {
     console.error('Error fetching session: ', error);
     return null;
