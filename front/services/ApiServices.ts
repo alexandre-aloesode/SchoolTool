@@ -85,7 +85,9 @@ async function refreshToken(session: UserSession): Promise<string | null> {
   }
 }
 
-function buildUrl(params: Record<string, string | number | (string | number)[]>): string {
+function buildUrl(
+  params: Record<string, string | number | (string | number)[]>,
+): string {
   let url = '';
   Object.keys(params).forEach((key) => {
     if (Array.isArray(params[key])) {
@@ -100,7 +102,6 @@ function buildUrl(params: Record<string, string | number | (string | number)[]>)
 }
 
 export const ApiActions = {
-  
   async get(payload: ApiPayload): Promise<AxiosResponse | null> {
     let route = payload.route;
     let url = buildUrl(payload.params);

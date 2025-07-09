@@ -7,9 +7,8 @@ import { useAuth } from '@/hooks/useAuth';
 // import GoogleLoginWebView from '@/components/auth/GoogleLoginWebView';
 
 export default function HomeScreen() {
-
   const { user, logout } = useAuth();
-  
+
   return (
     <View style={styles.container}>
       {user ? (

@@ -12,9 +12,19 @@ import {
 } from 'react-native';
 import { ApiActions } from '@/services/ApiServices';
 import ReviewModal from './ReviewModal';
-import type { ProgressModalProps, JobInProgress, JobSkills, JobGroupMembers } from '@/types/jobsTypes';
+import type {
+  ProgressModalProps,
+  JobInProgress,
+  JobSkills,
+  JobGroupMembers,
+} from '@/types/jobsTypes';
 
-const ProgressModal: React.FC<ProgressModalProps> = ({ visible, job, onClose, onReport }) => {
+const ProgressModal: React.FC<ProgressModalProps> = ({
+  visible,
+  job,
+  onClose,
+  onReport,
+}) => {
   const [loading, setLoading] = useState(false);
   const [skills, setSkills] = useState<JobSkills | null>(null);
   const [members, setMembers] = useState<JobGroupMembers | null>(null);
@@ -144,19 +154,21 @@ const ProgressModal: React.FC<ProgressModalProps> = ({ visible, job, onClose, on
               <Text>Fin : {jobData?.end_date}</Text>
 
               <Text style={styles.label}>Compétences :</Text>
-              {Array.isArray(skills) && skills.map((skill, i) => (
-                <Text key={i}>
-                  • {skill.skill_name} ({skill.skill_needed} →{' '}
-                  {skill.skill_earned})
-                </Text>
-              ))}
+              {Array.isArray(skills) &&
+                skills.map((skill, i) => (
+                  <Text key={i}>
+                    • {skill.skill_name} ({skill.skill_needed} →{' '}
+                    {skill.skill_earned})
+                  </Text>
+                ))}
 
               <Text style={styles.label}>Membres :</Text>
-              {Array.isArray(members) && members.map((m, i) => (
-                <Text key={i}>
-                  • {m.student_firstname} {m.student_lastname}
-                </Text>
-              ))}
+              {Array.isArray(members) &&
+                members.map((m, i) => (
+                  <Text key={i}>
+                    • {m.student_firstname} {m.student_lastname}
+                  </Text>
+                ))}
 
               <View style={styles.buttonRow}>
                 <Pressable

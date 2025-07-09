@@ -34,11 +34,23 @@ export default function SkillScreen() {
               grade: item.grade,
               total: item.total,
             }))
-            .sort((a: { skill: string }, b: { skill: string }) => a.skill.localeCompare(b.skill))
-            .map((item: { class_name: string; earned: string; grade: string; total: string }, index: number) => ({
-              ...item,
-              index,
-            }));
+            .sort((a: { skill: string }, b: { skill: string }) =>
+              a.skill.localeCompare(b.skill),
+            )
+            .map(
+              (
+                item: {
+                  class_name: string;
+                  earned: string;
+                  grade: string;
+                  total: string;
+                },
+                index: number,
+              ) => ({
+                ...item,
+                index,
+              }),
+            );
 
           setSkillData(formatted);
         }

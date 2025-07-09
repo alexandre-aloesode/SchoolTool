@@ -93,6 +93,8 @@ const UploadAbsences: React.FC = () => {
     Durée : ${absenceForm.duration} ${
       absenceForm.duration > 1 ? 'jours ouvrés' : 'jour ouvré'
     }`;
+      absenceForm.duration > 1 ? 'jours ouvrés' : 'jour ouvré'
+    }`;
 
   const handleUploadAbsence = () => {
     const { start_date, end_date, reason, image } = absenceForm;
@@ -229,9 +231,9 @@ const UploadAbsences: React.FC = () => {
                 <Text>📎 Joindre un justificatif</Text>
               </TouchableOpacity>
 
-              {absenceForm.imageName ? (
+              {absenceForm.imageName && (
                 <Text style={styles.imageName}>🗂️ {absenceForm.imageName}</Text>
-              ) : null}
+              )}
 
               <Button title="Envoyer" onPress={handleUploadAbsence} />
             </View>

@@ -39,7 +39,7 @@ const Logtimes = () => {
       console.error("Erreur: aucune réponse de l'API");
       return;
     }
-    
+
     if (logtimesResponse.status === 200) {
       setLogtimes(logtimesResponse.data || []);
     }

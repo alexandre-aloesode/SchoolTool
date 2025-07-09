@@ -20,7 +20,8 @@ const columnMinWidth = 130;
 const GoogleCalendarWidget = () => {
   const { user } = useAuth();
   const [events, setEvents] = useState<GoogleCalendarEvent[]>([]);
-  const [selectedEvent, setSelectedEvent] = useState<GoogleCalendarEvent | null>(null);
+  const [selectedEvent, setSelectedEvent] =
+    useState<GoogleCalendarEvent | null>(null);
   const [startOfWeek, setStartOfWeek] = useState(
     dayjs().startOf('week').add(1, 'day'),
   );

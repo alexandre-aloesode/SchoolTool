@@ -10,13 +10,17 @@ const MyButton = ({ label, onPress }) => (
 
 describe('MyButton', () => {
   it('renders the button label', () => {
-    const { getByText } = render(<MyButton label="Clique-moi" onPress={() => {}} />);
+    const { getByText } = render(
+      <MyButton label="Clique-moi" onPress={() => {}} />,
+    );
     expect(getByText('Clique-moi')).toBeTruthy();
   });
 
   it('calls onPress when pressed', () => {
     const onPressMock = jest.fn();
-    const { getByText } = render(<MyButton label="Clique-moi" onPress={onPressMock} />);
+    const { getByText } = render(
+      <MyButton label="Clique-moi" onPress={onPressMock} />,
+    );
     fireEvent.press(getByText('Clique-moi'));
     expect(onPressMock).toHaveBeenCalledTimes(1);
   });
