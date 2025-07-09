@@ -1,197 +1,175 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
   StyleSheet,
+  Modal,
   Pressable,
-  Linking,
-  ScrollView,
-  Alert,
+  Platform,
 } from 'react-native';
-import { Icon } from 'react-native-paper';
-import { useNavigation } from 'expo-router';
+import { Svg } from 'react-native-svg';
 import { ApiActions } from '@/services/ApiServices';
-import AuthContext from '@/context/authContext';
 
-export default function StudentSkills() {
-  const [student, setStudent] = useState(null);
-  const [jobsDone, setJobsDone] = useState(0);
-  const [jobsInProgress, setJobsInProgress] = useState(0);
-  const auth = useContext(AuthContext);
-  const navigation = useNavigation();
+const { VictoryChart, VictoryPolarAxis, VictoryArea } =
+  Platform.OS === 'web' ? require('victory') : require('victory-native');
 
-  const loadProfile = async () => {
-    try {
-      const studentReq = await ApiActions.get({
-        route: 'student',
-        params: {
-          firstname: '',
-          lastname: '',
-          email: '',
-          section_name: '',
-          promotion_name: '',
-          current_unit_name: '',
-          github: '',
-          linkedin: '',
-          cv: '',
-          plesk: '',
-          personal_website: '',
-        },
-      });
-      const doneJobs = await ApiActions.get({
-        route: 'job/done',
-        params: {
-          job_id: '',
-        },
-      });
-      const inProgressJobs = await ApiActions.get({
-        route: 'job/progress',
-        params: {
-          job_id: '',
-        },
-      });
-
-      setStudent(studentReq?.data?.[0]);
-      setJobsDone(doneJobs?.data?.length || 0);
-      setJobsInProgress(inProgressJobs?.data?.length || 0);
-    } catch (err) {
-      Alert.alert('Erreur', 'Impossible de charger le profil');
-    }
-  };
+export default function SkillScreen() {
+  const [selectedSkill, setSelectedSkill] = useState<any>(null);
+  const [skillData, setSkillData] = useState<any[]>([]);
 
   useEffect(() => {
-    loadProfile();
+    const loadSkills = async () => {
+      try {
+        const res = await ApiActions.get({
+          route: 'student/class/total',
+          params: { class_name: '' },
+        });
+
+        if (res?.data) {
+          const formatted = res.data
+            .filter((item: any) => item.class_name && item.earned)
+            .map((item: any) => ({
+              skill: item.class_name,
+              value: Number(item.earned),
+              grade: item.grade,
+              total: item.total,
+            }))
+            .sort((a, b) => a.skill.localeCompare(b.skill))
+            .map((item, index) => ({
+              ...item,
+              index,
+            }));
+
+          setSkillData(formatted);
+        }
+      } catch (err) {
+        console.error('Erreur chargement compétences', err);
+      }
+    };
+
+    loadSkills();
   }, []);
 
-  const openLink = (url) => {
-    if (url) Linking.openURL(url);
-  };
-
-  const handleLogout = () => {
-    auth.logout();
-    navigation.replace('/');
-  };
-
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <View style={styles.container}>
       <Text style={styles.title}>Compétences</Text>
-      {student && (
-        <>
-          <View style={styles.row}>
-            <Icon source="account" size={24} color="#0084FA" />
-            <Text style={styles.label}>
-              {student.student_firstname} {student.student_lastname}
-            </Text>
-          </View>
-          <View style={styles.row}>
-            <Icon source="calendar" size={24} color="#0084FA" />
-            <Text style={styles.label}>{student.current_unit_name}</Text>
-          </View>
-          <View style={styles.row}>
-            <Icon source="school" size={24} color="#0084FA" />
-            <Text style={styles.label}>{student.section_name}</Text>
-          </View>
-          <View style={styles.row}>
-            <Icon source="progress-clock" size={24} color="#0084FA" />
-            <Text style={styles.label}>
-              {jobsInProgress} projet(s) en cours
-            </Text>
-          </View>
-          <View style={styles.row}>
-            <Icon source="check-circle-outline" size={24} color="#0084FA" />
-            <Text style={styles.label}>{jobsDone} projet(s) fini(s)</Text>
-          </View>
 
-          <View style={styles.linksContainer}>
-            <Pressable
-              style={styles.link}
-              onPress={() => openLink(student.student_github)}
-            >
-              <Icon source="github" size={24} />
-              <Text style={styles.linkLabel}>Github</Text>
-            </Pressable>
-            <Pressable
-              style={styles.link}
-              onPress={() => openLink(student.student_plesk)}
-            >
-              <Icon source="web" size={24} />
-              <Text style={styles.linkLabel}>Plesk</Text>
-            </Pressable>
-            <Pressable
-              style={styles.link}
-              onPress={() => openLink(student.student_personal_website)}
-            >
-              <Icon source="briefcase" size={24} />
-              <Text style={styles.linkLabel}>Portfolio</Text>
-            </Pressable>
-            <Pressable
-              style={styles.link}
-              onPress={() => openLink(student.student_linkedin)}
-            >
-              <Icon source="linkedin" size={24} />
-              <Text style={styles.linkLabel}>LinkedIn</Text>
-            </Pressable>
-            <Pressable
-              style={styles.link}
-              onPress={() => openLink(student.student_cv)}
-            >
-              <Icon source="file" size={24} />
-              <Text style={styles.linkLabel}>CV</Text>
-            </Pressable>
-          </View>
-        </>
+      {skillData.length > 0 && (
+        <Svg width={350} height={350}>
+          <VictoryChart
+            polar
+            standalone={false}
+            domain={{ y: [0, 120] }}
+            width={350}
+            height={350}
+          >
+            <VictoryPolarAxis
+              tickValues={skillData.map((s) => s.index)}
+              tickFormat={skillData.map((s) => s.skill)}
+              style={{
+                tickLabels: {
+                  fontSize: 10,
+                  fill: 'black',
+                },
+                axis: { stroke: '#e0e0e0' },
+                grid: { stroke: '#e0e0e0', strokeDasharray: '4,8' },
+              }}
+              events={[
+                {
+                  target: 'tickLabels',
+                  eventHandlers: {
+                    onPressIn: (_, props) => {
+                      const clicked = skillData.find(
+                        (s) => s.index === props.index,
+                      );
+                      setSelectedSkill(clicked);
+                      return [];
+                    },
+                  },
+                },
+              ]}
+            />
+
+            <VictoryArea
+              data={skillData}
+              x="index"
+              y="value"
+              style={{
+                data: {
+                  fill: 'rgba(255,0,100,0.3)',
+                  stroke: 'deeppink',
+                  strokeWidth: 2,
+                },
+              }}
+            />
+          </VictoryChart>
+        </Svg>
       )}
 
-      <Pressable style={styles.logoutButton} onPress={handleLogout}>
-        <Text style={styles.logoutText}>Se déconnecter</Text>
-      </Pressable>
-    </ScrollView>
+      <Modal visible={!!selectedSkill} transparent animationType="slide">
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalTitle}>{selectedSkill?.skill}</Text>
+            <Text style={styles.modalText}>
+              Grade : {selectedSkill?.grade || 'N/A'}
+            </Text>
+            <Text style={styles.modalText}>
+              Score : {selectedSkill?.value} / {selectedSkill?.total}
+            </Text>
+            <Pressable
+              onPress={() => setSelectedSkill(null)}
+              style={styles.closeButton}
+            >
+              <Text style={styles.closeButtonText}>Fermer</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     padding: 20,
+    alignItems: 'center',
     backgroundColor: 'white',
+    flex: 1,
   },
   title: {
     fontSize: 22,
     fontWeight: 'bold',
     color: '#e91e63',
-    marginBottom: 16,
+    marginBottom: 10,
   },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 12,
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    padding: 20,
   },
-  label: {
-    marginLeft: 10,
-    fontSize: 16,
-  },
-  linksContainer: {
-    marginTop: 24,
-  },
-  link: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  linkLabel: {
-    marginLeft: 8,
-    fontSize: 16,
-    color: '#0084FA',
-  },
-  logoutButton: {
-    marginTop: 32,
-    backgroundColor: '#e91e63',
-    padding: 12,
+  modalContainer: {
+    backgroundColor: 'white',
     borderRadius: 8,
+    padding: 20,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  modalText: {
+    fontSize: 16,
+    marginBottom: 10,
+  },
+  closeButton: {
+    backgroundColor: '#e91e63',
+    padding: 10,
+    borderRadius: 6,
     alignItems: 'center',
   },
-  logoutText: {
+  closeButtonText: {
     color: 'white',
     fontWeight: 'bold',
-    fontSize: 16,
   },
 });

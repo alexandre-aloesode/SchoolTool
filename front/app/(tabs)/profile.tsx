@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import ProfileScreen from '@/components/profile/StudentProfile';
-import StudentSkills from '@/components/profile/StudentSkills';
+import SkillScreen from '@/components/profile/StudentSkills';
 
 const ProfileMain = () => {
   const [activeTab, setActiveTab] = useState('profile');
@@ -11,7 +11,7 @@ const ProfileMain = () => {
       case 'profile':
         return <ProfileScreen />;
       case 'skills':
-        return <StudentSkills />;
+        return <SkillScreen />;
       default:
         return <ProfileScreen />;
     }
