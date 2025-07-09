@@ -34,8 +34,8 @@ export default function SkillScreen() {
               grade: item.grade,
               total: item.total,
             }))
-            .sort((a, b) => a.skill.localeCompare(b.skill))
-            .map((item, index) => ({
+            .sort((a: { skill: string }, b: { skill: string }) => a.skill.localeCompare(b.skill))
+            .map((item: { class_name: string; earned: string; grade: string; total: string }, index: number) => ({
               ...item,
               index,
             }));
@@ -78,7 +78,7 @@ export default function SkillScreen() {
                 {
                   target: 'tickLabels',
                   eventHandlers: {
-                    onPressIn: (_, props) => {
+                    onPressIn: (_: any, props: { index: number }) => {
                       const clicked = skillData.find(
                         (s) => s.index === props.index,
                       );
