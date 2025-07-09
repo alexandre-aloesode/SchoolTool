@@ -27,16 +27,13 @@ const googleSecret = isExpoGo
 const authUrl = ENV.LPTF_AUTH_API_URL;
 
 export default function LoginWithGoogle() {
-  
   const router = useRouter();
   const { user, setUser } = useAuth();
   const [loading, setLoading] = useState(true);
 
-  const useProxy = isWeb || isExpoGo;
-
   const redirectUri = isExpoGo
     ? 'https://auth.expo.io/@alexaloesode/schooltool'
-    : AuthSession.makeRedirectUri({ useProxy: true });
+    : AuthSession.makeRedirectUri();
 
   const googleClientId = isExpoGo
     ? ENV.ANDROID_CLIENT_ID_EXPOGO
@@ -74,7 +71,6 @@ export default function LoginWithGoogle() {
       }
       setLoading(false);
     };
-
     checkUserSession();
   }, []);
 
@@ -98,7 +94,6 @@ export default function LoginWithGoogle() {
       const tokenData = await response.json();
 
       if (!tokenData.access_token) {
-        console.log('Token response:', tokenData);
         Alert.alert('Erreur', 'Token Google non reçu');
         return;
       }
@@ -118,8 +113,6 @@ export default function LoginWithGoogle() {
         Alert.alert('Erreur', 'Impossible de décoder le token utilisateur');
         return;
       }
-      console.log(tokenData);
-      
 
       const userSession = {
         accessToken: apiToken.token,
@@ -179,7 +172,7 @@ export default function LoginWithGoogle() {
           <Button
             disabled={!request}
             title="Se connecter avec Google"
-            onPress={() => promptAsync({ useProxy })}
+            onPress={() => promptAsync()}
             color="#4285F4"
           />
         </>

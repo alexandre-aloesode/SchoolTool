@@ -54,7 +54,7 @@ const UploadAbsences: React.FC = () => {
         status: "",
         link: "",
       } });
-      
+
       if (!response) {
         console.error("Erreur: aucune réponse de l'API");
         return;
@@ -121,6 +121,10 @@ const UploadAbsences: React.FC = () => {
               route: 'uploadAbsence',
               params: { ...absenceForm, duration },
             });
+            if (!response) {
+              console.error("Erreur: aucune réponse de l'API");
+              return;
+            }
             if (response.status === 200) {
               Alert.alert('Succès', 'Absence envoyée avec succès');
               setAbsenceForm({
