@@ -10,11 +10,12 @@ import {
 import { LineChart } from 'react-native-chart-kit';
 import { ApiActions } from '@/services/ApiServices';
 import dayjs from 'dayjs';
+import type { Logtime } from '@/types/logtimes';
 
 const screenWidth = Dimensions.get('window').width;
 
 const Logtimes = () => {
-  const [logtimes, setLogtimes] = useState([]);
+  const [logtimes, setLogtimes] = useState<Logtime[]>([]);
   const [loading, setLoading] = useState(true);
   const [weekStart, setWeekStart] = useState(
     dayjs().startOf('week').add(1, 'day'),
