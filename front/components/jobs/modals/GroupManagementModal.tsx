@@ -11,7 +11,11 @@ import {
 import { ApiActions } from '@/services/ApiServices';
 import { GroupManagementModalProps, JobGroups } from '@/types/jobsTypes';
 
-const GroupManagementModal: React.FC<GroupManagementModalProps> = ({ visible, jobId, onClose }) => {
+const GroupManagementModal: React.FC<GroupManagementModalProps> = ({
+  visible,
+  jobId,
+  onClose,
+}) => {
   const [groups, setGroups] = useState<JobGroups | null>(null);
   const [groupName, setGroupName] = useState('');
 
@@ -36,7 +40,7 @@ const GroupManagementModal: React.FC<GroupManagementModalProps> = ({ visible, jo
       console.error("Erreur: aucune réponse de l'API");
       return;
     }
-    
+
     if (res.status === 200) {
       setGroups(res.data || []);
     }
@@ -55,7 +59,7 @@ const GroupManagementModal: React.FC<GroupManagementModalProps> = ({ visible, jo
     fetchGroups();
   };
 
-  const askToJoinGroup = async (groupId : number | string) => {
+  const askToJoinGroup = async (groupId: number | string) => {
     await ApiActions.post({
       route: '/waitinglist',
       params: {

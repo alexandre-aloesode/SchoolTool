@@ -49,12 +49,11 @@ const JobsDone = () => {
       console.error("Erreur: aucune réponse de l'API");
       return;
     }
-    
+
     if (history.status === 200) {
       setPromotions(history.data || []);
       setSelectedPromotion(history.data[0]?.promotion_id || '');
     }
-
   };
 
   const loadUnitsAndJobs = async () => {
@@ -71,10 +70,12 @@ const JobsDone = () => {
       console.error("Erreur: aucune réponse de l'API");
       return;
     }
-    
+
     if (allUnits.status === 200) {
       setUnits(allUnits.data || []);
-      const allUnitIds = (allUnits.data as JobUnit[]).map((u: JobUnit) => u.unit_id);
+      const allUnitIds = (allUnits.data as JobUnit[]).map(
+        (u: JobUnit) => u.unit_id,
+      );
       const jobsResponse = await ApiActions.get({
         route: 'job/done',
         params: {
@@ -91,17 +92,16 @@ const JobsDone = () => {
           desc: '',
         },
       });
-  
+
       if (!jobsResponse) {
         console.error("Erreur: aucune réponse de l'API");
         return;
       }
-      
+
       if (jobsResponse.status === 200) {
         setJobsDone(jobsResponse.data || []);
       }
     }
-
   };
 
   const filteredJobs = () => {
@@ -116,7 +116,7 @@ const JobsDone = () => {
 
   const renderJob = ({ item }: { item: JobDone }): JSX.Element | null => {
     if (!item) return null;
-  
+
     return (
       <View style={styles.row}>
         <Text style={[styles.jobTitle, { flex: 1 }]}>{item.job_name}</Text>
@@ -131,7 +131,6 @@ const JobsDone = () => {
       </View>
     );
   };
-  
 
   return (
     <View style={styles.container}>

@@ -29,7 +29,7 @@ export default function ProfileScreen() {
   //   cv: '',
   //   personal_website: '',
   // });
-  
+
   const { logout } = useAuth();
 
   const loadProfile = async () => {
@@ -83,7 +83,7 @@ export default function ProfileScreen() {
     loadProfile();
   }, []);
 
-  const openLink = (url : string) => {
+  const openLink = (url: string) => {
     if (url) Linking.openURL(url);
   };
 
@@ -190,26 +190,27 @@ export default function ProfileScreen() {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContainer}>
             <Text style={styles.modalTitle}>Modifier mes liens</Text>
-            {links && Object.entries(links).map(([key, value]) => (
-              <TextInput
-                key={key}
-                placeholder={key.charAt(0).toUpperCase() + key.slice(1)}
-                value={value}
-                onChangeText={(text) =>
-                  setLinks((prev) => ({
-                    ...(prev || {
-                      github: '',
-                      plesk: '',
-                      linkedin: '',
-                      cv: '',
-                      personal_website: '',
-                    }),
-                    [key]: text,
-                  }))
-                }
-                style={styles.input}
-              />
-            ))}
+            {links &&
+              Object.entries(links).map(([key, value]) => (
+                <TextInput
+                  key={key}
+                  placeholder={key.charAt(0).toUpperCase() + key.slice(1)}
+                  value={value}
+                  onChangeText={(text) =>
+                    setLinks((prev) => ({
+                      ...(prev || {
+                        github: '',
+                        plesk: '',
+                        linkedin: '',
+                        cv: '',
+                        personal_website: '',
+                      }),
+                      [key]: text,
+                    }))
+                  }
+                  style={styles.input}
+                />
+              ))}
             <Button mode="contained" onPress={handleSaveLinks}>
               Sauvegarder
             </Button>

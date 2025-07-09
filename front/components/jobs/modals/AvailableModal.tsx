@@ -10,7 +10,11 @@ import {
 import GroupManagementModal from './GroupManagementModal';
 import type { AvailableModalProps } from '@/types/jobsTypes';
 
-const AvailableModal: React.FC<AvailableModalProps> = ({ visible, job, onClose }) => {
+const AvailableModal: React.FC<AvailableModalProps> = ({
+  visible,
+  job,
+  onClose,
+}) => {
   const [groupVisible, setGroupVisible] = useState(false);
 
   return (

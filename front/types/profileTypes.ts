@@ -11,7 +11,7 @@ export interface StudentInfo {
   plesk: string;
   personal_website: string;
   student_id: number | string;
-};
+}
 
 export interface StudentLinks {
   github: string;
@@ -19,4 +19,4 @@ export interface StudentLinks {
   linkedin: string;
   cv: string;
   personal_website: string;
-};
+}

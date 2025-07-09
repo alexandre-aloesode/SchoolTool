@@ -39,19 +39,23 @@ const JobsInProgress = () => {
   const getProgressInfo = (job: JobInProgress) => {
     const startStr = String(job.start_date).replace(' ', 'T');
     const endStr = String(job.end_date).replace(' ', 'T');
-  
+
     const startDate = new Date(startStr);
     const endDate = new Date(endStr);
     const today = new Date();
-  
-    const duration = (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24);
-    const remaining = (endDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24);
+
+    const duration =
+      (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24);
+    const remaining =
+      (endDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24);
     const delay = Math.max(0, -remaining);
-    const progress = Math.min(1, Math.max(0, (duration - remaining) / duration));
-  
+    const progress = Math.min(
+      1,
+      Math.max(0, (duration - remaining) / duration),
+    );
+
     return { progress, delay: Math.round(delay), isLate: delay > 0 };
   };
-  
 
   const renderHeader = () => (
     <View style={[styles.row, styles.headerRow]}>

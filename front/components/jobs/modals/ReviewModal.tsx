@@ -11,7 +11,11 @@ import {
 import { ApiActions } from '@/services/ApiServices';
 import { JobReview, ReviewModalProps } from '@/types/jobsTypes';
 
-const ReviewModal: React.FC<ReviewModalProps> = ({ visible, groupId, onClose }) => {
+const ReviewModal: React.FC<ReviewModalProps> = ({
+  visible,
+  groupId,
+  onClose,
+}) => {
   const [loading, setLoading] = useState(false);
   const [review, setReview] = useState<JobReview | null>(null);
 

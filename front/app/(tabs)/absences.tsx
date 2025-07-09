@@ -58,7 +58,7 @@ const UploadAbsences: React.FC = () => {
           link: '',
         },
       });
-      
+
       if (!response) {
         console.error("Erreur: aucune réponse de l'API");
         return;
@@ -91,8 +91,8 @@ const UploadAbsences: React.FC = () => {
     Raison : ${absenceForm.reason}
     Du ${absenceForm.start_date} au ${absenceForm.end_date}
     Durée : ${absenceForm.duration} ${
-    absenceForm.duration > 1 ? 'jours ouvrés' : 'jour ouvré'
-  }`;
+      absenceForm.duration > 1 ? 'jours ouvrés' : 'jour ouvré'
+    }`;
 
   const handleUploadAbsence = () => {
     const { start_date, end_date, reason, image } = absenceForm;
@@ -230,9 +230,7 @@ const UploadAbsences: React.FC = () => {
               </TouchableOpacity>
 
               {absenceForm.imageName && (
-                <Text style={styles.imageName}>
-                  🗂️ {absenceForm.imageName}
-                </Text>
+                <Text style={styles.imageName}>🗂️ {absenceForm.imageName}</Text>
               )}
 
               <Button title="Envoyer" onPress={handleUploadAbsence} />
