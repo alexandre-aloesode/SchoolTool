@@ -1,20 +1,21 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { StyleSheet, View, Text, Button } from 'react-native';
 import LoginWithGoogle from '@/components/auth/GoogleAuth';
-import AuthContext from '@/context/authContext';
 import LogtimeChart from '@/components/dashboard/logtimes';
 import GoogleCalendarWidget from '@/components/dashboard/googleCalendar';
+import { useAuth } from '@/hooks/useAuth';
 // import GoogleLoginWebView from '@/components/auth/GoogleLoginWebView';
 
 export default function HomeScreen() {
-  const auth = useContext(AuthContext);
 
+  const { user, logout } = useAuth();
+  
   return (
     <View style={styles.container}>
-      {auth?.user ? (
+      {user ? (
         <>
           <Text style={styles.title}>Bienvenue !</Text>
-          <Button title="Se déconnecter" onPress={auth.logout} color="red" />
+          <Button title="Se déconnecter" onPress={logout} color="red" />
           <LogtimeChart />
           <GoogleCalendarWidget />
         </>
