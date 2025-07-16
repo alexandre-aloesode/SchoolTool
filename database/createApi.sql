@@ -1,8 +1,8 @@
-CREATE DATABASE IF NOT EXISTS `schooltool_api` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+CREATE DATABASE IF NOT EXISTS `schooltool_api`;
 USE `schooltool_api`;
 -- `schooltool-api`.absence definition
 
-CREATE TABLE `absence` (
+CREATE TABLE IF NOT EXISTS `absence` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `student_fk` int(11) DEFAULT NULL,
   `start_date` date DEFAULT NULL,
@@ -21,7 +21,7 @@ CREATE TABLE `absence` (
 
 -- `schooltool-api`.alert definition
 
-CREATE TABLE `alert` (
+CREATE TABLE IF NOT EXISTS `alert` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `student_fk` int(11) NOT NULL,
   `followup_fk` int(11) NOT NULL,
@@ -34,7 +34,7 @@ CREATE TABLE `alert` (
 
 -- `schooltool-api`.calendar definition
 
-CREATE TABLE `calendar` (
+CREATE TABLE IF NOT EXISTS `calendar` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `promotion_fk` int(11) NOT NULL,
   `name` varchar(100) NOT NULL,
@@ -46,7 +46,7 @@ CREATE TABLE `calendar` (
 
 -- `schooltool-api`.calendar_history definition
 
-CREATE TABLE `calendar_history` (
+CREATE TABLE IF NOT EXISTS `calendar_history` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `applicant_fk` int(11) NOT NULL,
   `calendar_fk` int(11) NOT NULL,
@@ -58,19 +58,18 @@ CREATE TABLE `calendar_history` (
 );
 
 
--- `schooltool-api`.class definition
-
-CREATE TABLE `class` (
+CREATE TABLE IF NOT EXISTS `class` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `name` (`name`)
+  UNIQUE KEY `name` (`name`(191))
 );
+
 
 
 -- `schooltool-api`.log definition
 
-CREATE TABLE `log` (
+CREATE TABLE IF NOT EXISTS `log` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `email` varchar(255) DEFAULT NULL,
   `role` int(11) DEFAULT NULL,
@@ -86,7 +85,7 @@ CREATE TABLE `log` (
 
 -- `schooltool-api`.logtime_event definition
 
-CREATE TABLE `logtime_event` (
+CREATE TABLE IF NOT EXISTS `logtime_event` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `student_fk` int(11) NOT NULL,
   `adm_email` varchar(100) NOT NULL,
@@ -100,17 +99,17 @@ CREATE TABLE `logtime_event` (
 
 -- `schooltool-api`.`section` definition
 
-CREATE TABLE `section` (
+CREATE TABLE IF NOT EXISTS `section` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `name` (`name`)
+  UNIQUE KEY `name` (`name`(191))
 );
 
 
 -- `schooltool-api`.unit definition
 
-CREATE TABLE `unit` (
+CREATE TABLE IF NOT EXISTS `unit` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `code` varchar(255) NOT NULL,
   `name` varchar(255) NOT NULL,
@@ -118,13 +117,13 @@ CREATE TABLE `unit` (
   `start_date` date DEFAULT NULL,
   `end_date` date DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `code` (`code`)
+  UNIQUE KEY `code` (`code`(191))
 );
 
 
 -- `schooltool-api`.activity definition
 
-CREATE TABLE `activity` (
+CREATE TABLE IF NOT EXISTS `activity` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `type` enum('Consultation technique','How to','Kick-off','Soutenance','Suivi de projet','Coaching','Anglais','Relation\nEntreprises','Autre') NOT NULL,
   `is_mandatory` tinyint(1) NOT NULL,
@@ -140,7 +139,7 @@ CREATE TABLE `activity` (
 
 -- `schooltool-api`.calendar_day definition
 
-CREATE TABLE `calendar_day` (
+CREATE TABLE IF NOT EXISTS `calendar_day` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `calendar_fk` int(11) NOT NULL,
   `day` date NOT NULL,
@@ -154,7 +153,7 @@ CREATE TABLE `calendar_day` (
 
 -- `schooltool-api`.job definition
 
-CREATE TABLE `job` (
+CREATE TABLE IF NOT EXISTS `job` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `code` varchar(255) NOT NULL,
   `name` varchar(255) NOT NULL,
@@ -167,7 +166,7 @@ CREATE TABLE `job` (
   `is_visible` tinyint(1) NOT NULL DEFAULT 1,
   `unit_fk` int(11) NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `code` (`code`),
+  UNIQUE KEY `code` (`code`(191)),
   KEY `job_unit_key` (`unit_fk`),
   CONSTRAINT `job_unit_fk` FOREIGN KEY (`unit_fk`) REFERENCES `unit` (`id`) ON DELETE CASCADE
 );
@@ -175,7 +174,7 @@ CREATE TABLE `job` (
 
 -- `schooltool-api`.promotion definition
 
-CREATE TABLE `promotion` (
+CREATE TABLE IF NOT EXISTS `promotion` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
   `year` varchar(255) NOT NULL,
@@ -187,7 +186,7 @@ CREATE TABLE `promotion` (
   `duration` int(11) DEFAULT NULL,
   `certification` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `name` (`name`),
+  UNIQUE KEY `name` (`name`(191)),
   KEY `promotion_section_fk` (`section_fk`),
   CONSTRAINT `promotion_section_fk` FOREIGN KEY (`section_fk`) REFERENCES `section` (`id`)
 );
@@ -195,7 +194,7 @@ CREATE TABLE `promotion` (
 
 -- `schooltool-api`.promotion_unit definition
 
-CREATE TABLE `promotion_unit` (
+CREATE TABLE IF NOT EXISTS `promotion_unit` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `promotion_fk` int(11) NOT NULL,
   `unit_fk` int(11) NOT NULL,
@@ -209,14 +208,14 @@ CREATE TABLE `promotion_unit` (
 
 -- `schooltool-api`.skill definition
 
-CREATE TABLE `skill` (
+CREATE TABLE IF NOT EXISTS `skill` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `code` varchar(255) NOT NULL,
   `name` varchar(255) NOT NULL,
   `class_fk` int(11) NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `code` (`code`),
-  UNIQUE KEY `name` (`name`),
+  UNIQUE KEY `code` (`code`(191)),
+  UNIQUE KEY `name`(`name`(191)),
   KEY `skill_class_key` (`class_fk`),
   CONSTRAINT `skill_class_fk` FOREIGN KEY (`class_fk`) REFERENCES `class` (`id`) ON DELETE CASCADE
 );
@@ -224,7 +223,7 @@ CREATE TABLE `skill` (
 
 -- `schooltool-api`.unit_goal definition
 
-CREATE TABLE `unit_goal` (
+CREATE TABLE IF NOT EXISTS `unit_goal` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `value` int(11) NOT NULL,
   `skill_fk` int(11) NOT NULL,
@@ -239,7 +238,7 @@ CREATE TABLE `unit_goal` (
 
 -- `schooltool-api`.applicant definition
 
-CREATE TABLE `applicant` (
+CREATE TABLE IF NOT EXISTS `applicant` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `gender` enum('Madame','Monsieur') DEFAULT NULL,
   `firstname` varchar(255) NOT NULL,
@@ -271,7 +270,7 @@ CREATE TABLE `applicant` (
 
 -- `schooltool-api`.followup definition
 
-CREATE TABLE `followup` (
+CREATE TABLE IF NOT EXISTS `followup` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `creation_date` datetime NOT NULL,
   `applicant_fk` int(11) NOT NULL,
@@ -286,7 +285,7 @@ CREATE TABLE `followup` (
 
 -- `schooltool-api`.job_skill definition
 
-CREATE TABLE `job_skill` (
+CREATE TABLE IF NOT EXISTS `job_skill` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `needed` float NOT NULL,
   `earned` float NOT NULL,
@@ -303,7 +302,7 @@ CREATE TABLE `job_skill` (
 
 -- `schooltool-api`.promotion_history definition
 
-CREATE TABLE `promotion_history` (
+CREATE TABLE IF NOT EXISTS `promotion_history` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `applicant_fk` int(11) NOT NULL,
   `promotion_fk` int(11) NOT NULL,
@@ -319,7 +318,7 @@ CREATE TABLE `promotion_history` (
 
 -- `schooltool-api`.student definition
 
-CREATE TABLE `student` (
+CREATE TABLE IF NOT EXISTS `student` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `applicant_fk` int(11) NOT NULL,
   `email` varchar(255) NOT NULL,
@@ -331,7 +330,7 @@ CREATE TABLE `student` (
   `personal_website` varchar(255) DEFAULT NULL,
   `badge` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `email_login` (`email`),
+  UNIQUE KEY `email_login` (`email`(191)),
   KEY `student_current_unit_key` (`current_unit_fk`),
   KEY `student_applicant_fk` (`applicant_fk`),
   CONSTRAINT `student_applicant_fk` FOREIGN KEY (`applicant_fk`) REFERENCES `applicant` (`id`) ON DELETE CASCADE,
@@ -341,7 +340,7 @@ CREATE TABLE `student` (
 
 -- `schooltool-api`.unit_completed definition
 
-CREATE TABLE `unit_completed` (
+CREATE TABLE IF NOT EXISTS `unit_completed` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `completion_date` datetime NOT NULL,
   `student_fk` int(11) NOT NULL,
@@ -356,7 +355,7 @@ CREATE TABLE `unit_completed` (
 
 -- `schooltool-api`.unit_history definition
 
-CREATE TABLE `unit_history` (
+CREATE TABLE IF NOT EXISTS `unit_history` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `student_fk` int(11) NOT NULL,
   `unit_fk` int(11) NOT NULL,
@@ -372,7 +371,7 @@ CREATE TABLE `unit_history` (
 
 -- `schooltool-api`.unit_viewer definition
 
-CREATE TABLE `unit_viewer` (
+CREATE TABLE IF NOT EXISTS `unit_viewer` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `unit_fk` int(11) NOT NULL,
   `student_fk` int(11) NOT NULL,
@@ -387,7 +386,7 @@ CREATE TABLE `unit_viewer` (
 
 -- `schooltool-api`.activity_attendance definition
 
-CREATE TABLE `activity_attendance` (
+CREATE TABLE IF NOT EXISTS `activity_attendance` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `student_fk` int(11) NOT NULL,
   `activity_fk` int(11) NOT NULL,
@@ -402,7 +401,7 @@ CREATE TABLE `activity_attendance` (
 
 -- `schooltool-api`.alternance definition
 
-CREATE TABLE `alternance` (
+CREATE TABLE IF NOT EXISTS `alternance` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `contract_type` enum('Apprentissage','Professionnalisation') DEFAULT NULL,
   `OPCO` varchar(100) DEFAULT NULL,
@@ -427,7 +426,7 @@ CREATE TABLE `alternance` (
 
 -- `schooltool-api`.invoice definition
 
-CREATE TABLE `invoice` (
+CREATE TABLE IF NOT EXISTS `invoice` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
   `reference` varchar(100) NOT NULL,
@@ -445,7 +444,7 @@ CREATE TABLE `invoice` (
 
 -- `schooltool-api`.logtime definition
 
-CREATE TABLE `logtime` (
+CREATE TABLE IF NOT EXISTS `logtime` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `username` varchar(255) NOT NULL,
   `student_fk` int(11) NOT NULL,
@@ -461,7 +460,7 @@ CREATE TABLE `logtime` (
 
 -- `schooltool-api`.registration definition
 
-CREATE TABLE `registration` (
+CREATE TABLE IF NOT EXISTS `registration` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `group_id` int(11) NOT NULL,
   `group_name` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
@@ -492,7 +491,7 @@ CREATE TABLE `registration` (
 
 -- `schooltool-api`.waiting_list definition
 
-CREATE TABLE `waiting_list` (
+CREATE TABLE IF NOT EXISTS `waiting_list` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `student_fk` int(11) NOT NULL,
   `registration_fk` int(11) NOT NULL,
@@ -507,7 +506,7 @@ CREATE TABLE `waiting_list` (
 
 -- `schooltool-api`.acquiered_skill definition
 
-CREATE TABLE `acquiered_skill` (
+CREATE TABLE IF NOT EXISTS `acquiered_skill` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `status` varchar(255) NOT NULL DEFAULT 'En cours',
   `job_skill_fk` int(11) NOT NULL,

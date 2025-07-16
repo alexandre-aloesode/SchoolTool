@@ -58,10 +58,10 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="calendar"
+        name="profile"
         options={{
           title: "",
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="calendar.badge.clock" color="white" />,
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="person.crop.circle" color="white" />,
         }}
       />
     </Tabs>
