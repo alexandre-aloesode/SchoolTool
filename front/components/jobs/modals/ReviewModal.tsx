@@ -17,7 +17,7 @@ const ReviewModal: React.FC<ReviewModalProps> = ({
   onClose,
 }) => {
   const [loading, setLoading] = useState(false);
-  const [review, setReview] = useState<JobReview | null>(null);
+  const [review, setReview] = useState<JobReview | null>(null);  
 
   useEffect(() => {
     if (visible && groupId) {
