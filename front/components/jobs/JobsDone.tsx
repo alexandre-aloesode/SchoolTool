@@ -4,13 +4,12 @@ import {
   Text,
   FlatList,
   StyleSheet,
-  Modal,
   Dimensions,
-  ScrollView,
+  Pressable,
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
-import { IconButton, Button } from 'react-native-paper';
 import { ApiActions } from '@/services/ApiServices';
+import DoneModal from './modals/DoneModal';
 import type { JobDone, JobUnit, JobPromotion } from '@/types/jobsTypes';
 
 const screenWidth = Dimensions.get('window').width;
@@ -24,7 +23,6 @@ const JobsDone = () => {
   const [selectedUnit, setSelectedUnit] = useState('all');
 
   const [selectedJob, setSelectedJob] = useState<JobDone | null>(null);
-  const [modalVisible, setModalVisible] = useState(false);
 
   useEffect(() => {
     fetchInitialData();
@@ -45,12 +43,7 @@ const JobsDone = () => {
       },
     });
 
-    if (!history) {
-      console.error("Erreur: aucune réponse de l'API");
-      return;
-    }
-
-    if (history.status === 200) {
+    if (history?.status === 200) {
       setPromotions(history.data || []);
       setSelectedPromotion(history.data[0]?.promotion_id || '');
     }
@@ -66,16 +59,10 @@ const JobsDone = () => {
       },
     });
 
-    if (!allUnits) {
-      console.error("Erreur: aucune réponse de l'API");
-      return;
-    }
-
-    if (allUnits.status === 200) {
+    if (allUnits?.status === 200) {
       setUnits(allUnits.data || []);
-      const allUnitIds = (allUnits.data as JobUnit[]).map(
-        (u: JobUnit) => u.unit_id,
-      );
+
+      const allUnitIds = allUnits.data.map((u: JobUnit) => u.unit_id);
       const jobsResponse = await ApiActions.get({
         route: 'job/done',
         params: {
@@ -89,16 +76,12 @@ const JobsDone = () => {
           group_name: '',
           lead_email: '',
           order: 'click_date',
+          group_id: '',
           desc: '',
         },
       });
 
-      if (!jobsResponse) {
-        console.error("Erreur: aucune réponse de l'API");
-        return;
-      }
-
-      if (jobsResponse.status === 200) {
+      if (jobsResponse?.status === 200) {
         setJobsDone(jobsResponse.data || []);
       }
     }
@@ -109,28 +92,14 @@ const JobsDone = () => {
     return jobsDone.filter((job) => job.job_unit_id === selectedUnit);
   };
 
-  const openJobModal = (job: JobDone) => {
-    setSelectedJob(job);
-    setModalVisible(true);
-  };
-
-  const renderJob = ({ item }: { item: JobDone }): JSX.Element | null => {
-    if (!item) return null;
-
-    return (
-      <View style={styles.row}>
-        <Text style={[styles.jobTitle, { flex: 1 }]}>{item.job_name}</Text>
-        <View style={[styles.jobDetails, { flex: 2 }]}>
-          <Text style={styles.unitText}>{item.job_unit_name}</Text>
-          <IconButton
-            icon="magnify"
-            size={20}
-            onPress={() => openJobModal(item)}
-          />
-        </View>
+  const renderJob = ({ item }: { item: JobDone }) => (
+    <Pressable style={styles.row} onPress={() => setSelectedJob(item)}>
+      <Text style={[styles.jobTitle, { flex: 1 }]}>{item.job_name}</Text>
+      <View style={[styles.jobDetails, { flex: 2 }]}>
+        <Text style={styles.unitText}>{item.job_unit_name}</Text>
       </View>
-    );
-  };
+    </Pressable>
+  );
 
   return (
     <View style={styles.container}>
@@ -164,7 +133,7 @@ const JobsDone = () => {
             onValueChange={(val) => setSelectedUnit(val)}
             style={styles.picker}
           >
-            <Picker.Item label="Toutes les units" value="all" key="all" />
+            <Picker.Item label="Toutes les unités" value="all" key="all" />
             {units.map((unit) => (
               <Picker.Item
                 label={unit.unit_name}
@@ -176,53 +145,19 @@ const JobsDone = () => {
         </View>
       </View>
 
-      <View style={styles.listWrapper}>
-        <FlatList
-          data={filteredJobs()}
-          renderItem={renderJob}
-          keyExtractor={(item, index) =>
-            item?.registration_id?.toString?.() || `job-${index}`
-          }
-        />
-      </View>
+      <FlatList
+        data={filteredJobs()}
+        renderItem={renderJob}
+        keyExtractor={(item, index) =>
+          item?.registration_id?.toString?.() || `job-${index}`
+        }
+      />
 
-      <Modal animationType="slide" transparent={true} visible={modalVisible}>
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <ScrollView>
-              <Text style={styles.modalTitle}>
-                [{selectedJob?.job_unit_name}] {selectedJob?.job_name}
-              </Text>
-
-              <Text style={styles.modalSubtitle}>
-                {selectedJob?.group_name}
-              </Text>
-              <Text style={styles.modalDescription}>
-                {selectedJob?.job_description ||
-                  'Aucune description disponible.'}
-              </Text>
-
-              <Text style={styles.modalInfo}>
-                👨‍🏫 Chef de groupe : {selectedJob?.lead_email}
-              </Text>
-              <Text style={styles.modalInfo}>
-                📅 Début : {selectedJob?.start_date}
-              </Text>
-              <Text style={styles.modalInfo}>
-                📅 Fin : {selectedJob?.end_date}
-              </Text>
-
-              <Button
-                mode="contained"
-                onPress={() => setModalVisible(false)}
-                style={{ marginTop: 16 }}
-              >
-                Fermer
-              </Button>
-            </ScrollView>
-          </View>
-        </View>
-      </Modal>
+      <DoneModal
+        job={selectedJob}
+        visible={!!selectedJob}
+        onClose={() => setSelectedJob(null)}
+      />
     </View>
   );
 };
@@ -264,9 +199,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 4,
   },
-  listWrapper: {
-    flex: 1,
-  },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -285,43 +217,8 @@ const styles = StyleSheet.create({
   },
   jobDetails: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-end',
     alignItems: 'center',
-  },
-
-  // Modal
-  modalContainer: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
-    padding: 16,
-  },
-  modalContent: {
-    backgroundColor: 'white',
-    borderRadius: 12,
-    padding: 20,
-    elevation: 5,
-  },
-  modalTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#e91e63',
-    marginBottom: 8,
-  },
-  modalSubtitle: {
-    fontSize: 14,
-    fontWeight: '600',
-    marginBottom: 6,
-  },
-  modalDescription: {
-    fontSize: 13,
-    marginBottom: 8,
-    color: '#333',
-  },
-  modalInfo: {
-    fontSize: 13,
-    marginBottom: 4,
-    color: '#555',
   },
 });
 
