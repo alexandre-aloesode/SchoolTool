@@ -14,7 +14,9 @@ import type { UploadedAbsence } from '@/types/absencesTypes';
 
 const UploadAbsences: React.FC = () => {
   const [loading, setLoading] = useState(false);
-  const [uploadedAbsences, setUploadedAbsences] = useState<UploadedAbsence[]>([]);
+  const [uploadedAbsences, setUploadedAbsences] = useState<UploadedAbsence[]>(
+    [],
+  );
   const [formVisible, setFormVisible] = useState(false);
 
   useEffect(() => {
@@ -60,8 +62,8 @@ const UploadAbsences: React.FC = () => {
         {item.absence_status === 1
           ? 'Validée'
           : item.absence_status === 2
-          ? 'Refusée'
-          : 'En attente'}
+            ? 'Refusée'
+            : 'En attente'}
       </Text>
       {!!item.absence_comment && (
         <Text style={styles.absenceText}>💬 {item.absence_comment}</Text>
@@ -78,7 +80,11 @@ const UploadAbsences: React.FC = () => {
       <Text style={styles.sectionTitle}>Absences précédentes</Text>
 
       {loading ? (
-        <ActivityIndicator size="large" color="#1e88e5" style={{ marginTop: 20 }} />
+        <ActivityIndicator
+          size="large"
+          color="#1e88e5"
+          style={{ marginTop: 20 }}
+        />
       ) : (
         <FlatList
           data={uploadedAbsences}
