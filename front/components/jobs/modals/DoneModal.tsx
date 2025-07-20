@@ -1,11 +1,5 @@
 import React, { useState } from 'react';
-import {
-  Modal,
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-} from 'react-native';
+import { Modal, View, Text, StyleSheet, ScrollView } from 'react-native';
 import { Button } from 'react-native-paper';
 import type { JobDone } from '@/types/jobsTypes';
 import ReviewModal from './ReviewModal';
@@ -17,7 +11,7 @@ type DoneModalProps = {
 };
 
 const DoneModal: React.FC<DoneModalProps> = ({ job, visible, onClose }) => {
-  const [showReview, setShowReview] = useState(false);  
+  const [showReview, setShowReview] = useState(false);
 
   if (!job) return null;
 
@@ -36,7 +30,9 @@ const DoneModal: React.FC<DoneModalProps> = ({ job, visible, onClose }) => {
                 {job.job_description || 'Aucune description disponible.'}
               </Text>
 
-              <Text style={styles.modalInfo}>👨‍🏫 Chef de groupe : {job.lead_email}</Text>
+              <Text style={styles.modalInfo}>
+                👨‍🏫 Chef de groupe : {job.lead_email}
+              </Text>
               <Text style={styles.modalInfo}>📅 Début : {job.start_date}</Text>
               <Text style={styles.modalInfo}>📅 Fin : {job.end_date}</Text>
 
