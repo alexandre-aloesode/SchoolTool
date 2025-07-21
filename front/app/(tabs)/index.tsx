@@ -1,41 +1,66 @@
 import React from 'react';
-import { StyleSheet, View, Text, Button } from 'react-native';
+import {
+  StyleSheet,
+  View,
+  ScrollView,
+  SafeAreaView,
+  useWindowDimensions,
+} from 'react-native';
 import LoginWithGoogle from '@/components/auth/GoogleAuth';
 import LogtimeChart from '@/components/dashboard/logtimes';
 import GoogleCalendarWidget from '@/components/dashboard/googleCalendar';
 import { useAuth } from '@/hooks/useAuth';
-// import GoogleLoginWebView from '@/components/auth/GoogleLoginWebView';
 
 export default function HomeScreen() {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
+  const { height } = useWindowDimensions();
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.safeArea}>
       {user ? (
-        <>
-          <LogtimeChart />
-          <GoogleCalendarWidget />
-        </>
+        <ScrollView
+          contentContainerStyle={[styles.scrollContent, { minHeight: height }]}
+          bounces={false}
+        >
+          <View style={styles.chartSection}>
+            <LogtimeChart />
+          </View>
+          <View style={styles.calendarSection}>
+            <GoogleCalendarWidget />
+          </View>
+        </ScrollView>
       ) : (
-        <LoginWithGoogle />
-        // <GoogleLoginWebView />
+        <View style={styles.loginWrapper}>
+          <LoginWithGoogle />
+        </View>
       )}
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#f7f7f7',
+  },
+  scrollContent: {
+    flexGrow: 1,
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    paddingVertical: 16,
+  },
+  chartSection: {
+    width: '90%',
+    height: '40%',
+    marginBottom: 12,
+  },
+  calendarSection: {
+    width: '90%',
+    height: '40%',
+  },
+  loginWrapper: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f7f7f7',
-    paddingTop: 20,
-    paddingBottom: 60,
-  },
-  title: {
-    fontSize: 24,
-    marginBottom: 20,
-    color: '#333',
   },
 });

@@ -13,6 +13,7 @@ import dayjs from 'dayjs';
 import type { Logtime } from '@/types/logtimesTypes';
 
 const screenWidth = Dimensions.get('window').width;
+const chartPadding = 20;
 
 const Logtimes = () => {
   const [logtimes, setLogtimes] = useState<Logtime[]>([]);
@@ -58,7 +59,7 @@ const Logtimes = () => {
       );
       const minutes = log ? log.logtime_algo2 : 0;
       totalMinutes += minutes;
-      data.push((minutes / 60).toFixed(1)); // en heures
+      data.push((minutes / 60).toFixed(1));
     }
 
     return {
@@ -71,7 +72,7 @@ const Logtimes = () => {
   const chartData = getChartData();
 
   return (
-    <View style={styles.card}>
+    <View style={styles.cardContainer}>
       <Text style={styles.sectionTitle}>Temps de présence</Text>
       <View style={styles.header}>
         <TouchableOpacity
@@ -104,7 +105,7 @@ const Logtimes = () => {
             labels: chartData.labels,
             datasets: chartData.datasets,
           }}
-          width={screenWidth - 40}
+          width={screenWidth * 0.90 - chartPadding}
           height={220}
           fromZero
           yAxisLabel=""
@@ -122,7 +123,10 @@ const Logtimes = () => {
             fillShadowGradientOpacity: 1,
             barPercentage: 0.5,
           }}
-          style={{ borderRadius: 10 }}
+          style={{
+            borderRadius: 10,
+            alignSelf: 'center',
+          }}
         />
       )}
     </View>
@@ -132,17 +136,17 @@ const Logtimes = () => {
 export default Logtimes;
 
 const styles = StyleSheet.create({
-  card: {
+  cardContainer: {
+    flex: 1,
     backgroundColor: '#fff',
-    marginHorizontal: 16,
-    marginTop: 20,
-    padding: 14,
     borderRadius: 12,
+    paddingVertical: 14,
+    paddingHorizontal: 10,
+    elevation: 2,
     shadowColor: '#000',
-    shadowOpacity: 0.05,
-    shadowOffset: { width: 0, height: 4 },
-    shadowRadius: 6,
-    elevation: 3,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
   },
   header: {
     flexDirection: 'row',
@@ -170,6 +174,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#0084FA',
     textAlign: 'center',
-    marginBottom: 16,
+    marginBottom: 10,
   },
 });
