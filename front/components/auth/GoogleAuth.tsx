@@ -137,7 +137,7 @@ export default function LoginWithGoogle() {
       Toast.show({
         type: 'success',
         text1: 'Connexion réussie',
-        text2: 'Vous êtes maintenant connecté avec Google',
+        text2: 'Vous êtes maintenant connecté!',
       });
 
       router.replace('/');

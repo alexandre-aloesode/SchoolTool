@@ -41,7 +41,7 @@ export default function RootLayout() {
         </Stack>
         <StatusBar style="auto" />
       </ThemeProvider>
-      <Toast position="bottom" bottomOffset={50} />
+      <Toast position="top" topOffset={15} />
     </AuthProvider>
   );
 }

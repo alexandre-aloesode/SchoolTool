@@ -15,6 +15,8 @@ import * as ImagePicker from 'expo-image-picker';
 import { format } from 'date-fns';
 import { ApiActions } from '@/services/ApiServices';
 import type { AbsenceForm } from '@/types/absencesTypes';
+import ConfirmModal from './ConfirmModal';
+import Toast from 'react-native-toast-message';
 
 type Props = {
   visible: boolean;
@@ -40,25 +42,62 @@ const AbsenceFormModal: React.FC<Props> = ({ visible, onClose, onSuccess }) => {
     reason: '',
     image: null,
     imageName: '',
+    fileType: '',
   });
-
+  const [confirmVisible, setConfirmVisible] = useState(false);
+  const [computedDuration, setComputedDuration] = useState(0);
   const [showStartPicker, setShowStartPicker] = useState(false);
   const [showEndPicker, setShowEndPicker] = useState(false);
 
-  const pickImage = async () => {
+  const pickImage = async (setForm: (form: any) => void) => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       quality: 1,
     });
-
+  
     if (!result.canceled) {
-      setForm((prev) => ({
+      const asset = result.assets[0];
+      const uri = asset.uri;
+  
+      let fileName = asset.fileName || '';
+      if (!fileName) {
+        const uriParts = uri.split('/');
+        fileName = uriParts[uriParts.length - 1] || 'image';
+      }
+  
+      let extension = '';
+      if (fileName.includes('.')) {
+        extension = fileName.split('.').pop()?.toLowerCase() || '';
+      }
+  
+      let mimeType = 'application/octet-stream';
+      if (extension) {
+        if (['jpg', 'jpeg'].includes(extension)) mimeType = 'image/jpeg';
+        else if (extension === 'png') mimeType = 'image/png';
+        else if (extension === 'gif') mimeType = 'image/gif';
+        else if (extension === 'webp') mimeType = 'image/webp';
+      } else if (Platform.OS === 'web' && asset.type) {
+        mimeType = asset.type;
+        extension = mimeType.split('/').pop() || '';
+        fileName += `.${extension}`;
+      }
+  
+      setForm((prev: any) => ({
         ...prev,
-        image: result.assets[0].uri,
-        imageName: result.assets[0].uri.split('/').pop() || '',
+        image: uri,
+        imageName: fileName,
+        fileType: mimeType,
       }));
+  
+      console.log('📎 Fichier sélectionné :', {
+        fileName,
+        mimeType,
+        uri,
+      });
     }
   };
+  
+  
 
   const onDateChange = (
     _event: any,
@@ -79,66 +118,58 @@ const AbsenceFormModal: React.FC<Props> = ({ visible, onClose, onSuccess }) => {
   };
 
   const handleSubmit = () => {
-    const { start_date, end_date, reason, image } = form;
+    const { start_date, end_date, reason, image, fileType } = form;
+  
     if (!start_date || !end_date || !reason || !image) {
-      Alert.alert('Erreur', 'Veuillez remplir tous les champs.');
+      Toast.show({
+        type: 'error',
+        text1: 'Champs manquants',
+        text2: 'Veuillez remplir tous les champs avant de soumettre.',
+      });
       return;
     }
-
+  
+    const allowedTypes = [
+      'image/jpeg',
+      'image/jpg',
+      'image/png',
+      'application/pdf',
+      'image/webp',
+    ];
+  
+    if (!allowedTypes.includes(fileType)) {
+      Toast.show({
+        type: 'error',
+        text1: 'Format de fichier invalide',
+        text2: 'Seuls les formats JPG, PNG ou PDF sont autorisés.',
+      });
+      return;
+    }
+  
     const start = new Date(start_date);
     const end = new Date(end_date);
     if (start >= end) {
-      Alert.alert(
-        'Erreur',
-        'La date de début doit être antérieure à celle de retour.',
-      );
+      Toast.show({
+        type: 'error',
+        text1: 'Date invalide',
+        text2: 'La date de début doit précéder celle de retour.',
+      });
       return;
     }
-
+  
     let duration = 0;
     let temp = new Date(start);
     while (temp < end) {
-      if (temp.getDay() !== 0 && temp.getDay() !== 6) duration++;
+      const day = temp.getDay();
+      if (day !== 0 && day !== 6) duration++;
       temp.setDate(temp.getDate() + 1);
     }
-
-    Alert.alert(
-      'Confirmation',
-      `Raison : ${reason}\nDu ${start_date} au ${end_date}\nDurée : ${duration} jour(s)`,
-      [
-        { text: 'Annuler', style: 'cancel' },
-        {
-          text: 'Envoyer',
-          onPress: async () => {
-            setLoading(true);
-            try {
-              const response = await ApiActions.post({
-                route: 'uploadAbsence',
-                params: { ...form, duration },
-              });
-              if (response?.status === 200) {
-                Alert.alert('Succès', 'Absence envoyée.');
-                setForm({
-                  start_date: '',
-                  end_date: '',
-                  reason: '',
-                  image: null,
-                  imageName: '',
-                  duration: 0,
-                });
-                onSuccess();
-                onClose();
-              } else throw new Error();
-            } catch {
-              Alert.alert('Erreur', "L'envoi a échoué.");
-            } finally {
-              setLoading(false);
-            }
-          },
-        },
-      ],
-    );
+  
+    setComputedDuration(duration);
+    setConfirmVisible(true);
   };
+  
+  
 
   const renderDateInput = (
     label: string,
@@ -225,7 +256,7 @@ const AbsenceFormModal: React.FC<Props> = ({ visible, onClose, onSuccess }) => {
                 </TouchableOpacity>
               ))}
 
-              <TouchableOpacity style={styles.uploadBtn} onPress={pickImage}>
+<TouchableOpacity style={styles.uploadBtn} onPress={() => pickImage(setForm)}>
                 <Text>📎 Joindre un justificatif</Text>
               </TouchableOpacity>
               {form.imageName && (
@@ -240,6 +271,50 @@ const AbsenceFormModal: React.FC<Props> = ({ visible, onClose, onSuccess }) => {
           )}
         </View>
       </View>
+      <ConfirmModal
+        visible={confirmVisible}
+        message={`Raison : ${form.reason}\nDu ${form.start_date} au ${form.end_date}\nDurée : ${computedDuration} jour(s)`}
+        onCancel={() => setConfirmVisible(false)}
+        onConfirm={async () => {
+          setConfirmVisible(false);
+          setLoading(true);
+          try {
+            const response = await ApiActions.post({
+              route: 'absence',
+              params: { ...form, duration: computedDuration },
+            });
+            if (response?.status === 200) {
+              Toast.show({
+                type: 'success',
+                text1: 'Absence envoyée',
+                text2: 'Votre demande a bien été prise en compte 👌',
+              });
+              setForm({
+                start_date: '',
+                end_date: '',
+                reason: '',
+                image: null,
+                imageName: '',
+                duration: 0,
+                fileType: '',
+              });
+              onSuccess();
+              onClose();
+            } else {
+              throw new Error('Erreur côté API');
+            }
+          } catch (err) {
+            Toast.show({
+              type: 'error',
+              text1: 'Erreur',
+              text2: "L'envoi de votre absence a échoué, veuillez réessayer.",
+            });
+          } finally {
+            setLoading(false);
+          }
+        }}
+        
+      />
     </Modal>
   );
 };

@@ -14,7 +14,6 @@ export default function HomeScreen() {
       {user ? (
         <>
           <Text style={styles.title}>Bienvenue !</Text>
-          <Button title="Se déconnecter" onPress={logout} color="red" />
           <LogtimeChart />
           <GoogleCalendarWidget />
         </>

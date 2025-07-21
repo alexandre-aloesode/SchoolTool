@@ -22,13 +22,6 @@ export default function ProfileScreen() {
   const [jobsInProgress, setJobsInProgress] = useState(0);
   const [editing, setEditing] = useState(false);
   const [links, setLinks] = useState<StudentLinks | null>(null);
-  // const [links, setLinks] = useState<StudentLinks | null>({
-  //   github: '',
-  //   plesk: '',
-  //   linkedin: '',
-  //   cv: '',
-  //   personal_website: '',
-  // });
 
   const { logout } = useAuth();
 

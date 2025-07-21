@@ -5,6 +5,7 @@ export interface AbsenceForm {
   reason: string;
   image: string | null;
   imageName: string;
+  fileType: string;
 }
 
 export interface UploadedAbsence {

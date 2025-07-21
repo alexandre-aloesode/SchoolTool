@@ -6,11 +6,35 @@ import { IconSymbol } from '@/components/ui/IconSymbol';
 import TabBarBackground from '@/components/ui/TabBarBackground';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
-import AuthContext from '@/context/authContext';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
-  const auth = useContext(AuthContext);
+  const { user } = useAuth();
+
+  if (!user) {
+    return (
+      <Tabs
+        screenOptions={{
+          tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+          headerShown: false,
+          tabBarButton: HapticTab,
+          tabBarBackground: TabBarBackground,
+          tabBarStyle: { display: 'none' }
+        }}
+      >
+        <Tabs.Screen
+          name="index"
+          options={{
+            title: '',
+            tabBarIcon: ({ color }) => (
+              <IconSymbol size={28} name="house.fill" color="white" />
+            ),
+          }}
+        />
+      </Tabs>
+    );
+  }
 
   return (
     <Tabs
