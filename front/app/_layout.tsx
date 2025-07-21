@@ -41,7 +41,12 @@ export default function RootLayout() {
         </Stack>
         <StatusBar style="auto" />
       </ThemeProvider>
-      <Toast position="bottom" bottomOffset={50} />
+      <Toast
+  config={{}}
+  position="top"
+  topOffset={30}
+  visibilityTime={3000}
+/>
     </AuthProvider>
   );
 }
