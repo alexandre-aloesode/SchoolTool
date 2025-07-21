@@ -54,22 +54,22 @@ const AbsenceFormModal: React.FC<Props> = ({ visible, onClose, onSuccess }) => {
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       quality: 1,
     });
-  
+
     if (!result.canceled) {
       const asset = result.assets[0];
       const uri = asset.uri;
-  
+
       let fileName = asset.fileName || '';
       if (!fileName) {
         const uriParts = uri.split('/');
         fileName = uriParts[uriParts.length - 1] || 'image';
       }
-  
+
       let extension = '';
       if (fileName.includes('.')) {
         extension = fileName.split('.').pop()?.toLowerCase() || '';
       }
-  
+
       let mimeType = 'application/octet-stream';
       if (extension) {
         if (['jpg', 'jpeg'].includes(extension)) mimeType = 'image/jpeg';
@@ -81,14 +81,14 @@ const AbsenceFormModal: React.FC<Props> = ({ visible, onClose, onSuccess }) => {
         extension = mimeType.split('/').pop() || '';
         fileName += `.${extension}`;
       }
-  
+
       setForm((prev: any) => ({
         ...prev,
         image: uri,
         imageName: fileName,
         fileType: mimeType,
       }));
-  
+
       console.log('📎 Fichier sélectionné :', {
         fileName,
         mimeType,
@@ -96,8 +96,6 @@ const AbsenceFormModal: React.FC<Props> = ({ visible, onClose, onSuccess }) => {
       });
     }
   };
-  
-  
 
   const onDateChange = (
     _event: any,
@@ -119,7 +117,7 @@ const AbsenceFormModal: React.FC<Props> = ({ visible, onClose, onSuccess }) => {
 
   const handleSubmit = () => {
     const { start_date, end_date, reason, image, fileType } = form;
-  
+
     if (!start_date || !end_date || !reason || !image) {
       Toast.show({
         type: 'error',
@@ -128,7 +126,7 @@ const AbsenceFormModal: React.FC<Props> = ({ visible, onClose, onSuccess }) => {
       });
       return;
     }
-  
+
     const allowedTypes = [
       'image/jpeg',
       'image/jpg',
@@ -136,7 +134,7 @@ const AbsenceFormModal: React.FC<Props> = ({ visible, onClose, onSuccess }) => {
       'application/pdf',
       'image/webp',
     ];
-  
+
     if (!allowedTypes.includes(fileType)) {
       Toast.show({
         type: 'error',
@@ -145,7 +143,7 @@ const AbsenceFormModal: React.FC<Props> = ({ visible, onClose, onSuccess }) => {
       });
       return;
     }
-  
+
     const start = new Date(start_date);
     const end = new Date(end_date);
     if (start >= end) {
@@ -156,7 +154,7 @@ const AbsenceFormModal: React.FC<Props> = ({ visible, onClose, onSuccess }) => {
       });
       return;
     }
-  
+
     let duration = 0;
     let temp = new Date(start);
     while (temp < end) {
@@ -164,12 +162,10 @@ const AbsenceFormModal: React.FC<Props> = ({ visible, onClose, onSuccess }) => {
       if (day !== 0 && day !== 6) duration++;
       temp.setDate(temp.getDate() + 1);
     }
-  
+
     setComputedDuration(duration);
     setConfirmVisible(true);
   };
-  
-  
 
   const renderDateInput = (
     label: string,
@@ -256,7 +252,10 @@ const AbsenceFormModal: React.FC<Props> = ({ visible, onClose, onSuccess }) => {
                 </TouchableOpacity>
               ))}
 
-<TouchableOpacity style={styles.uploadBtn} onPress={() => pickImage(setForm)}>
+              <TouchableOpacity
+                style={styles.uploadBtn}
+                onPress={() => pickImage(setForm)}
+              >
                 <Text>📎 Joindre un justificatif</Text>
               </TouchableOpacity>
               {form.imageName && (
@@ -313,7 +312,6 @@ const AbsenceFormModal: React.FC<Props> = ({ visible, onClose, onSuccess }) => {
             setLoading(false);
           }
         }}
-        
       />
     </Modal>
   );
