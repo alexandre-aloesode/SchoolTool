@@ -24,11 +24,7 @@ const ConfirmModal: React.FC<Props> = ({
   onCancel,
 }) => {
   return (
-    <Modal
-      animationType="fade"
-      transparent
-      visible={visible}
-    >
+    <Modal animationType="fade" transparent visible={visible}>
       <View style={styles.overlay}>
         <View style={styles.modal}>
           <Text style={styles.title}>{title}</Text>
