@@ -1,5 +1,11 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  SafeAreaView,
+} from 'react-native';
 import JobsInProgress from '@/components/jobs/JobsInProgress';
 import JobsDone from '@/components/jobs/JobsDone';
 import JobsAvailable from '@/components/jobs/JobsAvailable';
