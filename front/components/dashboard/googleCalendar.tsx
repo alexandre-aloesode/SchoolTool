@@ -3,7 +3,6 @@ import {
   View,
   Text,
   StyleSheet,
-  Dimensions,
   ScrollView,
   Modal,
   Pressable,
@@ -13,9 +12,6 @@ import { useAuth } from '@/hooks/useAuth';
 import { getValidGoogleAccessToken } from '@/utils/googleToken';
 import type { GoogleCalendarEvent } from '@/types/googleCalendarTypes';
 import type { Dayjs } from 'dayjs';
-
-const screenWidth = Dimensions.get('window').width;
-const columnMinWidth = 130;
 
 const GoogleCalendarWidget = () => {
   const { user } = useAuth();
@@ -70,7 +66,8 @@ const GoogleCalendarWidget = () => {
   const isToday = (date: Dayjs) => dayjs().isSame(date, 'day');
 
   return (
-    <View style={styles.wrapper}>
+    <View style={styles.cardContainer}>
+      <Text style={styles.sectionTitle}>Calendrier</Text>
       <View style={styles.nav}>
         <Text
           style={styles.arrow}
@@ -92,12 +89,7 @@ const GoogleCalendarWidget = () => {
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={[
-          styles.grid,
-          {
-            width: Math.max(columnMinWidth * groupedEvents.length, screenWidth),
-          },
-        ]}
+        contentContainerStyle={styles.grid}
       >
         {groupedEvents.map(({ day, events }, index) => (
           <View
@@ -160,14 +152,14 @@ const GoogleCalendarWidget = () => {
 };
 
 const styles = StyleSheet.create({
-  wrapper: {
-    marginTop: 10,
-    marginBottom: 20,
-    width: '90%',
+  cardContainer: {
+    width: '100%',
+    height: '100%',
+    alignSelf: 'center',
     borderRadius: 12,
     backgroundColor: '#fff',
-    paddingVertical: 10,
-    paddingHorizontal: 6,
+    paddingVertical: 14,
+    paddingHorizontal: 10,
     minHeight: 310,
     elevation: 2,
     shadowColor: '#000',
@@ -184,14 +176,17 @@ const styles = StyleSheet.create({
   },
   arrow: {
     fontSize: 20,
-    color: '#1188aa',
+    color: '#3B82F6',
   },
   weekText: {
     fontWeight: 'bold',
-    color: '#1188aa',
+    fontSize: 16,
+    color: '#111',
   },
   grid: {
     flexDirection: 'row',
+    flexGrow: 1,
+    justifyContent: 'space-between',
     paddingHorizontal: 8,
   },
   column: {
@@ -232,8 +227,6 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
     color: '#aaa',
   },
-
-  // Modal
   modalOverlay: {
     flex: 1,
     justifyContent: 'center',
@@ -265,6 +258,13 @@ const styles = StyleSheet.create({
   modalCloseText: {
     color: '#fff',
     fontWeight: 'bold',
+  },
+  sectionTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#0084FA',
+    textAlign: 'center',
+    marginBottom: 10,
   },
 });
 
