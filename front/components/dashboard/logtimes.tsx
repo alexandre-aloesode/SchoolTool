@@ -105,7 +105,7 @@ const Logtimes = () => {
             labels: chartData.labels,
             datasets: chartData.datasets,
           }}
-          width={screenWidth * 0.90 - chartPadding}
+          width={screenWidth * 0.9 - chartPadding}
           height={220}
           fromZero
           yAxisLabel=""
