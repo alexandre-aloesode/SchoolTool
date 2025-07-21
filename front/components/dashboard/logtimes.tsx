@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   Dimensions,
 } from 'react-native';
-import { LineChart } from 'react-native-chart-kit';
+import { BarChart } from 'react-native-chart-kit';
 import { ApiActions } from '@/services/ApiServices';
 import dayjs from 'dayjs';
 import type { Logtime } from '@/types/logtimesTypes';
@@ -23,8 +23,8 @@ const Logtimes = () => {
 
   const fetchLogtimes = async () => {
     setLoading(true);
-
     const weekEnd = weekStart.add(6, 'day');
+
     const logtimesResponse = await ApiActions.get({
       route: 'logtime',
       params: {
@@ -35,12 +35,7 @@ const Logtimes = () => {
       },
     });
 
-    if (!logtimesResponse) {
-      console.error("Erreur: aucune réponse de l'API");
-      return;
-    }
-
-    if (logtimesResponse.status === 200) {
+    if (logtimesResponse?.status === 200) {
       setLogtimes(logtimesResponse.data || []);
     }
 
@@ -52,32 +47,23 @@ const Logtimes = () => {
   }, [weekStart]);
 
   const getChartData = () => {
-    const labels = [];
+    const labels = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
     const data = [];
-
     let totalMinutes = 0;
 
     for (let i = 0; i < 7; i++) {
       const date = weekStart.add(i, 'day');
-      labels.push(date.format('DD/MM'));
-
-      const log = logtimes.find((log) =>
-        dayjs(log.logtime_day).isSame(date, 'day'),
+      const log = logtimes.find((l) =>
+        dayjs(l.logtime_day).isSame(date, 'day'),
       );
       const minutes = log ? log.logtime_algo2 : 0;
       totalMinutes += minutes;
-      data.push(minutes / 60);
+      data.push((minutes / 60).toFixed(1)); // en heures
     }
 
     return {
       labels,
-      datasets: [
-        {
-          data,
-          color: () => '#ff6384',
-          strokeWidth: 2,
-        },
-      ],
+      datasets: [{ data: data.map(Number) }],
       total: totalMinutes,
     };
   };
@@ -85,8 +71,8 @@ const Logtimes = () => {
   const chartData = getChartData();
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Temps de log</Text>
+    <View style={styles.card}>
+      <Text style={styles.sectionTitle}>Temps de présence</Text>
       <View style={styles.header}>
         <TouchableOpacity
           onPress={() => setWeekStart((prev) => prev.subtract(7, 'day'))}
@@ -94,11 +80,14 @@ const Logtimes = () => {
           <Text style={styles.arrow}>◀</Text>
         </TouchableOpacity>
 
-        <Text style={styles.date}>
-          Semaine du {weekStart.format('DD/MM/YYYY')} • Total:{' '}
-          {Math.floor(chartData.total / 60)}h
-          {(chartData.total % 60).toString().padStart(2, '0')}
-        </Text>
+        <View style={{ alignItems: 'center' }}>
+          <Text style={styles.week}>
+            Semaine du {weekStart.format('DD/MM/YYYY')}
+          </Text>
+          <Text style={styles.total}>
+            Total des heures : {Math.floor(chartData.total / 60)}h
+          </Text>
+        </View>
 
         <TouchableOpacity
           onPress={() => setWeekStart((prev) => prev.add(7, 'day'))}
@@ -108,37 +97,32 @@ const Logtimes = () => {
       </View>
 
       {loading ? (
-        <ActivityIndicator size="large" color="#ff6384" />
+        <ActivityIndicator size="large" color="#3B82F6" />
       ) : (
-        <LineChart
+        <BarChart
           data={{
             labels: chartData.labels,
             datasets: chartData.datasets,
           }}
           width={screenWidth - 40}
           height={220}
+          fromZero
+          yAxisLabel=""
+          yAxisSuffix="h"
+          withInnerLines={false}
+          withHorizontalLabels
+          withVerticalLabels
           chartConfig={{
             backgroundGradientFrom: '#fff',
             backgroundGradientTo: '#fff',
-            color: () => '#ff6384',
-            labelColor: () => '#333',
-            decimalPlaces: 0,
-            propsForDots: {
-              r: '4',
-              strokeWidth: '2',
-              stroke: '#fff',
-            },
-            propsForBackgroundLines: {
-              stroke: '#ff638455', // Rose clair
-              strokeDasharray: '4', // Tirets courts
-              strokeWidth: 1,
-            },
+            decimalPlaces: 1,
+            color: () => '#3B82F6',
+            labelColor: () => '#111',
+            fillShadowGradient: '#3B82F6',
+            fillShadowGradientOpacity: 1,
+            barPercentage: 0.5,
           }}
-          bezier
-          style={{ borderRadius: 8, marginVertical: 8 }}
-          withVerticalLines={true}
-          withHorizontalLines={true}
-          withInnerLines={true}
+          style={{ borderRadius: 10 }}
         />
       )}
     </View>
@@ -148,31 +132,44 @@ const Logtimes = () => {
 export default Logtimes;
 
 const styles = StyleSheet.create({
-  container: {
-    margin: 20,
-    padding: 10,
-    borderRadius: 8,
+  card: {
     backgroundColor: '#fff',
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#d8005d',
-    marginBottom: 8,
+    marginHorizontal: 16,
+    marginTop: 20,
+    padding: 14,
+    borderRadius: 12,
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowOffset: { width: 0, height: 4 },
+    shadowRadius: 6,
+    elevation: 3,
   },
   header: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 12,
   },
   arrow: {
-    fontSize: 24,
-    paddingHorizontal: 10,
-    color: '#1188aa',
+    fontSize: 20,
+    color: '#3B82F6',
+    paddingHorizontal: 12,
   },
-  date: {
-    fontSize: 14,
-    fontWeight: '500',
+  week: {
+    fontWeight: 'bold',
+    fontSize: 16,
+    color: '#111',
+  },
+  total: {
+    fontSize: 13,
     color: '#333',
+    marginTop: 2,
+  },
+  sectionTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#0084FA',
+    textAlign: 'center',
+    marginBottom: 16,
   },
 });
