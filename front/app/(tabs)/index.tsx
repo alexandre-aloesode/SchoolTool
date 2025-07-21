@@ -13,7 +13,6 @@ export default function HomeScreen() {
     <View style={styles.container}>
       {user ? (
         <>
-          <Text style={styles.title}>Bienvenue !</Text>
           <LogtimeChart />
           <GoogleCalendarWidget />
         </>
