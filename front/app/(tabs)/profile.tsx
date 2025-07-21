@@ -1,10 +1,20 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  SafeAreaView,
+  ScrollView,
+  useWindowDimensions,
+} from 'react-native';
 import ProfileScreen from '@/components/profile/StudentProfile';
 import SkillScreen from '@/components/profile/StudentSkills';
+import Header from '@/components/global/Header';
 
 const ProfileMain = () => {
   const [activeTab, setActiveTab] = useState('profile');
+  const { height } = useWindowDimensions();
 
   const renderComponent = () => {
     switch (activeTab) {
@@ -18,7 +28,8 @@ const ProfileMain = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.safeArea}>
+      <Header />
       <View style={styles.tabContainer}>
         <TouchableOpacity
           style={[styles.tab, activeTab === 'profile' && styles.activeTab]}
@@ -33,26 +44,48 @@ const ProfileMain = () => {
           <Text style={styles.tabText}>Compétences</Text>
         </TouchableOpacity>
       </View>
-      {renderComponent()}
-    </View>
+
+      <ScrollView
+        contentContainerStyle={[styles.content, { minHeight: height }]}
+        bounces={false}
+      >
+        {renderComponent()}
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: 'white' },
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
   tabContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginBottom: 10,
+    paddingVertical: 12,
+    backgroundColor: '#fff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
   },
   tab: {
-    padding: 10,
-    marginHorizontal: 10,
+    paddingBottom: 10,
+    marginHorizontal: 16,
     borderBottomWidth: 2,
     borderBottomColor: 'transparent',
   },
-  activeTab: { borderBottomColor: 'red' },
-  tabText: { fontSize: 16, fontWeight: 'bold', color: 'black' },
+  activeTab: {
+    borderBottomColor: '#0084FA',
+  },
+  tabText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  content: {
+    flexGrow: 1,
+    padding: 20,
+  },
 });
 
 export default ProfileMain;
