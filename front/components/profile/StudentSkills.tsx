@@ -3,15 +3,11 @@ import {
   View,
   Text,
   StyleSheet,
-  Modal,
-  Pressable,
-  Platform,
+  FlatList,
+  TouchableOpacity,
 } from 'react-native';
-import { Svg } from 'react-native-svg';
 import { ApiActions } from '@/services/ApiServices';
-
-const { VictoryChart, VictoryPolarAxis, VictoryArea } =
-  Platform.OS === 'web' ? require('victory') : require('victory-native');
+import SkillCategoryModal from './modals/SkillCategoryModal';
 
 export default function SkillScreen() {
   const [selectedSkill, setSelectedSkill] = useState<any>(null);
@@ -33,23 +29,10 @@ export default function SkillScreen() {
               value: Number(item.earned),
               grade: item.grade,
               total: item.total,
+              class_id: item.class_id,
             }))
             .sort((a: { skill: string }, b: { skill: string }) =>
               a.skill.localeCompare(b.skill),
-            )
-            .map(
-              (
-                item: {
-                  class_name: string;
-                  earned: string;
-                  grade: string;
-                  total: string;
-                },
-                index: number,
-              ) => ({
-                ...item,
-                index,
-              }),
             );
 
           setSkillData(formatted);
@@ -62,126 +45,106 @@ export default function SkillScreen() {
     loadSkills();
   }, []);
 
+  const renderItem = ({ item }: { item: any }) => {
+    const percentage =
+      item.total && item.total > 0
+        ? Math.min((item.value / item.total) * 100, 100)
+        : 0;
+
+    return (
+      <TouchableOpacity
+        style={styles.skillRow}
+        onPress={() => setSelectedSkill(item)}
+      >
+        <Text style={styles.skillName}>{item.skill}</Text>
+        <View style={styles.barWrapper}>
+          <View
+            style={[
+              styles.bar,
+              { width: `${percentage}%` },
+            ]}
+          />
+          <Text style={styles.barValue}>{percentage.toFixed(1)}%</Text>
+        </View>
+      </TouchableOpacity>
+    );
+  };
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Compétences</Text>
+      <Text style={styles.sectionTitle}>Compétences acquises</Text>
 
-      {skillData.length > 0 && (
-        <Svg width={350} height={350}>
-          <VictoryChart
-            polar
-            standalone={false}
-            domain={{ y: [0, 120] }}
-            width={350}
-            height={350}
-          >
-            <VictoryPolarAxis
-              tickValues={skillData.map((s) => s.index)}
-              tickFormat={skillData.map((s) => s.skill)}
-              style={{
-                tickLabels: {
-                  fontSize: 10,
-                  fill: 'black',
-                },
-                axis: { stroke: '#e0e0e0' },
-                grid: { stroke: '#e0e0e0', strokeDasharray: '4,8' },
-              }}
-              events={[
-                {
-                  target: 'tickLabels',
-                  eventHandlers: {
-                    onPressIn: (_: any, props: { index: number }) => {
-                      const clicked = skillData.find(
-                        (s) => s.index === props.index,
-                      );
-                      setSelectedSkill(clicked);
-                      return [];
-                    },
-                  },
-                },
-              ]}
-            />
+      <FlatList
+        data={skillData}
+        keyExtractor={(item, index) => `${item.skill}-${index}`}
+        renderItem={renderItem}
+        contentContainerStyle={styles.list}
+      />
 
-            <VictoryArea
-              data={skillData}
-              x="index"
-              y="value"
-              style={{
-                data: {
-                  fill: 'rgba(255,0,100,0.3)',
-                  stroke: 'deeppink',
-                  strokeWidth: 2,
-                },
-              }}
-            />
-          </VictoryChart>
-        </Svg>
-      )}
-
-      <Modal visible={!!selectedSkill} transparent animationType="slide">
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContainer}>
-            <Text style={styles.modalTitle}>{selectedSkill?.skill}</Text>
-            <Text style={styles.modalText}>
-              Grade : {selectedSkill?.grade || 'N/A'}
-            </Text>
-            <Text style={styles.modalText}>
-              Score : {selectedSkill?.value} / {selectedSkill?.total}
-            </Text>
-            <Pressable
-              onPress={() => setSelectedSkill(null)}
-              style={styles.closeButton}
-            >
-              <Text style={styles.closeButtonText}>Fermer</Text>
-            </Pressable>
-          </View>
-        </View>
-      </Modal>
+      <SkillCategoryModal
+        visible={!!selectedSkill}
+        classId={selectedSkill?.class_id}
+        skillName={selectedSkill?.skill}
+        onClose={() => setSelectedSkill(null)}
+      />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    padding: 20,
-    alignItems: 'center',
-    backgroundColor: 'white',
     flex: 1,
+    backgroundColor: '#f7f7f7',
+    paddingTop: 16,
+    paddingHorizontal: 12,
+    width: '100%',
   },
-  title: {
-    fontSize: 22,
+  sectionTitle: {
+    fontSize: 20,
     fontWeight: 'bold',
-    color: '#e91e63',
-    marginBottom: 10,
+    color: '#0084FA',
+    marginBottom: 12,
+    textAlign: 'center',
   },
-  modalOverlay: {
-    flex: 1,
-    justifyContent: 'center',
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    padding: 20,
+  list: {
+    paddingBottom: 40,
+    width: '100%',
   },
-  modalContainer: {
-    backgroundColor: 'white',
-    borderRadius: 8,
-    padding: 20,
+  skillRow: {
+    width: '100%',
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
   },
-  modalTitle: {
-    fontSize: 18,
+  skillName: {
     fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  modalText: {
     fontSize: 16,
-    marginBottom: 10,
+    marginBottom: 6,
+    color: '#333',
   },
-  closeButton: {
-    backgroundColor: '#e91e63',
-    padding: 10,
+  barWrapper: {
+    backgroundColor: '#e0e0e0',
+    height: 24,
     borderRadius: 6,
-    alignItems: 'center',
+    overflow: 'hidden',
+    position: 'relative',
+    justifyContent: 'center',
   },
-  closeButtonText: {
-    color: 'white',
+  bar: {
+    backgroundColor: '#3B82F6',
+    height: '100%',
+  },
+  barValue: {
+    position: 'absolute',
+    alignSelf: 'center',
+    width: '100%',
+    textAlign: 'center',
+    color: '#fff',
     fontWeight: 'bold',
   },
 });

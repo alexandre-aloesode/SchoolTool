@@ -223,7 +223,8 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 22,
     fontWeight: 'bold',
-    color: '#e91e63',
+    color: '#0084FA',
+    textAlign: 'center',
     marginBottom: 16,
   },
   row: {

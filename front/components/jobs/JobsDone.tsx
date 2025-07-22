@@ -175,8 +175,9 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#e91e63',
+    color: '#0084FA',
     marginBottom: 12,
+    textAlign: 'center',
   },
   selectorsContainer: {
     flexDirection: screenWidth < 500 ? 'column' : 'row',
