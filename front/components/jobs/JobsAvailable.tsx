@@ -88,6 +88,10 @@ const JobsAvailable = () => {
         visible={!!selectedJob}
         job={selectedJob}
         onClose={() => setSelectedJob(null)}
+        onGroupCreated={() => {
+          setSelectedJob(null);
+          getJobsAvailable();
+        }}
       />
     </View>
   );

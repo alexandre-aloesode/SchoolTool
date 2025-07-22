@@ -106,6 +106,7 @@ export interface AvailableModalProps {
   visible: boolean;
   job: JobAvailable | null;
   onClose: () => void;
+  onGroupCreated?: () => void;
 }
 export interface ProgressModalProps {
   visible: boolean;
@@ -117,6 +118,7 @@ export interface GroupManagementModalProps {
   visible: boolean;
   jobId: number | string | null;
   onClose: () => void;
+  onGroupCreated?: () => void;
 }
 
 export interface ReviewModalProps {

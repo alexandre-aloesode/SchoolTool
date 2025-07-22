@@ -10,11 +10,13 @@ import {
 } from 'react-native';
 import { ApiActions } from '@/services/ApiServices';
 import { GroupManagementModalProps, JobGroups } from '@/types/jobsTypes';
+import Toast from 'react-native-toast-message';
 
 const GroupManagementModal: React.FC<GroupManagementModalProps> = ({
   visible,
   jobId,
   onClose,
+  onGroupCreated,
 }) => {
   const [groups, setGroups] = useState<JobGroups | null>(null);
   const [groupName, setGroupName] = useState('');
@@ -25,7 +27,7 @@ const GroupManagementModal: React.FC<GroupManagementModalProps> = ({
     }
   }, [visible, jobId]);
 
-  const fetchGroups = async () => {
+  const fetchGroups = async () => {    
     const res = await ApiActions.get({
       route: '/group/available',
       params: {
@@ -44,19 +46,49 @@ const GroupManagementModal: React.FC<GroupManagementModalProps> = ({
     if (res.status === 200) {
       setGroups(res.data || []);
     }
+    else {
+      Toast.show({
+        type: 'error',
+        text1: 'Erreur',
+        text2: 'Impossible de récupérer les groupes disponibles.',
+      });
+    }
   };
 
   const createGroup = async () => {
-    if (groupName.length < 5) return;
-    await ApiActions.post({
+    if (groupName.length < 5) {
+      Toast.show({
+        type: 'error',
+        text1: 'Erreur',
+        text2: 'Le nom du groupe doit contenir au moins 5 caractères.',
+      });
+      return;
+    }
+    const group = await ApiActions.post({
       route: '/group',
       params: {
         job_id: jobId,
         group_name: groupName,
       },
     });
-    setGroupName('');
-    fetchGroups();
+
+    if (group?.status == 200) {
+      Toast.show({
+        type: 'success',
+        text1: 'Succès',
+        text2: 'Groupe créé avec succès.',
+      });
+      setGroupName('');
+      onClose();
+      onGroupCreated?.();
+    }
+    else {
+      Toast.show({
+        type: 'error',
+        text1: 'Erreur',
+        text2: 'Impossible de créer le groupe.',
+      });
+    }
   };
 
   const askToJoinGroup = async (groupId: number | string) => {
