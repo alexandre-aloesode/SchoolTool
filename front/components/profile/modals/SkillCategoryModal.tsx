@@ -18,9 +18,17 @@ interface Props {
   onClose: () => void;
 }
 
-export default function SkillCategoryModal({ visible, classId, skillName, onClose }: Props) {
+export default function SkillCategoryModal({
+  visible,
+  classId,
+  skillName,
+  onClose,
+}: Props) {
   const [skills, setSkills] = useState<any[]>([]);
-  const [selectedSkill, setSelectedSkill] = useState<{ id: number; name: string } | null>(null);
+  const [selectedSkill, setSelectedSkill] = useState<{
+    id: number;
+    name: string;
+  } | null>(null);
 
   useEffect(() => {
     if (!classId) return;
@@ -48,7 +56,9 @@ export default function SkillCategoryModal({ visible, classId, skillName, onClos
   const renderItem = ({ item }: { item: any }) => (
     <TouchableOpacity
       style={styles.row}
-      onPress={() => setSelectedSkill({ id: item.skill_id, name: item.skill_name })}
+      onPress={() =>
+        setSelectedSkill({ id: item.skill_id, name: item.skill_name })
+      }
     >
       <Text style={[styles.cell, styles.name]}>{item.skill_name}</Text>
       <Text style={styles.cell}>{item.grade}</Text>

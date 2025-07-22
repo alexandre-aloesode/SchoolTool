@@ -16,7 +16,12 @@ interface Props {
   onClose: () => void;
 }
 
-export default function SkillJobModal({ visible, skillId, skillName, onClose }: Props) {
+export default function SkillJobModal({
+  visible,
+  skillId,
+  skillName,
+  onClose,
+}: Props) {
   const [jobs, setJobs] = useState<any[]>([]);
 
   useEffect(() => {
@@ -56,7 +61,9 @@ export default function SkillJobModal({ visible, skillId, skillName, onClose }: 
     <Modal visible={visible} animationType="slide" transparent>
       <View style={styles.overlay}>
         <View style={styles.modal}>
-          <Text style={styles.title}>Détail de la compétence [{skillName}]</Text>
+          <Text style={styles.title}>
+            Détail de la compétence [{skillName}]
+          </Text>
 
           <View style={styles.headerRow}>
             <Text style={[styles.header, styles.bold]}>Projet</Text>
