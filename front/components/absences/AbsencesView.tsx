@@ -114,8 +114,9 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   sectionTitle: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
+    color: '#0084FA',
     marginBottom: 12,
     textAlign: 'center',
   },

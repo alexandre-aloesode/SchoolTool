@@ -80,7 +80,7 @@ const styles = StyleSheet.create({
     borderBottomColor: 'transparent',
   },
   activeTab: {
-    borderBottomColor: '#e91e63',
+    borderBottomColor: '#0084FA',
   },
   tabText: {
     fontSize: 16,
