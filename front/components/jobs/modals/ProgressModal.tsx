@@ -27,9 +27,10 @@ const ProgressModal: React.FC<ProgressModalProps> = ({
 }) => {
   const [loading, setLoading] = useState(false);
   const [skills, setSkills] = useState<JobSkills | null>(null);
-  const [members, setMembers] = useState<JobGroupMembers | null>(null);
+  const [group, setGroup] = useState<JobGroupMembers | null>(null);
   const [jobData, setJobData] = useState<JobInProgress | null>(null);
   const [showReview, setShowReview] = useState(false);
+  const [showWaitingList, setShowWaitingList] = useState(false);
 
   useEffect(() => {
     if (visible && job) {
@@ -84,7 +85,7 @@ const ProgressModal: React.FC<ProgressModalProps> = ({
 
           setJobData(regReq?.data?.[0] || job);
           setSkills(skillsReq?.data || []);
-          setMembers(membersReq?.data[0]?.member || []);
+          setGroup(membersReq?.data[0] || []);
         } catch (err) {
           console.error('Erreur lors du chargement des détails du job', err);
         } finally {
@@ -163,8 +164,8 @@ const ProgressModal: React.FC<ProgressModalProps> = ({
                 ))}
 
               <Text style={styles.label}>Membres :</Text>
-              {Array.isArray(members) &&
-                members.map((m, i) => (
+              {Array.isArray(group?.member) &&
+                group?.member.map((m, i) => (
                   <Text key={i}>
                     • {m.student_firstname} {m.student_lastname}
                   </Text>
@@ -190,7 +191,18 @@ const ProgressModal: React.FC<ProgressModalProps> = ({
                   <Text style={styles.buttonText}>Rendre le projet</Text>
                 </Pressable>
               </View>
-
+              {jobData &&
+                group &&
+                jobData.job_max_students &&
+                group?.member?.length < Number(jobData.job_max_students) &&
+                !jobData.click_date && (
+                  <Pressable
+                    style={[styles.button, styles.waitingListBtn]}
+                    onPress={() => setShowWaitingList(true)}
+                  >
+                    <Text style={styles.buttonText}>Demandes en attente</Text>
+                  </Pressable>
+                )}
               <Pressable style={styles.closeBtn} onPress={onClose}>
                 <Text style={styles.closeText}>Fermer</Text>
               </Pressable>
@@ -267,6 +279,10 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#fff',
     fontWeight: 'bold',
+  },
+  waitingListBtn: {
+    backgroundColor: '#ffa000',
+    marginTop: 10,
   },
 });
 
