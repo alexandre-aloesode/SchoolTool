@@ -58,12 +58,7 @@ export default function SkillScreen() {
       >
         <Text style={styles.skillName}>{item.skill}</Text>
         <View style={styles.barWrapper}>
-          <View
-            style={[
-              styles.bar,
-              { width: `${percentage}%` },
-            ]}
-          />
+          <View style={[styles.bar, { width: `${percentage}%` }]} />
           <Text style={styles.barValue}>{percentage.toFixed(1)}%</Text>
         </View>
       </TouchableOpacity>
