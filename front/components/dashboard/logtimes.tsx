@@ -105,7 +105,7 @@ const Logtimes = () => {
             labels: chartData.labels,
             datasets: chartData.datasets,
           }}
-          width={screenWidth * 0.9 - chartPadding}
+          width={Dimensions.get('window').width * 0.84}
           height={220}
           fromZero
           yAxisLabel=""
@@ -147,6 +147,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
+    alignSelf: 'stretch',
   },
   header: {
     flexDirection: 'row',

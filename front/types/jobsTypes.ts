@@ -117,6 +117,7 @@ export interface ProgressModalProps {
   job: JobInProgress | null;
   onClose: () => void;
   onReport: () => void;
+  onStudentAccepted?: () => void;
 }
 export interface GroupManagementModalProps {
   visible: boolean;
