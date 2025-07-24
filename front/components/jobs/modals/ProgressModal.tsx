@@ -169,7 +169,8 @@ const ProgressModal: React.FC<ProgressModalProps> = ({
                 {Array.isArray(skills) &&
                   skills.map((skill, i) => (
                     <Text key={i}>
-                      • {skill.skill_name} ({skill.skill_needed} → {skill.skill_earned})
+                      • {skill.skill_name} ({skill.skill_needed} →{' '}
+                      {skill.skill_earned})
                     </Text>
                   ))}
 

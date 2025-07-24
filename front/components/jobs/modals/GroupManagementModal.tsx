@@ -27,7 +27,7 @@ const GroupManagementModal: React.FC<GroupManagementModalProps> = ({
     }
   }, [visible, jobId]);
 
-  const fetchGroups = async () => {    
+  const fetchGroups = async () => {
     const res = await ApiActions.get({
       route: '/group/available',
       params: {
@@ -45,8 +45,7 @@ const GroupManagementModal: React.FC<GroupManagementModalProps> = ({
 
     if (res.status === 200) {
       setGroups(res.data || []);
-    }
-    else {
+    } else {
       Toast.show({
         type: 'error',
         text1: 'Erreur',
@@ -81,8 +80,7 @@ const GroupManagementModal: React.FC<GroupManagementModalProps> = ({
       setGroupName('');
       onClose();
       onGroupCreated?.();
-    }
-    else {
+    } else {
       Toast.show({
         type: 'error',
         text1: 'Erreur',
