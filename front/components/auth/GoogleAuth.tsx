@@ -63,17 +63,6 @@ export default function LoginWithGoogle() {
     { authorizationEndpoint: 'https://accounts.google.com/o/oauth2/v2/auth' },
   );
 
-  useEffect(() => {
-    const checkUserSession = async () => {
-      const storedUser = await Session.getUserData();
-      if (storedUser) {
-        setUser(storedUser);
-      }
-      setLoading(false);
-    };
-    checkUserSession();
-  }, []);
-
   const exchangeCodeForToken = async (code: string) => {
     try {
       const response = await fetch('https://oauth2.googleapis.com/token', {
@@ -158,6 +147,17 @@ export default function LoginWithGoogle() {
     }
   }, [response]);
 
+  useEffect(() => {
+    const checkUserSession = async () => {
+      const storedUser = await Session.getUserData();
+      if (storedUser) {
+        setUser(storedUser);
+      }
+      setLoading(false);
+    };
+    checkUserSession();
+  }, []);
+
   if (loading) {
     return <Text>Chargement...</Text>;
   }
@@ -168,7 +168,7 @@ export default function LoginWithGoogle() {
         <Text style={styles.title}>Bienvenue, {user.email} !</Text>
       ) : (
         <>
-          <Text style={styles.title}>Bienvenue sur l'application</Text>
+          <Text style={styles.title}>Bienvenue sur SchoolTool</Text>
           <Button
             disabled={!request}
             title="Se connecter avec Google"
