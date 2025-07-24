@@ -14,6 +14,7 @@ const AvailableModal: React.FC<AvailableModalProps> = ({
   visible,
   job,
   onClose,
+  onGroupCreated,
 }) => {
   const [groupVisible, setGroupVisible] = useState(false);
 
@@ -57,6 +58,7 @@ const AvailableModal: React.FC<AvailableModalProps> = ({
           visible={groupVisible}
           jobId={job?.job_id ?? null}
           onClose={() => setGroupVisible(false)}
+          onGroupCreated={onGroupCreated}
         />
       </View>
     </Modal>

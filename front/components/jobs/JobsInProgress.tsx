@@ -6,31 +6,40 @@ import ProgressModal from './modals/ProgressModal';
 import type { JobInProgress } from '@/types/jobsTypes';
 
 const JobsInProgress = () => {
-  const [jobsInProgress, setJobsInProgress] = useState<JobInProgress[]>([]);
   const [selectedJob, setSelectedJob] = useState<JobInProgress | null>(null);
+  const [jobs, setJobs] = useState<JobInProgress[]>([]);
 
-  const getJobsInProgress = async () => {
-    const jobsRequest = await ApiActions.get({
-      route: 'job/progress',
+const getJobsInProgress = async () => {
+  const allJobs: JobInProgress[] = [];
+
+  const endpoints = [
+    { route: '/job/await', label: 'await' },
+    { route: '/job/progress', label: 'progress' },
+    { route: '/job/ready', label: 'ready' },
+  ];
+
+  for (const { route } of endpoints) {
+    const res = await ApiActions.get({
+      route,
       params: {
-        job_id: '',
         job_name: '',
+        job_id: '',
+        group_id: '',
+        registration_id: '',
         start_date: '',
         end_date: '',
-        registration_id: '',
-        group_id: '',
-        job_is_done: '',
+        order: route === '/job/ready' ? 'click_date' : 'end_date',
+        desc: '',
       },
     });
-    if (!jobsRequest) {
-      console.error("Erreur: aucune réponse de l'API");
-      return;
-    }
 
-    if (jobsRequest.status === 200) {
-      setJobsInProgress(jobsRequest.data || []);
+    if (res?.status === 200 && Array.isArray(res.data)) {
+      allJobs.push(...res.data);
     }
-  };
+  }
+
+  setJobs(allJobs);
+};
 
   useEffect(() => {
     getJobsInProgress();
@@ -92,7 +101,7 @@ const JobsInProgress = () => {
       <Text style={styles.sectionTitle}>Projets en cours</Text>
       {renderHeader()}
       <FlatList
-        data={jobsInProgress}
+        data={jobs}
         renderItem={renderJob}
         keyExtractor={(item, index) =>
           item?.job_id?.toString?.() || `job-${index}`

@@ -37,6 +37,8 @@ export interface JobInProgress {
   job_unit_id?: number | string;
   job_description?: string;
   job_duration?: number;
+  job_max_students?: number;
+  click_date?: string;
 }
 
 export interface JobUnit {
@@ -58,6 +60,8 @@ export interface JobGroupMembers {
     email: string;
     is_lead: boolean;
     registration_id: number | string;
+    student_firstname?: string;
+    student_lastname?: string;
   }[];
 }
 
@@ -106,17 +110,20 @@ export interface AvailableModalProps {
   visible: boolean;
   job: JobAvailable | null;
   onClose: () => void;
+  onGroupCreated?: () => void;
 }
 export interface ProgressModalProps {
   visible: boolean;
   job: JobInProgress | null;
   onClose: () => void;
   onReport: () => void;
+  onStudentAccepted?: () => void;
 }
 export interface GroupManagementModalProps {
   visible: boolean;
   jobId: number | string | null;
   onClose: () => void;
+  onGroupCreated?: () => void;
 }
 
 export interface ReviewModalProps {
