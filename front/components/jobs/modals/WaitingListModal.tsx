@@ -63,7 +63,7 @@ const WaitingListModal: React.FC<WaitingListModalProps> = ({
         text1: 'Étudiant accepté',
         text2: 'L’étudiant a été ajouté au groupe.',
       });
-    //   onStudentAccepted?.();
+      //   onStudentAccepted?.();
     } else {
       Toast.show({
         type: 'error',

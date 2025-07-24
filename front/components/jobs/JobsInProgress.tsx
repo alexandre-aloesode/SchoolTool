@@ -9,37 +9,37 @@ const JobsInProgress = () => {
   const [selectedJob, setSelectedJob] = useState<JobInProgress | null>(null);
   const [jobs, setJobs] = useState<JobInProgress[]>([]);
 
-const getJobsInProgress = async () => {
-  const allJobs: JobInProgress[] = [];
+  const getJobsInProgress = async () => {
+    const allJobs: JobInProgress[] = [];
 
-  const endpoints = [
-    { route: '/job/await', label: 'await' },
-    { route: '/job/progress', label: 'progress' },
-    { route: '/job/ready', label: 'ready' },
-  ];
+    const endpoints = [
+      { route: '/job/await', label: 'await' },
+      { route: '/job/progress', label: 'progress' },
+      { route: '/job/ready', label: 'ready' },
+    ];
 
-  for (const { route } of endpoints) {
-    const res = await ApiActions.get({
-      route,
-      params: {
-        job_name: '',
-        job_id: '',
-        group_id: '',
-        registration_id: '',
-        start_date: '',
-        end_date: '',
-        order: route === '/job/ready' ? 'click_date' : 'end_date',
-        desc: '',
-      },
-    });
+    for (const { route } of endpoints) {
+      const res = await ApiActions.get({
+        route,
+        params: {
+          job_name: '',
+          job_id: '',
+          group_id: '',
+          registration_id: '',
+          start_date: '',
+          end_date: '',
+          order: route === '/job/ready' ? 'click_date' : 'end_date',
+          desc: '',
+        },
+      });
 
-    if (res?.status === 200 && Array.isArray(res.data)) {
-      allJobs.push(...res.data);
+      if (res?.status === 200 && Array.isArray(res.data)) {
+        allJobs.push(...res.data);
+      }
     }
-  }
 
-  setJobs(allJobs);
-};
+    setJobs(allJobs);
+  };
 
   useEffect(() => {
     getJobsInProgress();
