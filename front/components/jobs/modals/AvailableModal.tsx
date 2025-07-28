@@ -83,10 +83,12 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 10,
+    color: '#e91e63',
   },
   label: {
     marginTop: 10,
     fontWeight: '600',
+    color: '#0084FA',
   },
   closeBtn: {
     marginTop: 20,

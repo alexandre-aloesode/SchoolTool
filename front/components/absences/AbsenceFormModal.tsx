@@ -335,6 +335,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginBottom: 16,
     textAlign: 'center',
+    color: '#0084FA',
   },
   label: {
     fontWeight: 'bold',

@@ -5,7 +5,7 @@ import {
   StyleSheet,
   ActivityIndicator,
   FlatList,
-  Button,
+  Pressable,
 } from 'react-native';
 import { format } from 'date-fns';
 import { ApiActions } from '@/services/ApiServices';
@@ -14,9 +14,7 @@ import type { UploadedAbsence } from '@/types/absencesTypes';
 
 const UploadAbsences: React.FC = () => {
   const [loading, setLoading] = useState(false);
-  const [uploadedAbsences, setUploadedAbsences] = useState<UploadedAbsence[]>(
-    [],
-  );
+  const [uploadedAbsences, setUploadedAbsences] = useState<UploadedAbsence[]>([]);
   const [formVisible, setFormVisible] = useState(false);
 
   useEffect(() => {
@@ -51,47 +49,48 @@ const UploadAbsences: React.FC = () => {
   };
 
   const renderAbsenceItem = ({ item }: { item: UploadedAbsence }) => (
-    <View style={styles.absenceCard}>
-      <Text style={styles.absenceText}>
-        📅 Du {format(new Date(item.absence_start_date), 'dd/MM/yyyy')} au{' '}
+    <View style={styles.row}>
+      <Text style={[styles.cell, styles.cellText]}>
+        {format(new Date(item.absence_start_date), 'dd/MM/yyyy')} -{' '}
         {format(new Date(item.absence_end_date), 'dd/MM/yyyy')}
       </Text>
-      <Text style={styles.absenceText}>🕒 {item.absence_duration} jour(s)</Text>
-      <Text style={styles.absenceText}>
-        ✅ Statut :{' '}
+      <Text style={[styles.cell, styles.cellText]}>{item.absence_duration} jour{item.absence_duration > 1 ? 's' : ''}</Text>
+      <Text style={[styles.cell, styles.cellText]}>
         {item.absence_status === 1
           ? 'Validée'
           : item.absence_status === 2
             ? 'Refusée'
             : 'En attente'}
       </Text>
-      {!!item.absence_comment && (
-        <Text style={styles.absenceText}>💬 {item.absence_comment}</Text>
-      )}
     </View>
   );
 
   return (
     <View style={styles.wrapper}>
-      <View style={styles.buttonContainer}>
-        <Button title="Nouvelle absence" onPress={() => setFormVisible(true)} />
-      </View>
 
-      <Text style={styles.sectionTitle}>Absences précédentes</Text>
+      <Pressable style={styles.addButton} onPress={() => setFormVisible(true)}>
+        <Text style={styles.addButtonText}>+ Nouvelle absence</Text>
+      </Pressable>
+      
+      <Text style={styles.title}>Absences précédentes</Text>
 
       {loading ? (
-        <ActivityIndicator
-          size="large"
-          color="#1e88e5"
-          style={{ marginTop: 20 }}
-        />
+        <ActivityIndicator size="large" color="#0084FA" style={{ marginTop: 20 }} />
       ) : (
-        <FlatList
-          data={uploadedAbsences}
-          keyExtractor={(item, index) => `${item.absence_start_date}-${index}`}
-          renderItem={renderAbsenceItem}
-          contentContainerStyle={styles.listContainer}
-        />
+        <View style={styles.tableContainer}>
+          <View style={styles.headerRow}>
+            <Text style={[styles.headerText, styles.cell]}>Période</Text>
+            <Text style={[styles.headerText, styles.cell]}>Durée</Text>
+            <Text style={[styles.headerText, styles.cell]}>Statut</Text>
+          </View>
+
+          <FlatList
+            data={uploadedAbsences}
+            keyExtractor={(item, index) => `${item.absence_start_date}-${index}`}
+            renderItem={renderAbsenceItem}
+            contentContainerStyle={{ paddingBottom: 20 }}
+          />
+        </View>
       )}
 
       <AbsenceFormModal
@@ -107,35 +106,56 @@ const styles = StyleSheet.create({
   wrapper: {
     flex: 1,
     padding: 16,
-    backgroundColor: '#f9f9f9',
+    backgroundColor: '#fff',
   },
-  buttonContainer: {
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  sectionTitle: {
-    fontSize: 18,
+  title: {
+    fontSize: 22,
     fontWeight: 'bold',
     color: '#0084FA',
-    marginBottom: 12,
     textAlign: 'center',
-  },
-  listContainer: {
-    paddingBottom: 40,
-  },
-  absenceCard: {
-    backgroundColor: '#fff',
-    padding: 12,
-    borderRadius: 8,
     marginBottom: 12,
-    elevation: 1,
-    width: '100%',
-    maxWidth: 500,
-    alignSelf: 'center',
   },
-  absenceText: {
-    fontSize: 13,
-    marginBottom: 4,
+  addButton: {
+    alignSelf: 'center',
+    marginBottom: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    backgroundColor: '#0084FA',
+    borderRadius: 6,
+  },
+  addButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 15,
+  },
+  tableContainer: {
+    borderTopWidth: 1,
+    borderColor: '#ddd',
+  },
+  headerRow: {
+    flexDirection: 'row',
+    borderBottomWidth: 1,
+    borderColor: '#ddd',
+    paddingVertical: 8,
+    backgroundColor: '#f2f2f2',
+  },
+  headerText: {
+    fontWeight: 'bold',
+    fontSize: 14,
+    color: '#333',
+    textAlign: 'left',
+  },
+  row: {
+    flexDirection: 'row',
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderColor: '#f0f0f0',
+  },
+  cell: {
+    flex: 1,
+  },
+  cellText: {
+    fontSize: 14,
     color: '#333',
   },
 });
