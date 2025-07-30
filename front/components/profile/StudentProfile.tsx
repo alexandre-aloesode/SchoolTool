@@ -1,20 +1,20 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
+  ScrollView,
   Pressable,
   Linking,
-  ScrollView,
   Alert,
   Modal,
   TextInput,
 } from 'react-native';
-import { Icon, Button } from 'react-native-paper';
 import { ApiActions } from '@/services/ApiServices';
 import { useAuth } from '@/hooks/useAuth';
 import Toast from 'react-native-toast-message';
-import { StudentInfo, StudentLinks } from '@/types/profileTypes';
+import { Icon } from 'react-native-paper';
+import type { StudentInfo, StudentLinks } from '@/types/profileTypes';
 
 export default function ProfileScreen() {
   const [student, setStudent] = useState<StudentInfo | null>(null);
@@ -80,75 +80,51 @@ export default function ProfileScreen() {
     if (url) Linking.openURL(url);
   };
 
-  const handleLogout = () => {
-    logout();
-  };
-
   const handleSaveLinks = async () => {
-    // if (!links || !links.github || !links.plesk || !links.linkedin || !links.cv || !links.personal_website) {
-    //   Toast.show({
-    //     type: 'error',
-    //     text1: 'Erreur',
-    //     text2: 'Veuillez remplir tous les champs avant de sauvegarder.',
-    //   });
-    //   return;
-    // }
     try {
-      await ApiActions.put({
-        route: 'student',
-        params: {
-          github: links?.github,
-          plesk: links?.plesk,
-          linkedin: links?.linkedin,
-          cv: links?.cv,
-          personal_website: links?.personal_website,
-        },
-      });
-      setEditing(false);
+      if (links) {
+        await ApiActions.put({ route: 'student', params: links });
+      } else {
+        throw new Error('Links cannot be null');
+      }
       Toast.show({
         type: 'success',
-        text1: 'Liens mis à jour',
-        text2: 'Vos liens ont été mis à jour avec succès.',
+        text1: 'Succès',
+        text2: 'Liens mis à jour',
       });
+      setEditing(false);
       loadProfile();
-    } catch (err) {
-      Alert.alert('Erreur', 'Échec de la mise à jour des liens');
+    } catch {
+      Alert.alert('Erreur', 'Impossible de mettre à jour les liens');
     }
   };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Profil</Text>
+      <Text style={styles.title}>Mon profil</Text>
+
       {student && (
-        <>
-          <View style={styles.row}>
-            <Icon source="account" size={24} color="#0084FA" />
-            <Text style={styles.label}>
-              {student.student_firstname} {student.student_lastname}
-            </Text>
-          </View>
-          <View style={styles.row}>
-            <Icon source="calendar" size={24} color="#0084FA" />
-            <Text style={styles.label}>{student.current_unit_name}</Text>
-          </View>
-          <View style={styles.row}>
-            <Icon source="school" size={24} color="#0084FA" />
-            <Text style={styles.label}>{student.section_name}</Text>
-          </View>
-          <View style={styles.row}>
-            <Icon source="progress-clock" size={24} color="#0084FA" />
-            <Text style={styles.label}>
-              {jobsInProgress} projet(s) en cours
-            </Text>
-          </View>
-          <View style={styles.row}>
-            <Icon source="check-circle-outline" size={24} color="#0084FA" />
-            <Text style={styles.label}>{jobsDone} projet(s) fini(s)</Text>
+        <View style={styles.card}>
+          <Text style={styles.name}>
+            {student.student_firstname} {student.student_lastname}
+          </Text>
+          <Text style={styles.label}>{student.section_name}</Text>
+          <Text style={styles.label}>{student.current_unit_name}</Text>
+
+          <View style={styles.statsRow}>
+            <View style={styles.statBox}>
+              <Text style={styles.statNumber}>{jobsInProgress}</Text>
+              <Text style={styles.statLabel}>En cours</Text>
+            </View>
+            <View style={styles.statBox}>
+              <Text style={styles.statNumber}>{jobsDone}</Text>
+              <Text style={styles.statLabel}>Terminés</Text>
+            </View>
           </View>
 
           <View style={styles.linksContainer}>
             {[
-              { label: 'Github', key: 'github', icon: 'github' },
+              { label: 'GitHub', key: 'github', icon: 'github' },
               { label: 'Plesk', key: 'plesk', icon: 'web' },
               {
                 label: 'Portfolio',
@@ -160,24 +136,26 @@ export default function ProfileScreen() {
             ].map(({ label, key, icon }) => (
               <Pressable
                 key={key}
-                style={styles.link}
+                style={styles.linkRow}
                 onPress={() => openLink((student as any)[`student_${key}`])}
               >
-                <Icon source={icon} size={24} />
+                <Icon source={icon} size={22} color="#0084FA" />
                 <Text style={styles.linkLabel}>{label}</Text>
               </Pressable>
             ))}
           </View>
 
-          <Pressable style={styles.editButton} onPress={() => setEditing(true)}>
-            <Text style={styles.logoutText}>Modifier mes liens</Text>
+          <Pressable
+            style={styles.primaryButton}
+            onPress={() => setEditing(true)}
+          >
+            <Text style={styles.primaryText}>Modifier mes liens</Text>
           </Pressable>
-        </>
+          <Pressable style={styles.logoutButton} onPress={logout}>
+            <Text style={styles.logoutText}>Se déconnecter</Text>
+          </Pressable>
+        </View>
       )}
-
-      <Pressable style={styles.logoutButton} onPress={handleLogout}>
-        <Text style={styles.logoutText}>Se déconnecter</Text>
-      </Pressable>
 
       <Modal visible={editing} transparent animationType="slide">
         <View style={styles.modalOverlay}>
@@ -204,10 +182,16 @@ export default function ProfileScreen() {
                   style={styles.input}
                 />
               ))}
-            <Button mode="contained" onPress={handleSaveLinks}>
-              Sauvegarder
-            </Button>
-            <Button onPress={() => setEditing(false)}>Annuler</Button>
+            <Pressable style={styles.primaryButton} onPress={handleSaveLinks}>
+              <Text style={styles.primaryText}>Sauvegarder</Text>
+            </Pressable>
+            <Pressable onPress={() => setEditing(false)}>
+              <Text
+                style={{ textAlign: 'center', color: '#444', marginTop: 12 }}
+              >
+                Annuler
+              </Text>
+            </Pressable>
           </View>
         </View>
       </Modal>
@@ -218,77 +202,113 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     padding: 20,
-    backgroundColor: 'white',
+    backgroundColor: '#f7f7f7',
+    alignItems: 'center',
   },
   title: {
     fontSize: 22,
     fontWeight: 'bold',
     color: '#0084FA',
-    textAlign: 'center',
     marginBottom: 16,
   },
-  row: {
-    flexDirection: 'row',
+  card: {
+    backgroundColor: '#fff',
+    width: '100%',
+    maxWidth: 500,
+    padding: 20,
+    borderRadius: 12,
+    elevation: 1,
     alignItems: 'center',
-    marginBottom: 12,
+  },
+  name: {
+    fontSize: 18,
+    fontWeight: '600',
+    marginBottom: 4,
+    color: '#222',
   },
   label: {
-    marginLeft: 10,
-    fontSize: 16,
+    color: '#666',
+    fontSize: 14,
   },
-  linksContainer: {
-    marginTop: 24,
-  },
-  link: {
+  statsRow: {
     flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 12,
+    marginVertical: 20,
+    justifyContent: 'space-around',
+    width: '100%',
   },
-  linkLabel: {
-    marginLeft: 8,
-    fontSize: 16,
+  statBox: {
+    alignItems: 'center',
+  },
+  statNumber: {
+    fontSize: 18,
+    fontWeight: 'bold',
     color: '#0084FA',
   },
+  statLabel: {
+    fontSize: 13,
+    color: '#555',
+  },
+  linksContainer: {
+    width: '100%',
+    marginBottom: 20,
+  },
+  linkRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 8,
+  },
+  linkLabel: {
+    marginLeft: 10,
+    color: '#0084FA',
+    fontSize: 15,
+  },
+  primaryButton: {
+    backgroundColor: '#0084FA',
+    padding: 10,
+    borderRadius: 8,
+    width: '100%',
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  primaryText: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
   logoutButton: {
-    marginTop: 32,
-    backgroundColor: '#e91e63',
+    marginTop: 30,
     padding: 12,
     borderRadius: 8,
+    backgroundColor: '#e91e63',
+    width: '100%',
+    maxWidth: 500,
     alignItems: 'center',
   },
   logoutText: {
-    color: 'white',
+    color: '#fff',
     fontWeight: 'bold',
-    fontSize: 16,
-  },
-  editButton: {
-    marginTop: 16,
-    backgroundColor: '#0084FA',
-    padding: 12,
-    borderRadius: 8,
-    alignItems: 'center',
   },
   modalOverlay: {
     flex: 1,
     justifyContent: 'center',
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: 'rgba(0,0,0,0.4)',
     padding: 20,
   },
   modalContainer: {
-    backgroundColor: 'white',
-    borderRadius: 8,
+    backgroundColor: '#fff',
+    borderRadius: 10,
     padding: 20,
   },
   modalTitle: {
     fontSize: 18,
-    marginBottom: 12,
     fontWeight: 'bold',
+    color: '#0084FA',
+    marginBottom: 12,
   },
   input: {
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 6,
-    padding: 8,
+    padding: 10,
     marginBottom: 12,
   },
 });

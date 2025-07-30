@@ -167,11 +167,11 @@ const styles = StyleSheet.create({
   progress: {
     height: 10,
     borderRadius: 4,
-    backgroundColor: '#e0e0e0',
+    backgroundColor: '#0084FA',
   },
   lateLabel: {
     fontSize: 12,
-    color: '#007bff',
+    color: '#0084FA',
     position: 'absolute',
     top: -16,
     right: 0,
