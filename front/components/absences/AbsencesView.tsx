@@ -14,7 +14,9 @@ import type { UploadedAbsence } from '@/types/absencesTypes';
 
 const UploadAbsences: React.FC = () => {
   const [loading, setLoading] = useState(false);
-  const [uploadedAbsences, setUploadedAbsences] = useState<UploadedAbsence[]>([]);
+  const [uploadedAbsences, setUploadedAbsences] = useState<UploadedAbsence[]>(
+    [],
+  );
   const [formVisible, setFormVisible] = useState(false);
 
   useEffect(() => {
@@ -54,7 +56,9 @@ const UploadAbsences: React.FC = () => {
         {format(new Date(item.absence_start_date), 'dd/MM/yyyy')} -{' '}
         {format(new Date(item.absence_end_date), 'dd/MM/yyyy')}
       </Text>
-      <Text style={[styles.cell, styles.cellText]}>{item.absence_duration} jour{item.absence_duration > 1 ? 's' : ''}</Text>
+      <Text style={[styles.cell, styles.cellText]}>
+        {item.absence_duration} jour{item.absence_duration > 1 ? 's' : ''}
+      </Text>
       <Text style={[styles.cell, styles.cellText]}>
         {item.absence_status === 1
           ? 'Validée'
@@ -67,15 +71,18 @@ const UploadAbsences: React.FC = () => {
 
   return (
     <View style={styles.wrapper}>
-
       <Pressable style={styles.addButton} onPress={() => setFormVisible(true)}>
         <Text style={styles.addButtonText}>+ Nouvelle absence</Text>
       </Pressable>
-      
+
       <Text style={styles.title}>Absences précédentes</Text>
 
       {loading ? (
-        <ActivityIndicator size="large" color="#0084FA" style={{ marginTop: 20 }} />
+        <ActivityIndicator
+          size="large"
+          color="#0084FA"
+          style={{ marginTop: 20 }}
+        />
       ) : (
         <View style={styles.tableContainer}>
           <View style={styles.headerRow}>
@@ -86,7 +93,9 @@ const UploadAbsences: React.FC = () => {
 
           <FlatList
             data={uploadedAbsences}
-            keyExtractor={(item, index) => `${item.absence_start_date}-${index}`}
+            keyExtractor={(item, index) =>
+              `${item.absence_start_date}-${index}`
+            }
             renderItem={renderAbsenceItem}
             contentContainerStyle={{ paddingBottom: 20 }}
           />

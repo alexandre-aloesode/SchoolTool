@@ -59,13 +59,13 @@ describe('JobsAvailable', () => {
 
   it('ouvre la modale en cliquant sur un job', async () => {
     const { getByText, queryByText } = render(<JobsAvailable />);
-  
+
     await waitFor(() => {
       expect(getByText('Développeur Frontend')).toBeTruthy();
     });
-  
+
     fireEvent.press(getByText('Développeur Frontend'));
-  
+
     await waitFor(() => {
       expect(queryByText(/Groupe/i)).toBeTruthy();
     });
